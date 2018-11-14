@@ -264,7 +264,7 @@ function entities.update(playerSpeed,dt,trackLength)
 		result = list[i]:scroll(playerSpeed,dt)
 		
 		if (result.blip) then
-			table.insert(newBlips,blip)
+			table.insert(newBlips,result.blip)
 		end
 		
 		if (result.lap) then

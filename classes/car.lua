@@ -194,11 +194,12 @@ function Car:updateOffRoad(dt)
 	return offRoad
 end
 
-function Car:getAcceleration()
-	if (self.speed < self.topSpeed*0.96) then
-		return (self.topSpeed-self.speed)/6
+-- Note: static function that is also used by blips
+function Car.getAcceleration(speed,topSpeed)
+	if (speed < topSpeed*0.96) then
+		return (topSpeed-speed)/6
 	else
-		return (self.topSpeed-self.speed)/14
+		return (topSpeed-speed)/14
 	end
 end
 
@@ -398,7 +399,7 @@ end
 
 function Car:update(dt)
 	local offRoad = self:updateOffRoad(dt)
-	local acc = self:getAcceleration()
+	local acc = Car.getAcceleration(self.speed,self.topSpeed)
 
 	if (offRoad) then
 		acc = acc * OFF_ROAD_ACC_FACTOR

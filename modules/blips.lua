@@ -1,6 +1,8 @@
 -- Max Downforce - modules/blips.lua
 -- 2018 Foppygames
 
+require "classes.car"
+
 local blips = {}
 
 -- =========================================================
@@ -62,7 +64,7 @@ function blips.update(playerSpeed,dt,trackLength)
 	while i <= #list do
 		local blip = list[i]
 		if (not(blip.new)) then
-			local acc = entities.getAcceleration(blip.speed,blip.topSpeed) * ACC_FACTOR
+			local acc = Car.getAcceleration(blip.speed,blip.topSpeed) * ACC_FACTOR
 			if (blip.speed > blip.topSpeed) then
 				blip.speed = blip.speed - acc
 				if (blip.speed < blip.topSpeed) then
@@ -83,14 +85,14 @@ function blips.update(playerSpeed,dt,trackLength)
 			if (oldZ < 0) then
 				-- blip has caught up and is appearing behind player
 				if (blip.z >= 0) then
-					-- create entity
-					local entity = entities.addCar(blip.x,perspective.minZ+blip.z,false,blip.performanceFraction)
+					-- create car
+					local car = entities.addCar(blip.x,perspective.minZ+blip.z,false,blip.performanceFraction)
 					
 					-- set properties
-					entity.color = blip.color
-					entity.speed = blip.speed
-					entity.targetSpeed = entity.speed
-					entity.freshFromBlip = true
+					car.color = blip.color
+					car.speed = blip.speed
+					car.targetSpeed = car.speed
+					car.freshFromBlip = true
 					
 					-- remove blip
 					table.remove(list,i)
@@ -98,14 +100,14 @@ function blips.update(playerSpeed,dt,trackLength)
 				elseif (math.abs(blip.z) >= (trackLength - (perspective.maxZ - perspective.minZ))) then
 					local diff = math.abs(blip.z) - (trackLength - (perspective.maxZ - perspective.minZ));
 					
-					-- create entity
-					local entity = entities.addCar(blip.x,perspective.maxZ-diff,false,blip.performanceFraction)
+					-- create car
+					local car = entities.addCar(blip.x,perspective.maxZ-diff,false,blip.performanceFraction)
 					
 					-- set properties
-					entity.color = blip.color
-					entity.speed = blip.speed
-					entity.targetSpeed = entity.speed
-					entity.freshFromBlip = true
+					car.color = blip.color
+					car.speed = blip.speed
+					car.targetSpeed = car.speed
+					car.freshFromBlip = true
 					
 					-- remove blip
 					table.remove(list,i)
@@ -118,27 +120,27 @@ function blips.update(playerSpeed,dt,trackLength)
 				if (blip.z >= (trackLength - (perspective.maxZ - perspective.minZ))) then
 					local diff = blip.z - (trackLength - (perspective.maxZ - perspective.minZ));
 				
-					-- create entity
-					local entity = entities.addCar(blip.x,perspective.minZ,false,blip.performanceFraction)
+					-- create car
+					local car = entities.addCar(blip.x,perspective.minZ,false,blip.performanceFraction)
 					
 					-- set properties
-					entity.color = blip.color
-					entity.speed = blip.speed
-					entity.targetSpeed = entity.speed
-					entity.freshFromBlip = true
+					car.color = blip.color
+					car.speed = blip.speed
+					car.targetSpeed = car.speed
+					car.freshFromBlip = true
 					
 					-- remove blip
 					table.remove(list,i)
 				-- blip is appearing on the horizon
 				elseif (blip.z <= 0) then
-					-- create entity
-					local entity = entities.addCar(blip.x,perspective.maxZ+blip.z,false,blip.performanceFraction)
+					-- create car
+					local car = entities.addCar(blip.x,perspective.maxZ+blip.z,false,blip.performanceFraction)
 					
 					-- set properties
-					entity.color = blip.color
-					entity.speed = blip.speed
-					entity.targetSpeed = entity.speed
-					entity.freshFromBlip = true
+					car.color = blip.color
+					car.speed = blip.speed
+					car.targetSpeed = car.speed
+					car.freshFromBlip = true
 					
 					-- remove blip
 					table.remove(list,i)

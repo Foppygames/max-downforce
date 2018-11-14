@@ -112,10 +112,6 @@ function switchToState(newState)
 				entities.addCar(x,z,false,Car.getAiPerformanceFraction(aiNumber,aiTotal)) --aheadOfPlayer
 				aiNumber = aiNumber + 1
 			end
-			
-			--print("player after loop "..i..":")
-			--print(player)
-			
 		end
 	elseif (state == STATE_GAME_OVER) then
 		-- ...
@@ -144,6 +140,7 @@ function love.update(dt)
 		if (entities.checkLap()) then
 			lap = lap + 1
 		end
+		
 		blips.addBlips(newBlips)
 		blips.update(playerSpeed,dt,segments.totalLength)
 		segments.update(playerSpeed,dt)

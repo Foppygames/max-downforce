@@ -26,9 +26,6 @@ function Entity:new(x,z)
 	o.width = 0
 	o.height = 0
 	
-	--print("ENTITY SELF:")
-	--print(self)
-	
 	return o
 end
 

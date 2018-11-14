@@ -84,7 +84,7 @@ function Entity:draw()
 	local newScreenX = self:computeNewScreenX()
 	love.graphics.push()
 	love.graphics.scale(imageScale,imageScale)
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	love.graphics.draw(self.image,newScreenX/imageScale - self.width/2,self.screenY/imageScale - self.height)
 	love.graphics.pop()
 	self.storedScreenX = newScreenX

@@ -300,7 +300,7 @@ local function drawBanner(entity,newScreenX,imageScale)
 	local bannerX = newScreenX/imageScale - entity.width/2
 	local bannerY = entity.screenY/imageScale - entity.y
 	love.graphics.draw(entity.image,bannerX,bannerY)
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	local width = 1
 	local x1 = bannerX - width
 	love.graphics.rectangle("fill",x1,bannerY,width,entity.y)

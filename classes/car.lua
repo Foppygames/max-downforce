@@ -105,7 +105,7 @@ function Car:new(x,z,isPlayer,performanceFraction) --aheadOfPlayer
 	o.explodeCount = 0
 	
 	if (o.isPlayer) then
-		o.color = {255,0,0}
+		o.color = {1,0,0}
 		o.pause = 0
 		o.topSpeed = TOP_SPEED
 		--o.posToPlayer = 0
@@ -120,7 +120,7 @@ function Car:new(x,z,isPlayer,performanceFraction) --aheadOfPlayer
 		o.sndEnginePower:setVolume(0.5)
 		love.audio.play(o.sndEnginePower)
 	else
-		local colorChoices = {0, 128, 255}
+		local colorChoices = {0, 0.5, 1}
 		o.color = {
 			colorChoices[love.math.random(#colorChoices)],
 			colorChoices[love.math.random(#colorChoices)],
@@ -492,7 +492,7 @@ function Car:draw()
 	local newScreenX = self:computeNewScreenX()
 	love.graphics.push()
 	love.graphics.scale(imageScale,imageScale)
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	
 	local screenX = newScreenX/imageScale
 	local screenY = self.screenY/imageScale
@@ -518,7 +518,7 @@ function Car:draw()
 	love.graphics.draw(imgBody,screenX - bodyWidth/2 - perspectiveEffect * 0.2,screenY - bodyHeight + accEffect)
 	
 	-- draw helmet
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	love.graphics.draw(imgHelmet,screenX - helmetWidth/2  - perspectiveEffect * 0.2,screenY - bodyHeight - helmetHeight + accEffect)
 	
 	-- draw air scoop
@@ -526,7 +526,7 @@ function Car:draw()
 	love.graphics.draw(imgAirScoop,screenX - airScoopWidth/2  - perspectiveEffect * 0.6,screenY - bodyHeight - airScoopHeight + accEffect)
 	
 	-- draw rear wheels
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect,screenY - rearWheelHeight + self.leftBumpDy)
 	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX + bodyWidth/2 - perspectiveEffect,screenY - rearWheelHeight + self.rightBumpDy)
 	

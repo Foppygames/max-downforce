@@ -192,16 +192,16 @@ function love.draw()
 			love.graphics.print("Max Downforce",110,20+i*8)	
 		end
 		
-		love.graphics.setColor(120,230,255)
+		love.graphics.setColor(0.470,0.902,1)
 		love.graphics.print("W = windowed / full screen",75,120)
 		
-		love.graphics.setColor(255,255,255)
+		love.graphics.setColor(1,1,1)
 		love.graphics.print("Press space to start",90,170)
 	end
 	
 	if (state == STATE_RACE) then
 		-- draw sky
-		love.graphics.setColor(255,255,255)
+		love.graphics.setColor(1,1,1)
 		love.graphics.draw(imageSky,0,0)
 		
 		horizon.draw()
@@ -239,23 +239,21 @@ function love.draw()
 			local z = perspective.zMap[i]
 			
 			-- set colors
-			local roadColor = 76
-			local curbColor = 1
-			local grassColor = 1
-			--if (((z + textureOffset) % 6) > 3) then
+			local roadColor = 0.298
+			local curbColorVariant = 1
+			local grassColorVariant = 1
 			if (((z + textureOffset) % 8) > 4) then
-				roadColor = 80
-				curbColor = 2
-				grassColor = 2
+				roadColor = 0.314
+				curbColorVariant = 2
+				grassColorVariant = 2
 			end
 			
 			if (segment.texture == segments.TEXTURE_START_FINISH) then
-				roadColor = 255
+				roadColor = 1
 			end
 			
 			if (segmentIndex < lastSegmentIndex) then
 				if (z > segments.getAtIndex(segmentIndex+1).z) then
-					--roadColor = 0
 					segmentIndex = segmentIndex + 1
 					segment = segments.getAtIndex(segmentIndex)
 				end
@@ -271,10 +269,10 @@ function love.draw()
 			entities.setupForDraw(z,screenX,screenY,perspective.scale[i],previousZ,previousScreenX,previousScreenY,previousScale,segment)
 			
 			-- draw grass
-			if (grassColor == 1) then
-				love.graphics.setColor(45,73,36) --(106,76,0) --(25,132,30)
+			if (grassColorVariant == 1) then
+				love.graphics.setColor(0.176,0.286,0.141)
 			else
-				love.graphics.setColor(38,62,31 )--(86,62,0) --(0,153,15)
+				love.graphics.setColor(0.149,0.243,0.122)
 			end
 			love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 			
@@ -283,16 +281,16 @@ function love.draw()
 			love.graphics.line(x,screenY,x+roadWidth,screenY)
 			
 			-- draw curbs
-			if (curbColor == 1) then
-				love.graphics.setColor(225,67,0)
+			if (curbColorVariant == 1) then
+				love.graphics.setColor(0.882,0.263,0)
 			else
-				love.graphics.setColor(255,255,255)
+				love.graphics.setColor(1,1,1)
 			end
 			love.graphics.line(x,screenY,x+curbWidth,screenY)
 			love.graphics.line(x+roadWidth-curbWidth,screenY,x+roadWidth,screenY)
 			
 			-- draw stripes
-			if (curbColor == 2) then
+			if (curbColorVariant == 2) then
 				love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
 			end
 			
@@ -315,14 +313,14 @@ function love.draw()
 		
 		-- on screen info: player speed
 		if (player ~= nil) then
-			love.graphics.setColor(120,230,255)
+			love.graphics.setColor(0.471,0.902,1)
 			love.graphics.print("SPEED",aspect.GAME_WIDTH-80,10)
 			love.graphics.print(player:getSpeedAsKMH(),aspect.GAME_WIDTH-80,25)
 			love.graphics.print("km/h",aspect.GAME_WIDTH-50,25)
 		end
 		
 		-- on screen info: current lap
-		love.graphics.setColor(120,230,255)
+		love.graphics.setColor(0.471,0.902,1)
 		love.graphics.print("LAP",20,10)
 		love.graphics.print(math.max(lap,1),20,25)
 		love.graphics.print("/ "..LAP_COUNT,40,25)
@@ -333,14 +331,14 @@ function love.draw()
 		end
 		
 		-- on screen info: current position
-		love.graphics.setColor(120,230,255)
+		love.graphics.setColor(0.471,0.902,1)
 		love.graphics.print("POS",aspect.GAME_WIDTH/2-20,10)
 		love.graphics.print(pos,aspect.GAME_WIDTH/2-20,25)
 		love.graphics.print("/ "..cars,aspect.GAME_WIDTH/2,25)
 	end
 	
 	if (state == STATE_GAME_OVER) then
-		love.graphics.setColor(255,255,255)
+		love.graphics.setColor(1,1,1)
 		love.graphics.print("GAME OVER",130,60)
 	end
 	

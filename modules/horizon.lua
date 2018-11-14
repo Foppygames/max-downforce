@@ -1,5 +1,5 @@
 -- Max Downforce - modules/horizon.lua
--- 2017 Foppygames
+-- 2017-2018 Foppygames
 
 local horizon = {}
 
@@ -68,7 +68,7 @@ function horizon.update(playerSegmentDdx,playerSpeed,dt)
 end
 
 function horizon.draw()
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	for i = 1,layers,1 do
 		for j = 0,count[i]-1,1 do
 			love.graphics.draw(image[i],x[i]+j*width[i],y[i])

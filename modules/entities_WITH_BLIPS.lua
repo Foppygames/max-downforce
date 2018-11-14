@@ -238,7 +238,7 @@ function entities.addCar(x,z,isPlayer,aiPerformanceFraction,posToPlayer)
 		entity.topSpeed = entity.performanceFraction * AI_TOP_SPEED
 	end
 	
-	local colorChoices = {0, 128, 255}
+	local colorChoices = {0, 0.5, 1}
 	entity.color = {
 		colorChoices[love.math.random(#colorChoices)],
 		colorChoices[love.math.random(#colorChoices)],
@@ -247,7 +247,7 @@ function entities.addCar(x,z,isPlayer,aiPerformanceFraction,posToPlayer)
 	
 	if (isPlayer) then
 		entity.color = {
-			255,0,0
+			1,0,0
 		}
 	end
 	
@@ -820,7 +820,7 @@ local function drawCar(entity,newScreenX,imageScale)
 	-- draw body
 	love.graphics.draw(imgBody,screenX - bodyWidth/2 - perspectiveEffect * 0.2,screenY - bodyHeight + accEffect)
 	
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	
 	-- draw helmet
 	love.graphics.draw(imgHelmet,screenX - helmetWidth/2  - perspectiveEffect * 0.2,screenY - bodyHeight - helmetHeight + accEffect)
@@ -830,7 +830,7 @@ local function drawCar(entity,newScreenX,imageScale)
 	-- draw air scoop
 	love.graphics.draw(imgAirScoop,screenX - airScoopWidth/2  - perspectiveEffect * 0.6,screenY - bodyHeight - airScoopHeight + accEffect)
 	
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	
 	-- draw rear wheels
 	love.graphics.draw(imgRearWheel[entity.rearWheelIndex],screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect,screenY - rearWheelHeight + entity.leftBumpDy)
@@ -850,7 +850,7 @@ local function drawBanner(entity,newScreenX,imageScale)
 	local bannerX = newScreenX/imageScale - entity.width/2
 	local bannerY = entity.screenY/imageScale - entity.y
 	love.graphics.draw(entity.image,bannerX,bannerY)
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	local width = 1
 	local x1 = bannerX - width
 	love.graphics.rectangle("fill",x1,bannerY,width,entity.y)
@@ -875,7 +875,7 @@ function entities.draw()
 		if (entity.entityType == entities.TYPE_TREE) then
 			love.graphics.setColor(entity.color,entity.color,entity.color)
 		else
-			love.graphics.setColor(255,255,255)
+			love.graphics.setColor(1,1,1)
 		end
 		if (entity.entityType == entities.TYPE_CAR) then
 			drawCar(entity,newScreenX,imageScale)

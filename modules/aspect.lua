@@ -1,5 +1,5 @@
 -- Max Downforce - modules/aspect.lua
--- 2017 Foppygames
+-- 2017-2018 Foppygames
 
 local aspect = {}
 
@@ -13,8 +13,8 @@ local utils = require("modules.utils")
 -- constants
 -- =========================================================
 
-aspect.WINDOW_WIDTH = 1280 --640
-aspect.WINDOW_HEIGHT = 800 --400
+aspect.WINDOW_WIDTH = 960 --1280 --640
+aspect.WINDOW_HEIGHT = 600 --800 --400
 aspect.GAME_WIDTH = 320
 aspect.GAME_HEIGHT = 200
 

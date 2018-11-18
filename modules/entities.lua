@@ -1,13 +1,15 @@
 -- Max Downforce - modules/entities.lua
 -- 2017-2018 Foppygames
 
-require "classes.car"
-
 local entities = {}
 
 -- =========================================================
 -- includes
 -- =========================================================
+
+require "classes.building"
+require "classes.car"
+require "classes.stadium"
 
 local aspect = require("modules.aspect")
 local perspective = require("modules.perspective")
@@ -18,12 +20,10 @@ local utils = require("modules.utils")
 -- constants
 -- =========================================================
 
---entities.TYPE_BUILDING = "building"
 --entities.TYPE_BANNER_START = "banner_start"
 --entities.TYPE_CAR = "car"
 --entities.TYPE_TREE = "tree"
 --entities.TYPE_SIGN = "sign"
---entities.TYPE_STADIUM = "stadium"
 
 -- =========================================================
 -- variables
@@ -44,7 +44,6 @@ local signIndex = 1
 
 function entities.init()
 	--[[
-	images[entities.TYPE_BUILDING] = love.graphics.newImage("images/building.png")
 	images[entities.TYPE_BANNER_START] = love.graphics.newImage("images/banner_start.png")
 	]]
 	--[[
@@ -57,21 +56,13 @@ function entities.init()
 		love.graphics.newImage("images/sign2.png"),
 		love.graphics.newImage("images/sign3.png")
 	}
-	images[entities.TYPE_STADIUM] = {
-		love.graphics.newImage("images/stadium_left.png"),
-		love.graphics.newImage("images/stadium_right.png")
-	}
-	]]
+	]]--
 	
 	--[[
-	baseScale[entities.TYPE_BUILDING] = 7
 	baseScale[entities.TYPE_BANNER_START] = 8
-	]]
-	--[[
 	baseScale[entities.TYPE_TREE] = 8
 	baseScale[entities.TYPE_SIGN] = 12
-	baseScale[entities.TYPE_STADIUM] = 14
-	]]
+	]]--
 	
 	list = {}
 end
@@ -116,12 +107,6 @@ function entities.add(entityType,x,z)
 	--[[
 	if (entityType == entities.TYPE_TREE) then
 		entity.image = images[entityType][math.random(2)]
-	elseif (entityType == entities.TYPE_STADIUM) then
-		if (x < 0) then
-			entity.image = images[entityType][1]
-		else
-			entity.image = images[entityType][2]
-		end
 	elseif (entityType == entities.TYPE_SIGN) then
 		entity.image = images[entityType][signIndex]
 		signIndex = signIndex + 1
@@ -136,12 +121,6 @@ function entities.add(entityType,x,z)
 	]]
 	
 	--[[
-	if (entityType == entities.TYPE_BUILDING) then
-		entity.smoothX = true
-	end
-	]]
-	
-	--[[
 	if (entityType == entities.TYPE_TREE) then
 		entity.smoothX = true
 		entity.x = entity.x + math.random(-aspect.GAME_WIDTH/2,aspect.GAME_WIDTH/2)
@@ -150,12 +129,6 @@ function entities.add(entityType,x,z)
 	
 	--[[
 	if (entityType == entities.TYPE_SIGN) then
-		entity.smoothX = true
-	end
-	]]
-	
-	--[[
-	if (entityType == entities.TYPE_STADIUM) then
 		entity.smoothX = true
 	end
 	]]
@@ -184,6 +157,15 @@ function entities.addBanner(entityType,x,y,z)
 end
 ]]
 
+function entities.addBuilding(x,z)
+	local building = Building:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,building)
+	
+	return building
+end
+
 function entities.addCar(x,z,isPlayer,performanceFraction) --aheadOfPlayer
 	local car = Car:new(x,z,isPlayer,performanceFraction) --aheadOfPlayer
 	
@@ -191,6 +173,15 @@ function entities.addCar(x,z,isPlayer,performanceFraction) --aheadOfPlayer
 	table.insert(list,car)
 	
 	return car
+end
+
+function entities.addStadium(x,z)
+	local stadium = Stadium:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,stadium)
+	
+	return stadium
 end
 
 --[[

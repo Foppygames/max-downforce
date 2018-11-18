@@ -66,7 +66,9 @@ function setupGame()
 	
 	imageSky = love.graphics.newImage("images/sky.png")
 	
+	Building.init()
 	Car.init()
+	Stadium.init()
 	
 	entities.init()
 	blips.init()

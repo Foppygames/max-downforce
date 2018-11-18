@@ -36,11 +36,17 @@ local items = {}
 -- =========================================================
 
 function processItem(itemType,z)
-	--[[
 	if (itemType == schedule.ITEM_BUILDINGS_L) then
-		entities.add(entities.TYPE_BUILDING,-900,z)
+		entities.addBuilding(-900,z)
 	elseif (itemType == schedule.ITEM_BUILDINGS_R) then
-		entities.add(entities.TYPE_BUILDING,900,z)
+		entities.addBuilding(900,z)
+	elseif (itemType == schedule.ITEM_STADIUM_L) then
+		entities.addStadium(-850,z)
+	elseif (itemType == schedule.ITEM_STADIUM_R) then
+		entities.addStadium(850,z)
+	end
+	
+	--[[
 	elseif (itemType == schedule.ITEM_BANNER_START) then
 		entities.addBanner(entities.TYPE_BANNER_START,0,30,z)
 	elseif (itemType == schedule.ITEM_TREES_L) then
@@ -56,10 +62,6 @@ function processItem(itemType,z)
 		entities.add(entities.TYPE_SIGN,-700,z)
 	elseif (itemType == schedule.ITEM_SIGN_R) then
 		entities.add(entities.TYPE_SIGN,700,z)
-	elseif (itemType == schedule.ITEM_STADIUM_L) then
-		entities.add(entities.TYPE_STADIUM,-850,z)
-	elseif (itemType == schedule.ITEM_STADIUM_R) then
-		entities.add(entities.TYPE_STADIUM,850,z)
 	end
 	]]
 end

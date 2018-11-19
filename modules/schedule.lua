@@ -20,7 +20,6 @@ schedule.ITEM_BUILDINGS_L = "buildings_l"
 schedule.ITEM_BUILDINGS_R = "buildings_r"
 schedule.ITEM_SIGN_L = "sign_l"
 schedule.ITEM_SIGN_R = "sign_r"
-schedule.ITEM_TREES_L = "trees_l"
 schedule.ITEM_TREES_L_R = "trees_l_r"
 schedule.ITEM_STADIUM_L = "stadium_l"
 schedule.ITEM_STADIUM_R = "stadium_r"
@@ -44,6 +43,13 @@ function processItem(itemType,z)
 		entities.addStadium(-850,z)
 	elseif (itemType == schedule.ITEM_STADIUM_R) then
 		entities.addStadium(850,z)
+	elseif (itemType == schedule.ITEM_TREES_L_R) then
+		entities.addTree(-2000,z,0.6)
+		entities.addTree(-1300,z-4,0.8)
+		entities.addTree(-600,z-8,1)
+		entities.addTree(600,z-8,1)
+		entities.addTree(1300,z-4,0.8)
+		entities.addTree(2000,z,0.6)
 	end
 	
 	--[[
@@ -51,13 +57,6 @@ function processItem(itemType,z)
 		entities.addBanner(entities.TYPE_BANNER_START,0,30,z)
 	elseif (itemType == schedule.ITEM_TREES_L) then
 		entities.add(entities.TYPE_TREE,-900,z)
-	elseif (itemType == schedule.ITEM_TREES_L_R) then
-		entities.addTree(-1500,z,145)
-		entities.addTree(-1100,z-4,205)
-		entities.addTree(-700,z-8,255)
-		entities.addTree(700,z,255)
-		entities.addTree(1100,z-4,205)
-		entities.addTree(1500,z-8,145)
 	elseif (itemType == schedule.ITEM_SIGN_L) then
 		entities.add(entities.TYPE_SIGN,-700,z)
 	elseif (itemType == schedule.ITEM_SIGN_R) then

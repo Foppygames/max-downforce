@@ -115,8 +115,8 @@ local track = {
 			{
 				itemType = schedule.ITEM_TREES_L_R,
 				startZ = 0.0,
-				dz = 0.1,
-				count = 20
+				dz = 0.2,
+				count = 10
 			}
 		},
 		texture = segments.TEXTURE_NORMAL
@@ -130,8 +130,8 @@ local track = {
 			{
 				itemType = schedule.ITEM_TREES_L_R,
 				startZ = 0.0,
-				dz = 0.05,
-				count = 7/0.05
+				dz = 0.2,
+				count = 45 --9/0.2
 			}
 		},
 		texture = segments.TEXTURE_NORMAL
@@ -185,14 +185,7 @@ local track = {
 	{
 		ddx = -0.2,
 		length = 2,
-		scheduleItems = {
-			{
-				itemType = schedule.ITEM_TREES_L_R,
-				startZ = 0.0,
-				dz = 0.1,
-				count = 2/0.1
-			}
-		},
+		scheduleItems = {},
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- medium straight

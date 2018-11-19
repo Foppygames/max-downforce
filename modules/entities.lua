@@ -10,6 +10,7 @@ local entities = {}
 require "classes.building"
 require "classes.car"
 require "classes.stadium"
+require "classes.tree"
 
 local aspect = require("modules.aspect")
 local perspective = require("modules.perspective")
@@ -22,7 +23,6 @@ local utils = require("modules.utils")
 
 --entities.TYPE_BANNER_START = "banner_start"
 --entities.TYPE_CAR = "car"
---entities.TYPE_TREE = "tree"
 --entities.TYPE_SIGN = "sign"
 
 -- =========================================================
@@ -47,10 +47,6 @@ function entities.init()
 	images[entities.TYPE_BANNER_START] = love.graphics.newImage("images/banner_start.png")
 	]]
 	--[[
-	images[entities.TYPE_TREE] = {
-		love.graphics.newImage("images/tree2.png"),
-		love.graphics.newImage("images/tree3.png")
-	}
 	images[entities.TYPE_SIGN] =  {
 		love.graphics.newImage("images/sign1.png"),
 		love.graphics.newImage("images/sign2.png"),
@@ -60,7 +56,6 @@ function entities.init()
 	
 	--[[
 	baseScale[entities.TYPE_BANNER_START] = 8
-	baseScale[entities.TYPE_TREE] = 8
 	baseScale[entities.TYPE_SIGN] = 12
 	]]--
 	
@@ -105,9 +100,7 @@ function entities.add(entityType,x,z)
 	}]]
 	
 	--[[
-	if (entityType == entities.TYPE_TREE) then
-		entity.image = images[entityType][math.random(2)]
-	elseif (entityType == entities.TYPE_SIGN) then
+	if (entityType == entities.TYPE_SIGN) then
 		entity.image = images[entityType][signIndex]
 		signIndex = signIndex + 1
 		if (signIndex > #images[entityType]) then
@@ -118,13 +111,6 @@ function entities.add(entityType,x,z)
 	end
 	entity.width = entity.image:getWidth()
 	entity.height = entity.image:getHeight()
-	]]
-	
-	--[[
-	if (entityType == entities.TYPE_TREE) then
-		entity.smoothX = true
-		entity.x = entity.x + math.random(-aspect.GAME_WIDTH/2,aspect.GAME_WIDTH/2)
-	end
 	]]
 	
 	--[[
@@ -184,15 +170,14 @@ function entities.addStadium(x,z)
 	return stadium
 end
 
---[[
 function entities.addTree(x,z,color)
-	local entity = entities.add(entities.TYPE_TREE,x,z)
+	local tree = Tree:new(x,z,color)
 	
-	entity.color = color
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,tree)
 	
-	return entity
+	return tree
 end
-]]
 
 --[[local function checkCarCollisions(entity,player,dt)
 	local carLength = perspective.maxZ / 50

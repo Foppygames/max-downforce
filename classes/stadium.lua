@@ -2,9 +2,7 @@
 -- 2018 Foppygames
 
 -- modules
-local aspect = require("modules.aspect")
-local perspective = require("modules.perspective")
-local road = require("modules.road")
+-- ...
 
 -- classes
 require "classes.entity"

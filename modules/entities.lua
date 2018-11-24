@@ -9,6 +9,7 @@ local entities = {}
 
 require "classes.building"
 require "classes.car"
+require "classes.sign"
 require "classes.stadium"
 require "classes.tree"
 
@@ -23,7 +24,6 @@ local utils = require("modules.utils")
 
 --entities.TYPE_BANNER_START = "banner_start"
 --entities.TYPE_CAR = "car"
---entities.TYPE_SIGN = "sign"
 
 -- =========================================================
 -- variables
@@ -36,28 +36,14 @@ local lap = false
 local images = {}
 local baseScale = {}
 local index = nil
-local signIndex = 1
 	
 -- =========================================================
 -- functions
 -- =========================================================
 
 function entities.init()
-	--[[
-	images[entities.TYPE_BANNER_START] = love.graphics.newImage("images/banner_start.png")
-	]]
-	--[[
-	images[entities.TYPE_SIGN] =  {
-		love.graphics.newImage("images/sign1.png"),
-		love.graphics.newImage("images/sign2.png"),
-		love.graphics.newImage("images/sign3.png")
-	}
-	]]--
-	
-	--[[
-	baseScale[entities.TYPE_BANNER_START] = 8
-	baseScale[entities.TYPE_SIGN] = 12
-	]]--
+	--images[entities.TYPE_BANNER_START] = love.graphics.newImage("images/banner_start.png")
+	--baseScale[entities.TYPE_BANNER_START] = 8
 	
 	list = {}
 end
@@ -100,23 +86,9 @@ function entities.add(entityType,x,z)
 	}]]
 	
 	--[[
-	if (entityType == entities.TYPE_SIGN) then
-		entity.image = images[entityType][signIndex]
-		signIndex = signIndex + 1
-		if (signIndex > #images[entityType]) then
-			signIndex = 1
-		end
-	else
-		entity.image = images[entityType]
-	end
+	entity.image = images[entityType]
 	entity.width = entity.image:getWidth()
 	entity.height = entity.image:getHeight()
-	]]
-	
-	--[[
-	if (entityType == entities.TYPE_SIGN) then
-		entity.smoothX = true
-	end
 	]]
 	
 	--[[
@@ -168,6 +140,15 @@ function entities.addStadium(x,z)
 	table.insert(list,stadium)
 	
 	return stadium
+end
+
+function entities.addSign(x,z)
+	local sign = Sign:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,sign)
+	
+	return sign
 end
 
 function entities.addTree(x,z,color)

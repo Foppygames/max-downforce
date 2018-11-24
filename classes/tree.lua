@@ -1,9 +1,6 @@
 -- Max Downforce - classes/tree.lua
 -- 2018 Foppygames
 
--- modules
-local aspect = require("modules.aspect")
-
 -- classes
 require "classes.entity"
 

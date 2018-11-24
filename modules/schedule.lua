@@ -39,6 +39,10 @@ function processItem(itemType,z)
 		entities.addBuilding(-900,z)
 	elseif (itemType == schedule.ITEM_BUILDINGS_R) then
 		entities.addBuilding(900,z)
+	elseif (itemType == schedule.ITEM_SIGN_L) then
+		entities.addSign(-700,z)
+	elseif (itemType == schedule.ITEM_SIGN_R) then
+		entities.addSign(700,z)
 	elseif (itemType == schedule.ITEM_STADIUM_L) then
 		entities.addStadium(-850,z)
 	elseif (itemType == schedule.ITEM_STADIUM_R) then
@@ -57,11 +61,6 @@ function processItem(itemType,z)
 		entities.addBanner(entities.TYPE_BANNER_START,0,30,z)
 	elseif (itemType == schedule.ITEM_TREES_L) then
 		entities.add(entities.TYPE_TREE,-900,z)
-	elseif (itemType == schedule.ITEM_SIGN_L) then
-		entities.add(entities.TYPE_SIGN,-700,z)
-	elseif (itemType == schedule.ITEM_SIGN_R) then
-		entities.add(entities.TYPE_SIGN,700,z)
-	end
 	]]
 end
 

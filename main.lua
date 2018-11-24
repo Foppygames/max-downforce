@@ -7,6 +7,7 @@
 
 require "classes.building"
 require "classes.car"
+require "classes.sign"
 require "classes.stadium"
 require "classes.tree"
 
@@ -67,6 +68,7 @@ function setupGame()
 	
 	Building.init()
 	Car.init()
+	Sign.init()
 	Stadium.init()
 	Tree.init()
 	

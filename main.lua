@@ -5,6 +5,7 @@
 -- includes
 -- =========================================================
 
+require "classes.banner"
 require "classes.building"
 require "classes.car"
 require "classes.sign"
@@ -66,6 +67,7 @@ function setupGame()
 	
 	imageSky = love.graphics.newImage("images/sky.png")
 	
+	Banner.init()
 	Building.init()
 	Car.init()
 	Sign.init()

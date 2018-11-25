@@ -54,14 +54,9 @@ function processItem(itemType,z)
 		entities.addTree(600,z-8,1)
 		entities.addTree(1300,z-4,0.8)
 		entities.addTree(2000,z,0.6)
-	end
-	
-	--[[
 	elseif (itemType == schedule.ITEM_BANNER_START) then
-		entities.addBanner(entities.TYPE_BANNER_START,0,30,z)
-	elseif (itemType == schedule.ITEM_TREES_L) then
-		entities.add(entities.TYPE_TREE,-900,z)
-	]]
+		entities.addBanner(0,z)
+	end
 end
 
 -- =========================================================

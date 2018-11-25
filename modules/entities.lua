@@ -7,6 +7,7 @@ local entities = {}
 -- includes
 -- =========================================================
 
+require "classes.banner"
 require "classes.building"
 require "classes.car"
 require "classes.sign"
@@ -22,8 +23,7 @@ local utils = require("modules.utils")
 -- constants
 -- =========================================================
 
---entities.TYPE_BANNER_START = "banner_start"
---entities.TYPE_CAR = "car"
+-- ...
 
 -- =========================================================
 -- variables
@@ -42,9 +42,6 @@ local index = nil
 -- =========================================================
 
 function entities.init()
-	--images[entities.TYPE_BANNER_START] = love.graphics.newImage("images/banner_start.png")
-	--baseScale[entities.TYPE_BANNER_START] = 8
-	
 	list = {}
 end
 
@@ -69,51 +66,14 @@ function entities.checkLap()
 	return lap
 end
 
--- add entity in correct order of increasing z
---[[
-function entities.add(entityType,x,z)
-	local entity = {
-		entityType = entityType,
-		x = x,
-		z = z,
-		storedScreenX = -1,
-		baseScale = baseScale[entityType],
-		scale = 0,
-		roadX = 0,
-		smoothX = false,
-		isBanner = false,
-		solid = true
-	}]]
-	
-	--[[
-	entity.image = images[entityType]
-	entity.width = entity.image:getWidth()
-	entity.height = entity.image:getHeight()
-	]]
-	
-	--[[
-	if (entityType == entities.TYPE_BANNER_START) then
-		entity.solid = false
-	end
-	]]
+function entities.addBanner(x,z)
+	local banner = Banner:new(x,z)
 	
 	-- insert at end since most items introduced at horizon (max z)
-	--[[table.insert(list,entity)
+	table.insert(list,banner)
 	
-	return entity
-end]]
-
--- Note: y is unscaled height of banner
---[[
-function entities.addBanner(entityType,x,y,z)
-	local entity = entities.add(entityType,x,z)
-	
-	entity.isBanner = true
-	entity.y = y
-	
-	return entity
+	return banner
 end
-]]
 
 function entities.addBuilding(x,z)
 	local building = Building:new(x,z)
@@ -251,19 +211,6 @@ function entities.setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,pre
 		index = index + 1
 	end
 end
-
---[[
-local function drawBanner(entity,newScreenX,imageScale)
-	local bannerX = newScreenX/imageScale - entity.width/2
-	local bannerY = entity.screenY/imageScale - entity.y
-	love.graphics.draw(entity.image,bannerX,bannerY)
-	love.graphics.setColor(1,1,1)
-	local width = 1
-	local x1 = bannerX - width
-	love.graphics.rectangle("fill",x1,bannerY,width,entity.y)
-	love.graphics.rectangle("fill",x1+entity.width+width,bannerY,width,entity.y)
-end
-]]
 
 function entities.draw()
 	for i = #list,1,-1 do

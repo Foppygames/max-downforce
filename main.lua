@@ -31,6 +31,7 @@ local STATE_RACE = 1
 local STATE_GAME_OVER = 2
 
 local LAP_COUNT = 10
+local FINISHED_COUNT = 5
 
 -- =========================================================
 -- variables
@@ -49,6 +50,8 @@ local playerSpeed = 0
 local lap = 0
 local cars = 20
 local pos = 20
+local finished = false
+local finishedCount = 0
 
 -- =========================================================
 -- functions
@@ -93,8 +96,13 @@ function switchToState(newState)
 	if (state == STATE_TITLE) then
 		-- ...
 	elseif (state == STATE_RACE) then
+		lap = 0
+		finished = false
+		finishedCount = 0
+
 		blips.reset()
 		horizon.reset()
+		schedule.reset()
 		segments.reset()
 		segments.addFirst()
 	
@@ -129,9 +137,6 @@ function love.update(dt)
 		if (player ~= nil) then
 			playerSpeed = player.speed
 		else
-			
-			print("love.update() player is nil!")
-		
 			playerSpeed = 0
 		end
 		
@@ -145,6 +150,16 @@ function love.update(dt)
 		local newBlips = entities.update(playerSpeed,dt,segments.totalLength)
 		if (entities.checkLap()) then
 			lap = lap + 1
+			if (lap > LAP_COUNT) then
+				if ((not finished) and (player ~= nil)) then
+					-- turn player car into cpu car
+					player:setIsPlayer(false)
+					
+					-- start count down after finish
+					finishedCount = FINISHED_COUNT
+				end
+				finished = true
+			end
 		end
 		
 		blips.addBlips(newBlips)
@@ -158,6 +173,13 @@ function love.update(dt)
 				if (player.explodeCount <= 0) then
 					switchToState(STATE_GAME_OVER)
 				end
+			end
+		end
+		
+		if (finishedCount > 0) then
+			finishedCount = finishedCount - dt
+			if (finishedCount <= 0) then
+				switchToState(STATE_GAME_OVER)
 			end
 		end
 	end
@@ -190,7 +212,7 @@ function love.draw()
 	
 	if (state == STATE_TITLE) then
 		for i = 1, 5 do
-			local color = 255-((5-i)*55)
+			local color = 1-(5-i)*0.2
 			love.graphics.setColor(color,color,color)
 			love.graphics.print("Max Downforce",110,20+i*8)	
 		end
@@ -342,7 +364,11 @@ function love.draw()
 	
 	if (state == STATE_GAME_OVER) then
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("GAME OVER",130,60)
+		if (not finished) then
+			love.graphics.print("GAME OVER",130,60)
+		else
+			love.graphics.print("CONGRATULATIONS!",95,60)
+		end
 	end
 	
 	aspect.letterbox()

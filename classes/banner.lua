@@ -57,3 +57,7 @@ function Banner:draw()
 	love.graphics.pop()
 	self.storedScreenX = newScreenX
 end
+
+function Banner:isStartBanner()
+	return true
+end

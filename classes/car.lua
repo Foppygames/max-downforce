@@ -545,3 +545,9 @@ end
 function Car:getSpeedAsKMH()
 	return math.floor(self.speed / self.topSpeed * TOP_SPEED_IN_KMH)
 end
+
+-- used to turn player into cpu car after finish
+function Car:setIsPlayer(isPlayer)
+	self.isPlayer = isPlayer
+end
+

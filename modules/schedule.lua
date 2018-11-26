@@ -63,6 +63,10 @@ end
 -- public functions
 -- =========================================================
 
+function schedule.reset()
+	items = {}
+end
+
 -- note: z parameter is starting z for series of items
 -- if z is smaller than maxZ this means items may have to be processed right away
 function schedule.add(itemType,dz,count,z)

@@ -35,14 +35,15 @@ function Entity:update()
 end
 
 function Entity:scroll(playerSpeed,dt)
+	local lap = false
 	local delete = false
 	
 	self.z = self.z - playerSpeed * dt
 	if ((self.z < perspective.minZ) or (self.z > perspective.maxZ)) then
-		-- entity is start finish banner; count lap
-		--[[if (entity.entityType == entities.TYPE_BANNER_START) then
+		-- entity is start banner; count lap
+		if (self:isStartBanner()) then
 			lap = true
-		end]]
+		end
 		
 		-- remove entity
 		delete = true
@@ -50,7 +51,7 @@ function Entity:scroll(playerSpeed,dt)
 
 	return {
 		blip = nil,
-		lap = false,
+		lap = lap,
 		delete = delete
 	}
 end
@@ -86,5 +87,9 @@ function Entity:draw()
 	love.graphics.draw(self.image,newScreenX/imageScale - self.width/2,self.screenY/imageScale - self.height)
 	love.graphics.pop()
 	self.storedScreenX = newScreenX
+end
+
+function Entity:isStartBanner()
+	return false
 end
 

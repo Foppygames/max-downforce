@@ -1,16 +1,17 @@
 -- Max Downforce - main.lua
 -- 2017-2018 Foppygames
 
-require "classes.car"
-
 -- =========================================================
 -- includes
 -- =========================================================
 
--- classes
+require "classes.banner"
+require "classes.building"
 require "classes.car"
+require "classes.sign"
+require "classes.stadium"
+require "classes.tree"
 
--- modules
 local aspect = require("modules.aspect")
 local blips = require("modules.blips")
 local entities = require("modules.entities")
@@ -66,7 +67,12 @@ function setupGame()
 	
 	imageSky = love.graphics.newImage("images/sky.png")
 	
+	Banner.init()
+	Building.init()
 	Car.init()
+	Sign.init()
+	Stadium.init()
+	Tree.init()
 	
 	entities.init()
 	blips.init()

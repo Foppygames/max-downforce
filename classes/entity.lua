@@ -6,7 +6,7 @@ local perspective = require("modules.perspective")
 
 -- entity is not based on another class
 Entity = {}
-    
+
 function Entity:new(x,z)
 	o = {}
 	setmetatable(o, self)
@@ -25,6 +25,7 @@ function Entity:new(x,z)
 	o.image = nil
 	o.width = 0
 	o.height = 0
+	o.color = 1
 	
 	return o
 end
@@ -81,7 +82,7 @@ function Entity:draw()
 	local newScreenX = self:computeNewScreenX()
 	love.graphics.push()
 	love.graphics.scale(imageScale,imageScale)
-	love.graphics.setColor(1,1,1)
+	love.graphics.setColor(self.color,self.color,self.color)
 	love.graphics.draw(self.image,newScreenX/imageScale - self.width/2,self.screenY/imageScale - self.height)
 	love.graphics.pop()
 	self.storedScreenX = newScreenX

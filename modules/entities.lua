@@ -120,40 +120,37 @@ function entities.addTree(x,z,color)
 	return tree
 end
 
---[[local function checkCarCollisions(entity,player,dt)
+local function checkCollision(car,player,dt)
 	local carLength = perspective.maxZ / 50
 	local i = 1
 	while i <= #list do
 		local other = list[i]
 		
-		-- other is not entity
-		if (other ~= entity) then
+		if (other ~= car) then
 		
-			-- other is not car
-			if (other.entityType ~= entities.TYPE_CAR) then
+			if (not other:isCar()) then
 		
-				-- other is solid
 				if (other.solid) then
 		
 					-- collision on z
-					if ((entity.z < other.z) and ((entity.z + carLength) >= other.z)) then
+					if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
 					
-						local dX = math.abs(other.x - entity.x)
+						local dX = math.abs(other.x - car.x)
 						
-						local totalCarWidth = (bodyWidth + frontWheelWidth * 2) * entity.baseScale
+						local totalCarWidth = Car.getBaseTotalCarWidth() * car.baseScale
 						
 						-- collision on x
-						if (dX < (other.width * other.baseScale / 2 + totalCarWidth / 2)) then 
+						if (dX < (other:getCollisionWidth() * other.baseScale / 2 + totalCarWidth / 2)) then 
 							-- car explodes
-							entity.speed = 0
-							entity.acc = 0
-							if (entity.explodeCount == 0) then
-								entity.explodeCount = 2
-							end
+							car.speed = 0
+							car.accEffect = 0
+							
+							--if (entity.explodeCount == 0) then
+							--	entity.explodeCount = 2
+							--end
 							
 							return true
 						end
-						
 					end
 				
 				end
@@ -166,7 +163,7 @@ end
 	end	
 	
 	return false
-end]]
+end
 
 function entities.update(playerSpeed,dt,trackLength)
 	lap = false
@@ -174,6 +171,13 @@ function entities.update(playerSpeed,dt,trackLength)
 	
 	local i = 1
 	while i <= #list do
+		if (list[i]:isCar()) then
+			list[i].collided = false
+			if (checkCollision(list[i])) then
+				list[i].collided = true
+			end
+		end
+		
 		-- update
 		list[i]:update(dt)
 		

@@ -146,6 +146,7 @@ function Car:new(x,z,isPlayer,performanceFraction) --aheadOfPlayer
 	o.leftBumpDy = 0
 	o.rightBumpDy = 0
 	o.baseScale = 2
+	o.collided = false
 	
 	return o
 end
@@ -201,6 +202,10 @@ function Car.getAcceleration(speed,topSpeed)
 	else
 		return (topSpeed-speed)/14
 	end
+end
+
+function Car.getBaseTotalCarWidth()
+	return (bodyWidth + frontWheelWidth * 2)
 end
 
 function Car:updateSteerPlayer(dt)
@@ -405,14 +410,10 @@ function Car:update(dt)
 		acc = acc * OFF_ROAD_ACC_FACTOR
 	end
 	
-	--[[
-	local collided = checkCarCollisions(entity,player,dt)
-	]]
-	local collided = false
-	
 	self:updateSteer(dt)
 	
-	if (not collided) then
+	-- collided is managed by entities module
+	if (not self.collided) then
 		self:updateSpeed(acc,dt)
 	end
 	
@@ -551,3 +552,6 @@ function Car:setIsPlayer(isPlayer)
 	self.isPlayer = isPlayer
 end
 
+function Car:isCar()
+	return true
+end

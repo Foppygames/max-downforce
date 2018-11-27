@@ -34,3 +34,8 @@ function Tree:new(x,z,color)
 	
 	return o
 end
+
+-- use reduced collision width for collision with trunk only
+function Tree:getCollisionWidth()
+	return self.width / 2
+end

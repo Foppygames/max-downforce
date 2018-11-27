@@ -93,3 +93,10 @@ function Entity:isStartBanner()
 	return false
 end
 
+function Entity:isCar()
+	return false
+end
+
+function Entity:getCollisionWidth()
+	return self.width
+end

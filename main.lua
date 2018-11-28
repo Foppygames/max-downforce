@@ -295,9 +295,9 @@ function love.draw()
 			
 			-- draw grass
 			if (grassColorVariant == 1) then
-				love.graphics.setColor(0.176,0.286,0.141)
+				love.graphics.setColor(0.25,0.4,0.25)
 			else
-				love.graphics.setColor(0.149,0.243,0.122)
+				love.graphics.setColor(0.20,0.3,0.20)
 			end
 			love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 			

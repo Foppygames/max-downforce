@@ -121,44 +121,47 @@ function entities.addTree(x,z,color)
 end
 
 local function checkCollision(car,player,dt)
+	local baseCarWidth = Car.getBaseTotalCarWidth()
 	local carLength = perspective.maxZ / 50
+	local carWidth = baseCarWidth * car.baseScale
+						
 	local i = 1
 	while i <= #list do
 		local other = list[i]
-		
 		if (other ~= car) then
-		
+			-- other entity is scenery
 			if (not other:isCar()) then
-		
 				if (other.solid) then
-		
 					-- collision on z
 					if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
-					
 						local dX = math.abs(other.x - car.x)
-						
-						local totalCarWidth = Car.getBaseTotalCarWidth() * car.baseScale
-						
 						-- collision on x
-						if (dX < (other:getCollisionWidth() * other.baseScale / 2 + totalCarWidth / 2)) then 
-							-- car explodes
+						if (dX < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then 
+							-- car is halted
 							car.speed = 0
 							car.accEffect = 0
-							
 							--if (entity.explodeCount == 0) then
 							--	entity.explodeCount = 2
 							--end
-							
 							return true
 						end
 					end
-				
 				end
-				
+			-- other entity is car
+			else
+				-- collision on z
+				if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
+					local dX = math.abs(other.x - car.x)
+					-- collision on x
+					if (dX < (baseCarWidth * other.baseScale / 2 + carWidth / 2)) then 
+						-- car is blocked
+						car.speed = other.speed * 0.8
+						car.accEffect = 0
+						return true
+					end
+				end
 			end
-			
 		end
-		
 		i = i + 1
 	end	
 	

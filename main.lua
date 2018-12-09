@@ -110,7 +110,6 @@ function switchToState(newState)
 		local aiNumber = 1
 		local startZ = perspective.zMap[30];
 		local dz = (perspective.maxZ - perspective.minZ) / 24
-		--local aheadOfPlayer = false
 		
 		for i = 1, aiTotal+1 do
 			local z = startZ+(dz/2)*(i-1)*2
@@ -120,10 +119,9 @@ function switchToState(newState)
 				x = x * -1
 			end
 			if ((i - 1) == (cars - pos)) then
-				player = entities.addCar(x,z,true,1) --aheadOfPlayer
-				--aheadOfPlayer = true
+				player = entities.addCar(x,z,true,1)
 			else
-				entities.addCar(x,z,false,Car.getAiPerformanceFraction(aiNumber,aiTotal)) --aheadOfPlayer
+				entities.addCar(x,z,false,Car.getAiPerformanceFraction(aiNumber,aiTotal))
 				aiNumber = aiNumber + 1
 			end
 		end
@@ -147,7 +145,7 @@ function love.update(dt)
 		end
 		
 		schedule.update(playerSpeed,dt)
-		local newBlips = entities.update(playerSpeed,dt,segments.totalLength)
+		local entitiesUpdateResult = entities.update(playerSpeed,dt,segments.totalLength)
 		if (entities.checkLap()) then
 			lap = lap + 1
 			if (lap > LAP_COUNT) then
@@ -162,10 +160,12 @@ function love.update(dt)
 			end
 		end
 		
-		blips.addBlips(newBlips)
-		blips.update(playerSpeed,dt,segments.totalLength)
+		blips.addBlips(entitiesUpdateResult.newBlips)
+		local blipsUpdateResult = blips.update(playerSpeed,dt,segments.totalLength)
 		segments.update(playerSpeed,dt)
 		horizon.update(segments.getAtIndex(1).ddx,playerSpeed,dt)
+		
+		pos = entitiesUpdateResult.carsInFrontOfPlayer + blipsUpdateResult.carsInFrontOfPlayer + 1
 		
 		if (player ~= nil) then
 			if (player.explodeCount > 0) then

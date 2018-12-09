@@ -84,8 +84,8 @@ function entities.addBuilding(x,z)
 	return building
 end
 
-function entities.addCar(x,z,isPlayer,performanceFraction) --aheadOfPlayer
-	local car = Car:new(x,z,isPlayer,performanceFraction) --aheadOfPlayer
+function entities.addCar(x,z,isPlayer,performanceFraction)
+	local car = Car:new(x,z,isPlayer,performanceFraction)
 	
 	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,car)
@@ -170,7 +170,11 @@ end
 
 function entities.update(playerSpeed,dt,trackLength)
 	lap = false
-	newBlips = {}
+	
+	local newBlips = {}
+	local carsInFrontOfPlayer = 0
+	local carsBehindPlayer = 0
+	local seenPlayer = false
 	
 	local i = 1
 	while i <= #list do
@@ -185,7 +189,7 @@ function entities.update(playerSpeed,dt,trackLength)
 		list[i]:update(dt)
 		
 		-- scroll
-		result = list[i]:scroll(playerSpeed,dt)
+		local result = list[i]:scroll(playerSpeed,dt)
 		
 		if (result.blip) then
 			table.insert(newBlips,result.blip)
@@ -193,6 +197,27 @@ function entities.update(playerSpeed,dt,trackLength)
 		
 		if (result.lap) then
 			lap = true
+		end
+		
+		if (list[i]:isCar()) then
+			if (list[i].isPlayer) then
+				seenPlayer = true
+			elseif (not result.delete) then
+				-- in same lap
+				if (list[i].posToPlayer == 0) then
+					if (seenPlayer) then
+						carsInFrontOfPlayer = carsInFrontOfPlayer + 1
+					else
+						carsBehindPlayer = carsBehindPlayer + 1
+					end
+				-- cpu lap(s) behind player
+				elseif (list[i].posToPlayer > 0) then
+					carsBehindPlayer = carsBehindPlayer + 1
+				-- cpu lap(s) in front of player
+				else
+					carsInFrontOfPlayer = carsInFrontOfPlayer + 1
+				end
+			end
 		end
 		
 		if (result.delete) then
@@ -205,7 +230,11 @@ function entities.update(playerSpeed,dt,trackLength)
 	-- sort all entities on increasing z
 	table.sort(list,function(a,b) return a.z < b.z end)
 	
-	return newBlips
+	return {
+		newBlips = newBlips,
+		carsInFrontOfPlayer = carsInFrontOfPlayer,
+		carsBehindPlayer = carsBehindPlayer
+	}
 end
 
 function entities.resetForDraw()

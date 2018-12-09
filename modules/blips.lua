@@ -37,13 +37,14 @@ function blips.reset()
 	list = {}
 end
 
-function blips.addBlip(x,z,speed,aiTopSpeed,color,performanceFraction)
+function blips.addBlip(x,z,speed,aiTopSpeed,color,performanceFraction,posToPlayer)
 	local blip = {
 		x = x,
 		z = z,
 		speed = speed,
 		color = color,
 		performanceFraction = performanceFraction,
+		posToPlayer = posToPlayer,
 		topSpeed = performanceFraction * TOP_SPEED_FACTOR * aiTopSpeed,
 		new = true
 	}
@@ -54,15 +55,17 @@ function blips.addBlips(newBlips)
 	local i = 1
 	while i <= #newBlips do
 		local blip = newBlips[i]
-		blips.addBlip(blip.x,blip.z,blip.speed,blip.aiTopSpeed,blip.color,blip.performanceFraction)
+		blips.addBlip(blip.x,blip.z,blip.speed,blip.aiTopSpeed,blip.color,blip.performanceFraction,blip.posToPlayer)
 		i = i + 1
 	end
 end
 
 function blips.update(playerSpeed,dt,trackLength)
+	local carsInFrontOfPlayer = 0
 	local i = 1
 	while i <= #list do
 		local blip = list[i]
+		local deleted = false
 		if (not(blip.new)) then
 			local acc = Car.getAcceleration(blip.speed,blip.topSpeed) * ACC_FACTOR
 			if (blip.speed > blip.topSpeed) then
@@ -93,9 +96,11 @@ function blips.update(playerSpeed,dt,trackLength)
 					car.speed = blip.speed
 					car.targetSpeed = car.speed
 					car.freshFromBlip = true
+					car.posToPlayer = blip.posToPlayer - 1
 					
 					-- remove blip
 					table.remove(list,i)
+					deleted = true
 				-- blip is appearing on the horizon and will be lapped by player
 				elseif (math.abs(blip.z) >= (trackLength - (perspective.maxZ - perspective.minZ))) then
 					local diff = math.abs(blip.z) - (trackLength - (perspective.maxZ - perspective.minZ));
@@ -108,9 +113,11 @@ function blips.update(playerSpeed,dt,trackLength)
 					car.speed = blip.speed
 					car.targetSpeed = car.speed
 					car.freshFromBlip = true
+					car.posToPlayer = blip.posToPlayer + 1
 					
 					-- remove blip
 					table.remove(list,i)
+					deleted = true
 				else
 					i = i + 1
 				end
@@ -128,9 +135,11 @@ function blips.update(playerSpeed,dt,trackLength)
 					car.speed = blip.speed
 					car.targetSpeed = car.speed
 					car.freshFromBlip = true
+					car.posToPlayer = blip.posToPlayer - 1
 					
 					-- remove blip
 					table.remove(list,i)
+					deleted = true
 				-- blip is appearing on the horizon
 				elseif (blip.z <= 0) then
 					-- create car
@@ -141,17 +150,27 @@ function blips.update(playerSpeed,dt,trackLength)
 					car.speed = blip.speed
 					car.targetSpeed = car.speed
 					car.freshFromBlip = true
+					car.posToPlayer = blip.posToPlayer + 1
 					
 					-- remove blip
 					table.remove(list,i)
+					deleted = true
 				else
 					i = i + 1
 				end
-			end		
+			end	
 		else
 			blip.new = false
 		end
+		
+		if (blip.posToPlayer < 0) then
+			carsInFrontOfPlayer = carsInFrontOfPlayer + 1
+		end
 	end
+	
+	return {
+		carsInFrontOfPlayer = carsInFrontOfPlayer
+	}
 end
 
 return blips

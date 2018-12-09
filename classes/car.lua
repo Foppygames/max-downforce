@@ -88,7 +88,7 @@ function Car.getAiPerformanceFraction(aiNumber,aiTotal)
 	return AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * (aiNumber / aiTotal)
 end
 
-function Car:new(x,z,isPlayer,performanceFraction) --aheadOfPlayer
+function Car:new(x,z,isPlayer,performanceFraction)
 	o = Entity:new(x,z)	
 	setmetatable(o, self)
 	self.__index = self
@@ -103,12 +103,12 @@ function Car:new(x,z,isPlayer,performanceFraction) --aheadOfPlayer
 	o.sndEngineIdle = nil
 	o.sndEnginePower = nil
 	o.explodeCount = 0
-	
+	o.posToPlayer = 0
+		
 	if (o.isPlayer) then
 		o.color = {1,0,0}
 		o.pause = 0
 		o.topSpeed = TOP_SPEED
-		--o.posToPlayer = 0
 		
 		o.sndEngineIdle = love.audio.newSource("sounds/engine_idle.wav","static")
 		o.sndEngineIdle:setLooping(true)
@@ -128,11 +128,6 @@ function Car:new(x,z,isPlayer,performanceFraction) --aheadOfPlayer
 		}
 		o.pause = 2
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
-		--[[if (aheadOfPlayer) then
-			o.posToPlayer = 1
-		else
-			o.posToPlayer = -1
-		end]]
 	end
 	
 	o.segmentDdx = 0
@@ -451,7 +446,8 @@ function Car:scroll(playerSpeed,dt)
 					speed = self.speed,
 					aiTopSpeed = AI_TOP_SPEED,
 					color = self.color,
-					performanceFraction = self.performanceFraction
+					performanceFraction = self.performanceFraction,
+					posToPlayer = self.posToPlayer + 1
 				}
 			else
 				blip = {
@@ -460,7 +456,8 @@ function Car:scroll(playerSpeed,dt)
 					speed = self.speed,
 					aiTopSpeed = AI_TOP_SPEED,
 					color = self.color,
-					performanceFraction = self.performanceFraction
+					performanceFraction = self.performanceFraction,
+					posToPlayer = self.posToPlayer - 1
 				}
 			end
 			

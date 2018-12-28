@@ -120,44 +120,62 @@ function entities.addTree(x,z,color)
 	return tree
 end
 
-local function checkCollision(car,player,dt)
+local function checkCollision(car,lookAhead)
 	local baseCarWidth = Car.getBaseTotalCarWidth()
 	local carLength = perspective.maxZ / 50
 	local carWidth = baseCarWidth * car.baseScale
-						
+	local checkDistance = carLength
+	if (lookAhead) then
+		checkDistance = checkDistance + carLength * 15 * (car.speed / car.topSpeed)
+	end
+	
 	local i = 1
 	while i <= #list do
 		local other = list[i]
 		if (other ~= car) then
 			-- other entity is scenery
 			if (not other:isCar()) then
-				if (other.solid) then
-					-- collision on z
-					if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
-						local dX = math.abs(other.x - car.x)
-						-- collision on x
-						if (dX < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then 
-							-- car is halted
-							car.speed = 0
-							car.accEffect = 0
-							--if (entity.explodeCount == 0) then
-							--	entity.explodeCount = 2
-							--end
-							return true
+				if (not lookAhead) then
+					if (other.solid) then
+						-- collision on z
+						if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
+							local dX = math.abs(other.x - car.x)
+							-- collision on x
+							if (dX < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then 
+								-- car is halted
+								car.speed = 0
+								car.accEffect = 0
+								--if (entity.explodeCount == 0) then
+								--	entity.explodeCount = 2
+								--end
+								return {collision = true}
+							end
 						end
 					end
 				end
 			-- other entity is car
 			else
 				-- collision on z
-				if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
-					local dX = math.abs(other.x - car.x)
-					-- collision on x
-					if (dX < (baseCarWidth * other.baseScale / 2 + carWidth / 2)) then 
-						-- car is blocked
-						car.speed = other.speed * 0.8
-						car.accEffect = 0
-						return true
+				if ((car.z < other.z) and ((car.z + checkDistance) >= other.z)) then
+					-- closing in on each other
+					if (car.speed > other.speed) then
+						local dX = math.abs(other.x - car.x)
+						-- collision on x
+						if (dX < (baseCarWidth * other.baseScale / 2 + carWidth / 2)) then 
+							-- only looking ahead
+							if (lookAhead) then
+								return {
+									collision = true,
+									collisionX = other.x
+								}
+							-- actual collision
+							else
+								-- car is blocked
+								car.speed = other.speed * 0.8
+								car.accEffect = 0
+								return {collision = true}
+							end
+						end
 					end
 				end
 			end
@@ -165,7 +183,7 @@ local function checkCollision(car,player,dt)
 		i = i + 1
 	end	
 	
-	return false
+	return {collision = false}
 end
 
 function entities.update(playerSpeed,dt,trackLength)
@@ -180,7 +198,8 @@ function entities.update(playerSpeed,dt,trackLength)
 	while i <= #list do
 		if (list[i]:isCar()) then
 			list[i].collided = false
-			if (checkCollision(list[i])) then
+			local checkCollisionResult = checkCollision(list[i],false)
+			if (checkCollisionResult.collision) then
 				list[i].collided = true
 			end
 		end
@@ -216,6 +235,13 @@ function entities.update(playerSpeed,dt,trackLength)
 				-- cpu lap(s) in front of player
 				else
 					carsInFrontOfPlayer = carsInFrontOfPlayer + 1
+				end
+				
+				local lookAheadResult = checkCollision(list[i],true)
+				
+				-- ai: possible collision detected
+				if (lookAheadResult.collision) then
+					list[i]:selectNewLane(lookAheadResult.collisionX)
 				end
 			end
 		end

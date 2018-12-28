@@ -109,11 +109,11 @@ function switchToState(newState)
 		local aiTotal = cars-1
 		local aiNumber = 1
 		local startZ = perspective.zMap[30];
-		local dz = (perspective.maxZ - perspective.minZ) / 24
+		local dz = (perspective.maxZ - perspective.minZ) / 18
 		
 		for i = 1, aiTotal+1 do
 			local z = startZ+(dz/2)*(i-1)*2
-			local x = road.ROAD_WIDTH/6
+			local x = road.ROAD_WIDTH/4
 			if (i % 2 == 0) then
 				z = z + dz / 2
 				x = x * -1

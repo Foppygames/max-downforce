@@ -19,11 +19,12 @@ local BRAKE = 30
 local IDLE_BRAKE = 2
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
-local AI_MIN_PERFORMANCE_FRACTION = 0.3
-local AI_MAX_PERFORMANCE_FRACTION = 1.0
+local AI_MIN_PERFORMANCE_FRACTION = 0.60 --0.3
+local AI_MAX_PERFORMANCE_FRACTION = 0.98 --1.0
 local AI_TOP_SPEED = TOP_SPEED * 1.01
 local AI_CURVE_SLOWDOWN_FACTOR = 0.05
 local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 20
+local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.90
 
 -- local variables
 local imgBody = nil
@@ -238,7 +239,7 @@ function Car:updateSteerCpu(dt)
 			self.steer = MAX_STEER
 		end
 	elseif (self.steer ~= 0) then
-		self.steer = self.steer * STEER_RETURN_FACTOR
+		self.steer = self.steer * AI_STEER_RETURN_FACTOR
 	end
 end
 
@@ -471,6 +472,14 @@ function Car:scroll(playerSpeed,dt)
 		lap = lap,
 		delete = delete
 	}
+end
+
+function Car:selectNewLane(collisionX)
+	if (collisionX < 0) then
+		self.targetX = road.ROAD_WIDTH/4
+	else
+		self.targetX = -road.ROAD_WIDTH/4
+	end
 end
 
 function Car:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previousScreenY,previousScale,segment)

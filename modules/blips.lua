@@ -16,8 +16,8 @@ local perspective = require("modules.perspective")
 -- constants
 -- =========================================================
 
-local TOP_SPEED_FACTOR = 0.99
-local ACC_FACTOR = 0.01
+local TOP_SPEED_FACTOR = 1 --0.99
+local ACC_FACTOR = 1 --0.01
 
 -- =========================================================
 -- private variables
@@ -69,12 +69,12 @@ function blips.update(playerSpeed,dt,trackLength)
 		if (not(blip.new)) then
 			local acc = Car.getAcceleration(blip.speed,blip.topSpeed) * ACC_FACTOR
 			if (blip.speed > blip.topSpeed) then
-				blip.speed = blip.speed - acc
+				blip.speed = blip.speed - acc * dt
 				if (blip.speed < blip.topSpeed) then
 					blip.speed = blip.topSpeed
 				end
 			elseif (blip.speed < blip.topSpeed) then
-				blip.speed = blip.speed + acc
+				blip.speed = blip.speed + acc * dt
 				if (blip.speed > blip.topSpeed) then
 					blip.speed = blip.topSpeed
 				end

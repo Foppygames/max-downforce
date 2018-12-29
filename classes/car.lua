@@ -19,8 +19,8 @@ local BRAKE = 30
 local IDLE_BRAKE = 2
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
-local AI_MIN_PERFORMANCE_FRACTION = 0.60 --0.3
-local AI_MAX_PERFORMANCE_FRACTION = 0.98 --1.0
+local AI_MIN_PERFORMANCE_FRACTION = 0.30
+local AI_MAX_PERFORMANCE_FRACTION = 0.95
 local AI_TOP_SPEED = TOP_SPEED * 1.01
 local AI_CURVE_SLOWDOWN_FACTOR = 0.05
 local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 20
@@ -193,10 +193,19 @@ end
 
 -- Note: static function that is also used by blips
 function Car.getAcceleration(speed,topSpeed)
+	local standardDiff = TOP_SPEED-speed
+	if (standardDiff < 0) then
+		standardDiff = 0
+	end
+
+	local carDiff = topSpeed-speed
+	
+	local averagedDiff = (3*standardDiff + carDiff) / 4
+	
 	if (speed < topSpeed*0.96) then
-		return (topSpeed-speed)/6
+		return averagedDiff / 6
 	else
-		return (topSpeed-speed)/14
+		return averagedDiff / 14
 	end
 end
 

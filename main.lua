@@ -109,7 +109,7 @@ function switchToState(newState)
 		local aiTotal = cars-1
 		local aiNumber = 1
 		local startZ = perspective.zMap[30];
-		local dz = (perspective.maxZ - perspective.minZ) / 18
+		local dz = (perspective.maxZ - perspective.minZ) / cars
 		
 		for i = 1, aiTotal+1 do
 			local z = startZ+(dz/2)*(i-1)*2

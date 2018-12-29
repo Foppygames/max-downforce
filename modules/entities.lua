@@ -126,7 +126,7 @@ local function checkCollision(car,lookAhead)
 	local carWidth = baseCarWidth * car.baseScale
 	local checkDistance = carLength
 	if (lookAhead) then
-		checkDistance = checkDistance + carLength * 15 * (car.speed / car.topSpeed)
+		checkDistance = checkDistance + carLength * 5 * (car.speed / car.topSpeed)
 	end
 	
 	local i = 1

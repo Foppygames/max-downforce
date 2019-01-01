@@ -21,6 +21,7 @@ local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
 local AI_MIN_PERFORMANCE_FRACTION = 0.30
 local AI_MAX_PERFORMANCE_FRACTION = 0.95
+local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.12
 local AI_TOP_SPEED = TOP_SPEED * 1.01
 local AI_CURVE_SLOWDOWN_FACTOR = 0.05
 local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 20
@@ -86,7 +87,18 @@ function Car.init()
 end
 
 function Car.getAiPerformanceFraction(aiNumber,aiTotal)
-	return AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * (aiNumber / aiTotal)
+	local standard = AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * (aiNumber / aiTotal)
+	local randomized = standard - AI_PERFORMANCE_FRACTION_RANDOM_RANGE/2 + math.random() * AI_PERFORMANCE_FRACTION_RANDOM_RANGE
+	
+	if (randomized < AI_MIN_PERFORMANCE_FRACTION) then
+		randomized = AI_MIN_PERFORMANCE_FRACTION
+	end
+
+	if (randomized > AI_MAX_PERFORMANCE_FRACTION) then
+		randomized = AI_MAX_PERFORMANCE_FRACTION
+	end
+	
+	return randomized
 end
 
 function Car:new(x,z,isPlayer,performanceFraction)

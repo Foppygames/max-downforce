@@ -31,6 +31,8 @@ local STATE_RACE = 1
 local STATE_GAME_OVER = 2
 
 local LAP_COUNT = 10
+local CAR_COUNT = 20
+local PLAYER_POS = 20
 local FINISHED_COUNT = 5
 
 -- =========================================================
@@ -48,8 +50,8 @@ local player = nil
 local playerX = 0
 local playerSpeed = 0
 local lap = 0
-local cars = 20
-local pos = 20
+local cars = CAR_COUNT
+local pos = PLAYER_POS
 local finished = false
 local finishedCount = 0
 
@@ -97,6 +99,8 @@ function switchToState(newState)
 		-- ...
 	elseif (state == STATE_RACE) then
 		lap = 0
+		cars = CAR_COUNT
+		pos = PLAYER_POS
 		finished = false
 		finishedCount = 0
 
@@ -109,7 +113,7 @@ function switchToState(newState)
 		local aiTotal = cars-1
 		local aiNumber = 1
 		local startZ = perspective.zMap[30];
-		local dz = (perspective.maxZ - perspective.minZ) / cars
+		local dz = (perspective.maxZ - perspective.minZ) / pos
 		
 		for i = 1, aiTotal+1 do
 			local z = startZ+(dz/2)*(i-1)*2

@@ -43,6 +43,7 @@ local index = nil
 
 function entities.init()
 	list = {}
+	index = nil
 end
 
 function entities.reset()
@@ -126,7 +127,7 @@ local function checkCollision(car,lookAhead)
 	local carWidth = baseCarWidth * car.baseScale
 	local checkDistance = carLength
 	if (lookAhead) then
-		checkDistance = checkDistance + carLength * 5 * (car.speed / car.topSpeed)
+		checkDistance = checkDistance + carLength * 10 * (car.speed / car.topSpeed)
 	end
 	
 	local i = 1

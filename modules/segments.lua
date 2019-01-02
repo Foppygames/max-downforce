@@ -15,6 +15,7 @@ local schedule = require("modules.schedule")
 -- =========================================================
 
 segments.MAX_SEGMENT_DDX = 0.0028
+segments.FIRST_SEGMENT_LENGTH = 3.79 -- used in setting up starting grid
 
 segments.TEXTURE_NORMAL = "normal"
 segments.TEXTURE_START_FINISH = "start_finish"
@@ -29,14 +30,14 @@ local SMOOTHING_SEGMENT_LENGTH = 0.04
 -- note: length is written as fraction of maxZ, to be converted in segments.init()
 -- note: dz is written as fraction of maxZ, to be converted in segments.init()
 local track = {
-	-- piece of straight containing grid in stadium area
+	-- straight before start/finish
 	{
 		ddx = 0,
-		length = 0.79,
+		length = segments.FIRST_SEGMENT_LENGTH,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_STADIUM_L,
-				startZ = 0.00,
+				startZ = segments.FIRST_SEGMENT_LENGTH - 0.79,
 				dz = 0.1,
 				count = 8
 			},
@@ -250,15 +251,7 @@ local track = {
 		length = 5,
 		scheduleItems = {},
 		texture = segments.TEXTURE_NORMAL
-	},
-	-- straight before start/finish into stadium area
-	{
-		ddx = 0,
-		length = 3,
-		scheduleItems = {},
-		texture = segments.TEXTURE_NORMAL
 	}
-	
 }
 local trackIndex
 local active

@@ -31,8 +31,8 @@ local STATE_RACE = 1
 local STATE_GAME_OVER = 2
 
 local LAP_COUNT = 10
-local CAR_COUNT = 20
-local PLAYER_POS = 20
+local CAR_COUNT = 50 --20
+local PLAYER_POS = 40 --20
 local FINISHED_COUNT = 5
 
 -- =========================================================
@@ -113,9 +113,41 @@ function switchToState(newState)
 		local aiTotal = cars-1
 		local aiNumber = 1
 		local startZ = perspective.zMap[30];
-		local dz = (perspective.maxZ - perspective.minZ) / pos
+		local dz = (perspective.maxZ - perspective.minZ) / 14
 		
-		for i = 1, aiTotal+1 do
+		-- player not on first segment
+		if ((pos * dz) > (segments.FIRST_SEGMENT_LENGTH * perspective.maxZ)) then
+			print("Warning: player not on first segment")
+		end
+		
+		-- scroll towards player position with respect to end of first segment
+		segments.update(segments.FIRST_SEGMENT_LENGTH * perspective.maxZ - ((pos + 4) * dz), 1)
+		
+		-- add player
+		local x = road.ROAD_WIDTH / 4
+		if (pos % 2 == 0) then
+			x = x * -1
+		end
+		local z = startZ
+		player = entities.addCar(x,z,true,1)
+		
+		-- add cpu cars from back to front
+		for i = 1, cars do
+			local cpuPos = cars - (i - 1)
+			if (cpuPos ~= pos) then
+				local relPos = pos - cpuPos
+				z = startZ + dz * relPos
+				x = road.ROAD_WIDTH / 4
+				if (i % 2 == 0) then
+					z = z + dz / 2
+					x = x * -1
+				end
+				entities.addCar(x,z,false,Car.getAiPerformanceFraction(aiNumber,aiTotal))
+				aiNumber = aiNumber + 1
+			end
+		end
+		
+		--[[for i = 1, aiTotal+1 do
 			local z = startZ+(dz/2)*(i-1)*2
 			local x = road.ROAD_WIDTH/4
 			if (i % 2 == 0) then
@@ -123,12 +155,12 @@ function switchToState(newState)
 				x = x * -1
 			end
 			if ((i - 1) == (cars - pos)) then
-				player = entities.addCar(x,z,true,1)
+				--player = entities.addCar(x,z,true,1)
 			else
 				entities.addCar(x,z,false,Car.getAiPerformanceFraction(aiNumber,aiTotal))
 				aiNumber = aiNumber + 1
 			end
-		end
+		end]]--
 	elseif (state == STATE_GAME_OVER) then
 		-- ...
 	end
@@ -136,10 +168,14 @@ end
 
 function love.update(dt)
 	if (state == STATE_RACE) then
+		local playerX
+		
 		if (player ~= nil) then
 			playerSpeed = player.speed
+			playerX = player.x
 		else
 			playerSpeed = 0
+			playerX = nil
 		end
 		
 		-- update texture offset
@@ -165,7 +201,7 @@ function love.update(dt)
 		end
 		
 		blips.addBlips(entitiesUpdateResult.newBlips)
-		local blipsUpdateResult = blips.update(playerSpeed,dt,segments.totalLength)
+		local blipsUpdateResult = blips.update(playerSpeed,dt,segments.totalLength,playerX)
 		segments.update(playerSpeed,dt)
 		horizon.update(segments.getAtIndex(1).ddx,playerSpeed,dt)
 		

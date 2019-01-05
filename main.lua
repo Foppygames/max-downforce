@@ -146,21 +146,6 @@ function switchToState(newState)
 				aiNumber = aiNumber + 1
 			end
 		end
-		
-		--[[for i = 1, aiTotal+1 do
-			local z = startZ+(dz/2)*(i-1)*2
-			local x = road.ROAD_WIDTH/4
-			if (i % 2 == 0) then
-				z = z + dz / 2
-				x = x * -1
-			end
-			if ((i - 1) == (cars - pos)) then
-				--player = entities.addCar(x,z,true,1)
-			else
-				entities.addCar(x,z,false,Car.getAiPerformanceFraction(aiNumber,aiTotal))
-				aiNumber = aiNumber + 1
-			end
-		end]]--
 	elseif (state == STATE_GAME_OVER) then
 		-- ...
 	end

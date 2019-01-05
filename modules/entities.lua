@@ -126,6 +126,7 @@ local function checkCollision(car,lookAhead)
 	local carLength = perspective.maxZ / 50
 	local carWidth = baseCarWidth * car.baseScale
 	local checkDistance = carLength
+	
 	if (lookAhead) then
 		checkDistance = checkDistance + carLength * 10 * (car.speed / car.topSpeed)
 	end
@@ -167,7 +168,8 @@ local function checkCollision(car,lookAhead)
 							if (lookAhead) then
 								return {
 									collision = true,
-									collisionX = other.x
+									collisionX = other.x,
+									blockingCarSpeed = other.speed
 								}
 							-- actual collision
 							else
@@ -242,7 +244,7 @@ function entities.update(playerSpeed,dt,trackLength)
 				
 				-- ai: possible collision detected
 				if (lookAheadResult.collision) then
-					list[i]:selectNewLane(lookAheadResult.collisionX)
+					list[i]:selectNewLane(lookAheadResult.collisionX,lookAheadResult.blockingCarSpeed)
 				end
 			end
 		end

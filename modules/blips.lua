@@ -18,7 +18,6 @@ local road = require("modules.road")
 -- =========================================================
 
 local TOP_SPEED_FACTOR = 1 --0.99
-local ACC_FACTOR = 1 --0.01
 
 -- =========================================================
 -- private variables
@@ -83,7 +82,7 @@ function blips.update(playerSpeed,dt,trackLength,playerX)
 				blip.pause = blip.pause - 1 * dt
 				i = i + 1
 			else
-				local acc = Car.getAcceleration(blip.speed,blip.topSpeed) * ACC_FACTOR
+				local acc = Car.getAcceleration(blip.speed,blip.topSpeed)
 				if (blip.speed > blip.topSpeed) then
 					blip.speed = blip.speed - acc * dt
 					if (blip.speed < blip.topSpeed) then

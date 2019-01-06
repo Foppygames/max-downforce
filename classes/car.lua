@@ -19,14 +19,14 @@ local BRAKE = 30
 local IDLE_BRAKE = 2
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
-local AI_MIN_PERFORMANCE_FRACTION = 0.40
+local AI_MIN_PERFORMANCE_FRACTION = 0.50
 local AI_MAX_PERFORMANCE_FRACTION = 0.95
 local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.10
 local AI_TOP_SPEED = TOP_SPEED * 1.01
 local AI_CURVE_SLOWDOWN_FACTOR = 0.05
 local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 20
 local AI_STEER_CHANGE = STEER_CHANGE * 0.9
-local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.85 --0.90
+local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.5 --0.85
 
 -- local variables
 local imgBody = nil
@@ -118,9 +118,6 @@ function Car:new(x,z,isPlayer,performanceFraction)
 	o.sndEnginePower = nil
 	o.explodeCount = 0
 	o.posToPlayer = 0
-	
-	o.aiLaneChangeCount = 0
-	o.aiLaneChangeResetTime = 0
 	o.aiBlockingCarSpeed = nil
 		
 	if (o.isPlayer) then
@@ -312,6 +309,7 @@ function Car:updateSpeedCPU(acc,dt)
 				self.speed = self.speed - BRAKE * dt
 				self.accEffect = -BRAKE
 			end
+			self.aiBlockingCarSpeed = nil
 		elseif (self.speed < self.targetSpeed) then
 			self.speed = self.speed + acc * dt
 			self.accEffect = acc
@@ -452,14 +450,6 @@ function Car:update(dt)
 	else
 		-- update z
 		self.z = self.z + self.speed * dt
-		
-		-- update lane change reset timer
-		self.aiLaneChangeResetTime = self.aiLaneChangeResetTime - dt
-		if (self.aiLaneChangeResetTime <= 0) then
-			self.aiLaneChangeResetTime = 0
-			self.aiLaneChangeCount = 0
-			self.aiBlockingCarSpeed = nil
-		end
 	end
 	
 	self:updateWheelAnimation(dt)
@@ -516,41 +506,16 @@ function Car:scroll(playerSpeed,dt)
 	}
 end
 
-function Car:selectNewLane(collisionX,blockingCarSpeed)
-	local collisionXSign = (collisionX > 0)
-	local targetXSign = (self.targetX > 0)
-	
-	-- change not yet initiated
-	if (collisionXSign == targetXSign) then
-		-- default is to change lanes
-		local change = true
-			
-		-- lane has been changed twice recently
-		if (self.aiLaneChangeCount == 2) then
-			-- do not change
-			change = false
-		end
-
-		if (change) then
-			self.aiBlockingCarSpeed = nil
-		
-			if (collisionX < 0) then
-				self.targetX = road.ROAD_WIDTH/4
-			else
-				self.targetX = -road.ROAD_WIDTH/4
-			end
-			
-			-- count lane change
-			self.aiLaneChangeCount = self.aiLaneChangeCount + 1
-			
-			-- first lane change in series
-			if (self.aiLaneChangeCount == 1) then
-				-- set time to reset count
-				self.aiLaneChangeResetTime = 1
-			end
+function Car:selectNewLane(collisionX,collisionDz,blockingCarSpeed,otherLaneResult)
+	-- other lane blocked
+	if (otherLaneResult.collision and (otherLaneResult.collisionDz < collisionDz)) then
+		-- consider braking
+		self.aiBlockingCarSpeed = blockingCarSpeed
+	else
+		if (collisionX < 0) then
+			self.targetX = road.ROAD_WIDTH/4
 		else
-			-- maybe braking is necessary
-			self.aiBlockingCarSpeed = blockingCarSpeed
+			self.targetX = -road.ROAD_WIDTH/4
 		end
 	end
 end

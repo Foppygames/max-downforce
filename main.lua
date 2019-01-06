@@ -31,8 +31,8 @@ local STATE_RACE = 1
 local STATE_GAME_OVER = 2
 
 local LAP_COUNT = 10
-local CAR_COUNT = 50 --20
-local PLAYER_POS = 40 --20
+local CAR_COUNT = 50
+local PLAYER_POS = 50
 local FINISHED_COUNT = 5
 
 -- =========================================================
@@ -124,9 +124,9 @@ function switchToState(newState)
 		segments.update(segments.FIRST_SEGMENT_LENGTH * perspective.maxZ - ((pos + 4) * dz), 1)
 		
 		-- add player
-		local x = road.ROAD_WIDTH / 4
+		local x = -road.ROAD_WIDTH / 4
 		if (pos % 2 == 0) then
-			x = x * -1
+			x = -x
 		end
 		local z = startZ
 		player = entities.addCar(x,z,true,1)

@@ -1,5 +1,5 @@
 -- Max Downforce - modules/blips.lua
--- 2018 Foppygames
+-- 2018-2019 Foppygames
 
 require "classes.car"
 
@@ -17,7 +17,7 @@ local road = require("modules.road")
 -- constants
 -- =========================================================
 
-local TOP_SPEED_FACTOR = 1 --0.99
+local TOP_SPEED_FACTOR = 0.99
 
 -- =========================================================
 -- private variables
@@ -108,7 +108,7 @@ function blips.update(playerSpeed,dt,trackLength,playerX)
 						
 						-- set properties
 						car.color = blip.color
-						car.speed = blip.speed
+						car.speed = blip.speed * 0.95
 						car.targetSpeed = car.speed
 						car.freshFromBlip = true
 						car.posToPlayer = blip.posToPlayer - 1
@@ -147,7 +147,7 @@ function blips.update(playerSpeed,dt,trackLength,playerX)
 						
 						-- set properties
 						car.color = blip.color
-						car.speed = blip.speed
+						car.speed = blip.speed * 0.95
 						car.targetSpeed = car.speed
 						car.freshFromBlip = true
 						car.posToPlayer = blip.posToPlayer - 1

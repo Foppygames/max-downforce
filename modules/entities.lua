@@ -1,5 +1,5 @@
 -- Max Downforce - modules/entities.lua
--- 2017-2018 Foppygames
+-- 2017-2019 Foppygames
 
 local entities = {}
 

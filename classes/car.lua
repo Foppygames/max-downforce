@@ -1,5 +1,5 @@
 -- Max Downforce - classes/car.lua
--- 2018 Foppygames
+-- 2018-2019 Foppygames
 
 -- modules
 local aspect = require("modules.aspect")
@@ -17,16 +17,18 @@ local TOP_SPEED = 80
 local TOP_SPEED_IN_KMH = 360
 local BRAKE = 30
 local IDLE_BRAKE = 2
+local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.30
+local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.40
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
-local AI_MIN_PERFORMANCE_FRACTION = 0.50
+local AI_MIN_PERFORMANCE_FRACTION = 0.45
 local AI_MAX_PERFORMANCE_FRACTION = 0.95
-local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.10
+local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.20
 local AI_TOP_SPEED = TOP_SPEED * 1.01
 local AI_CURVE_SLOWDOWN_FACTOR = 0.05
-local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 20
+local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 30
 local AI_STEER_CHANGE = STEER_CHANGE * 0.9
-local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.5 --0.85
+local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.60
 
 -- local variables
 local imgBody = nil
@@ -88,18 +90,19 @@ function Car.init()
 end
 
 function Car.getAiPerformanceFraction(aiNumber,aiTotal)
-	local standard = AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * (aiNumber / aiTotal)
-	local randomized = standard - AI_PERFORMANCE_FRACTION_RANDOM_RANGE/2 + math.random() * AI_PERFORMANCE_FRACTION_RANDOM_RANGE
+	local fraction = AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * (aiNumber / aiTotal)
 	
-	if (randomized < AI_MIN_PERFORMANCE_FRACTION) then
-		randomized = AI_MIN_PERFORMANCE_FRACTION
-	end
-
-	if (randomized > AI_MAX_PERFORMANCE_FRACTION) then
-		randomized = AI_MAX_PERFORMANCE_FRACTION
+	-- every 4th car is randomized
+	if (aiNumber % 4 == 0) then
+		fraction = fraction - AI_PERFORMANCE_FRACTION_RANDOM_RANGE/2 + math.random() * AI_PERFORMANCE_FRACTION_RANDOM_RANGE
+		if (fraction < AI_MIN_PERFORMANCE_FRACTION) then
+			fraction = AI_MIN_PERFORMANCE_FRACTION
+		elseif (fraction > AI_MAX_PERFORMANCE_FRACTION) then
+			fraction = AI_MAX_PERFORMANCE_FRACTION
+		end	
 	end
 	
-	return randomized
+	return fraction
 end
 
 function Car:new(x,z,isPlayer,performanceFraction)
@@ -163,8 +166,6 @@ end
 
 function Car:updateOffRoad(dt)
 	local offRoad = false
-	local maxDistBeforeCurb = road.ROAD_WIDTH*0.30
-	local maxDistBeforeGrass = road.ROAD_WIDTH*0.40
 	
 	if (self.leftBumpDy < 0) then
 		self.leftBumpDy = self.leftBumpDy + self.speed/2 * dt
@@ -180,18 +181,18 @@ function Car:updateOffRoad(dt)
 		end
 	end
 	
-	if (self.x < -maxDistBeforeCurb) then
+	if (self.x < -MAX_DIST_BEFORE_CURB) then
 		if (self.leftBumpDy == 0) then
 			self.leftBumpDy = -1
 		end
-		if (self.x < -maxDistBeforeGrass) then
+		if (self.x < -MAX_DIST_BEFORE_GRASS) then
 			offRoad = true
 		end
-	elseif (self.x > maxDistBeforeCurb) then
+	elseif (self.x > MAX_DIST_BEFORE_CURB) then
 		if (self.rightBumpDy == 0) then
 			self.rightBumpDy = -1
 		end
-		if (self.x > maxDistBeforeGrass) then
+		if (self.x > MAX_DIST_BEFORE_GRASS) then
 			offRoad = true
 		end
 	end
@@ -251,6 +252,14 @@ function Car:updateSteerPlayer(dt)
 end
 
 function Car:updateSteerCpu(dt)
+	-- stay on track
+	if (self.x < -MAX_DIST_BEFORE_CURB) then
+		self.targetX = -road.ROAD_WIDTH/4
+	elseif (self.x > MAX_DIST_BEFORE_CURB) then
+		self.targetX = road.ROAD_WIDTH/4
+	end
+
+	-- steer towards target
 	if (self.x > (self.targetX + AI_TARGET_X_MARGIN)) then
 		self.steer = self.steer - AI_STEER_CHANGE * (1 + math.abs(self.segmentDdx)) * dt
 		if (self.steer < -MAX_STEER) then

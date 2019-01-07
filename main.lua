@@ -1,5 +1,5 @@
 -- Max Downforce - main.lua
--- 2017-2018 Foppygames
+-- 2017-2019 Foppygames
 
 -- =========================================================
 -- includes
@@ -113,7 +113,7 @@ function switchToState(newState)
 		local aiTotal = cars-1
 		local aiNumber = 1
 		local startZ = perspective.zMap[30];
-		local dz = (perspective.maxZ - perspective.minZ) / 14
+		local dz = (perspective.maxZ - perspective.minZ) / 13
 		
 		-- player not on first segment
 		if ((pos * dz) > (segments.FIRST_SEGMENT_LENGTH * perspective.maxZ)) then

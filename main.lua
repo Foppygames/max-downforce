@@ -20,6 +20,7 @@ local perspective = require("modules.perspective")
 local road = require("modules.road")
 local schedule = require("modules.schedule")
 local segments = require("modules.segments")
+local sound = require("modules.sound")
 local utils = require("modules.utils")
 
 -- =========================================================
@@ -84,6 +85,7 @@ function setupGame()
 	horizon.init()
 	perspective.initZMapAndScaling()
 	segments.init()
+	sound.init()
 	aspect.init(fullScreen)
 end
 

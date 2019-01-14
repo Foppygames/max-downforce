@@ -100,3 +100,8 @@ end
 function Entity:getCollisionWidth()
 	return self.width
 end
+
+-- cleans up object prior to deletion
+function Entity:clean()
+	-- ...
+end

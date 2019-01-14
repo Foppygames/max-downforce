@@ -47,19 +47,11 @@ function entities.init()
 end
 
 function entities.reset()
-	-- stop audio
 	local i = 1
 	while i <= #list do
-		local entity = list[i]
-		if (entity.sndEngineIdle ~= nil) then
-			love.audio.stop(entity.sndEngineIdle)
-		end
-		if (entity.sndEnginePower ~= nil) then
-			love.audio.stop(entity.sndEnginePower)
-		end
+		list[i]:clean()
 		i = i + 1
 	end
-	
 	list = {}
 end
 
@@ -285,6 +277,8 @@ function entities.update(playerSpeed,dt,trackLength)
 		end
 		
 		if (result.delete) then
+			list[i]:clean()
+		
 			table.remove(list,i)
 		else
 			i = i + 1

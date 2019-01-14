@@ -13,7 +13,7 @@ local aspect = require("modules.aspect")
 -- constants
 -- =========================================================
 
-road.ROAD_WIDTH = aspect.GAME_WIDTH * 1.55
+road.ROAD_WIDTH = aspect.GAME_WIDTH * 1.60 --1.55
 road.CURB_WIDTH = road.ROAD_WIDTH / 15
 road.STRIPE_WIDTH = road.CURB_WIDTH / 3
 

@@ -5,6 +5,7 @@
 local aspect = require("modules.aspect")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
+local sound = require("modules.sound")
 
 -- classes
 require "classes.entity"
@@ -21,7 +22,7 @@ local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.30
 local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.40
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
-local AI_MIN_PERFORMANCE_FRACTION = 0.45
+local AI_MIN_PERFORMANCE_FRACTION = 0.40
 local AI_MAX_PERFORMANCE_FRACTION = 0.95
 local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.20
 local AI_TOP_SPEED = TOP_SPEED * 1.01
@@ -122,21 +123,21 @@ function Car:new(x,z,isPlayer,performanceFraction)
 	o.explodeCount = 0
 	o.posToPlayer = 0
 	o.aiBlockingCarSpeed = nil
-		
+	o.pause = 2
+			
 	if (o.isPlayer) then
 		o.color = {1,0,0}
-		o.pause = 0
 		o.topSpeed = TOP_SPEED
 		
-		o.sndEngineIdle = love.audio.newSource("sounds/engine_idle.wav","static")
-		o.sndEngineIdle:setLooping(true)
+		o.sndEngineIdle = sound.getClone(sound.ENGINE_IDLE)
 		o.sndEngineIdle:setVolume(1)
 		love.audio.play(o.sndEngineIdle)
 		
-		o.sndEnginePower = love.audio.newSource("sounds/power3.ogg","static")
-		o.sndEnginePower:setLooping(true)
+		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
 		o.sndEnginePower:setVolume(0.5)
 		love.audio.play(o.sndEnginePower)
+		
+		o.gears = 7
 	else
 		local colorChoices = {0, 0.5, 1}
 		o.color = {
@@ -144,8 +145,13 @@ function Car:new(x,z,isPlayer,performanceFraction)
 			colorChoices[love.math.random(#colorChoices)],
 			colorChoices[love.math.random(#colorChoices)]
 		}
-		o.pause = 2
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
+		
+		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
+		o.sndEnginePower:setVolume(0)
+		love.audio.play(o.sndEnginePower)
+		
+		o.gears = math.random(3,8)
 	end
 	
 	o.segmentDdx = 0
@@ -284,27 +290,31 @@ function Car:updateSteer(dt)
 end
 
 function Car:updateSpeedPlayer(acc,dt)
-	if love.keyboard.isDown("up") then
-		self.speed = self.speed + acc * dt
-		self.accEffect = acc
-		if (self.speed > self.topSpeed) then
-			self.speed = self.topSpeed
-			self.accEffect = 0
-		end
+	if (self.pause > 0) then
+		self.pause = self.pause - 1 * dt
 	else
-		if (self.speed > 0) then
-			if love.keyboard.isDown("down") then
-				self.speed = self.speed - BRAKE * dt
-				self.accEffect = -BRAKE
-			else
-				self.speed = self.speed - IDLE_BRAKE * dt
-				self.accEffect = self.accEffect * 0.9
+		if love.keyboard.isDown("up") then
+			self.speed = self.speed + acc * dt
+			self.accEffect = acc
+			if (self.speed > self.topSpeed) then
+				self.speed = self.topSpeed
+				self.accEffect = 0
 			end
-		end
-		if (self.speed <= 0) then
-			self.speed = 0
-			self.steer = 0
-			self.accEffect = self.accEffect * 0.6
+		else
+			if (self.speed > 0) then
+				if love.keyboard.isDown("down") then
+					self.speed = self.speed - BRAKE * dt
+					self.accEffect = -BRAKE
+				else
+					self.speed = self.speed - IDLE_BRAKE * dt
+					self.accEffect = self.accEffect * 0.9
+				end
+			end
+			if (self.speed <= 0) then
+				self.speed = 0
+				self.steer = 0
+				self.accEffect = self.accEffect * 0.6
+			end
 		end
 	end
 end
@@ -377,7 +387,7 @@ function Car:updateSteerResultPlayer()
 end
 
 function Car:updateSteerResultCpu()
-	local steerUpdateSpeed = 20 --15
+	local steerUpdateSpeed = 20
 	if (self.steerResult < self.steer) then
 		self.steerResult = self.steerResult + steerUpdateSpeed
 		if (self.steerResult > self.steer) then
@@ -425,15 +435,35 @@ function Car:updateOutwardForce()
 	end
 end
 
+function Car:updateEngineSoundPlayer()
+	local gear = math.floor((self.speed/self.topSpeed) / (1.0/self.gears))
+	local gearSpeed = (self.speed - (gear*(self.topSpeed/self.gears))) / (self.topSpeed/self.gears)
+	self.sndEngineIdle:setPitch(1 + 1.5 * (self.speed/self.topSpeed) + math.random() / 10)
+	self.sndEnginePower:setPitch((0.4 + (gear+1) * 2.0  / 12 + gearSpeed * 0.8) * 0.5 + math.random() / 35)
+end
+
+function Car:updateEngineSoundCpu()
+	local gear = math.floor((self.speed/self.topSpeed) / (1.0/self.gears))
+	local gearSpeed = (self.speed - (gear*(self.topSpeed/self.gears))) / (self.topSpeed/self.gears)
+	local pitch = (0.4 + (gear+1) * 2.0  / 12 + gearSpeed * 0.8) * 0.5 + math.random() / 35
+	self.sndEnginePower:setPitch(pitch*1.1)
+	
+	local volume = 1 - (self.z - perspective.minZ) / (perspective.maxZ / 2 - perspective.minZ)
+	if (volume > 1) then
+		volume = 1
+	end
+	if (volume < 0) then
+		volume = 0
+	end
+	self.sndEnginePower:setVolume(volume * 0.3)
+end
+
 function Car:updateEngineSound()
-	local gears = 7
-	local gear = math.floor((self.speed/self.topSpeed) / (1.0/gears))
-	local gearSpeed = (self.speed - (gear*(self.topSpeed/gears))) / (self.topSpeed/gears)
-	local steerRateDx = 0.05 * math.abs(self.steer) / MAX_STEER
-	local ratePower = (0.4 + (gear+1) * 2.0  / 12 + gearSpeed * 0.8) * 0.5 + math.random() / 35
-	local rateIdle = 1 + 1.5 * (self.speed/self.topSpeed) + math.random() / 10
-	self.sndEngineIdle:setPitch(rateIdle)
-	self.sndEnginePower:setPitch(ratePower)
+	if (self.isPlayer) then
+		self:updateEngineSoundPlayer()
+	else
+		self:updateEngineSoundCpu()
+	end
 end
 
 function Car:update(dt)
@@ -453,10 +483,9 @@ function Car:update(dt)
 	
 	self:updateSteerResult()
 	self:updateOutwardForce()
+	self:updateEngineSound()
 	
-	if (self.isPlayer) then
-		self:updateEngineSound()
-	else
+	if (not self.isPlayer) then
 		-- update z
 		self.z = self.z + self.speed * dt
 	end
@@ -607,4 +636,15 @@ end
 
 function Car:isCar()
 	return true
+end
+
+function Car:clean()
+	if (self.sndEngineIdle ~= nil) then
+		love.audio.stop(self.sndEngineIdle)
+		self.sndEngineIdle = nil
+	end
+	if (self.sndEnginePower ~= nil) then
+		love.audio.stop(self.sndEnginePower)
+		self.sndEnginePower = nil
+	end
 end

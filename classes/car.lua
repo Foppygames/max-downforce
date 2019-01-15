@@ -445,7 +445,7 @@ end
 function Car:updateEngineSoundCpu()
 	local gear = math.floor((self.speed/self.topSpeed) / (1.0/self.gears))
 	local gearSpeed = (self.speed - (gear*(self.topSpeed/self.gears))) / (self.topSpeed/self.gears)
-	self.sndEnginePower:setPitch(0.2 + gear * 0.1 + gearSpeed * 0.4)
+	self.sndEnginePower:setPitch(0.5 + gear * 0.045 + gearSpeed * 0.4)
 	
 	local volume = 1 - (self.z - perspective.minZ) / (perspective.maxZ / 2 - perspective.minZ)
 	if (volume > 1) then

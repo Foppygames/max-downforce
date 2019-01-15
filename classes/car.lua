@@ -438,15 +438,14 @@ end
 function Car:updateEngineSoundPlayer()
 	local gear = math.floor((self.speed/self.topSpeed) / (1.0/self.gears))
 	local gearSpeed = (self.speed - (gear*(self.topSpeed/self.gears))) / (self.topSpeed/self.gears)
-	self.sndEngineIdle:setPitch(1 + 1.5 * (self.speed/self.topSpeed) + math.random() / 10)
-	self.sndEnginePower:setPitch((0.4 + (gear+1) * 2.0  / 12 + gearSpeed * 0.8) * 0.5 + math.random() / 35)
+	self.sndEngineIdle:setPitch(1 + 2.5 * (self.speed/self.topSpeed))
+	self.sndEnginePower:setPitch(0.5 + gear * 0.045 + gearSpeed * 0.4)
 end
 
 function Car:updateEngineSoundCpu()
 	local gear = math.floor((self.speed/self.topSpeed) / (1.0/self.gears))
 	local gearSpeed = (self.speed - (gear*(self.topSpeed/self.gears))) / (self.topSpeed/self.gears)
-	local pitch = (0.4 + (gear+1) * 2.0  / 12 + gearSpeed * 0.8) * 0.5 + math.random() / 35
-	self.sndEnginePower:setPitch(pitch*1.1)
+	self.sndEnginePower:setPitch(0.2 + gear * 0.1 + gearSpeed * 0.4)
 	
 	local volume = 1 - (self.z - perspective.minZ) / (perspective.maxZ / 2 - perspective.minZ)
 	if (volume > 1) then

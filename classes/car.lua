@@ -11,21 +11,21 @@ local sound = require("modules.sound")
 require "classes.entity"
 
 -- local constants
-local MAX_STEER = 30
+local MAX_STEER = 35
 local STEER_CHANGE = 45
 local STEER_RETURN_FACTOR = 0.96
-local TOP_SPEED = 80
+local TOP_SPEED = 90
 local TOP_SPEED_IN_KMH = 360
-local BRAKE = 30
+local BRAKE = 40
 local IDLE_BRAKE = 2
 local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.30
 local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.40
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
-local AI_MIN_PERFORMANCE_FRACTION = 0.40
-local AI_MAX_PERFORMANCE_FRACTION = 0.95
+local AI_MIN_PERFORMANCE_FRACTION = 0.50
+local AI_MAX_PERFORMANCE_FRACTION = 0.92
 local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.20
-local AI_TOP_SPEED = TOP_SPEED * 1.01
+local AI_TOP_SPEED = TOP_SPEED
 local AI_CURVE_SLOWDOWN_FACTOR = 0.05
 local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 30
 local AI_STEER_CHANGE = STEER_CHANGE * 0.9
@@ -410,7 +410,7 @@ function Car:updateSteerResult()
 end
 
 function Car:updateOutwardForcePlayer()
-	local newOutwardForce = self.segmentDdx*self.speed*self.speed*1.55
+	local newOutwardForce = self.segmentDdx*self.speed*self.speed*1.40
 	if (math.abs(newOutwardForce) < math.abs(self.outwardForce)) then
 		self.outwardForce = newOutwardForce
 	else

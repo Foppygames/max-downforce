@@ -291,11 +291,11 @@ function love.draw()
 			local z = perspective.zMap[i]
 			
 			-- set colors
-			local roadColor = 0.298
+			local roadColor = 0.14 --0.298
 			local curbColorVariant = 1
 			local grassColorVariant = 1
 			if (((z + textureOffset) % 8) > 4) then
-				roadColor = 0.314
+				roadColor = 0.17 --0.314
 				curbColorVariant = 2
 				grassColorVariant = 2
 			end
@@ -322,9 +322,11 @@ function love.draw()
 			
 			-- draw grass
 			if (grassColorVariant == 1) then
-				love.graphics.setColor(0.25,0.4,0.25)
+				--love.graphics.setColor(0.25,0.4,0.25)
+				love.graphics.setColor(0.25,0.8,0.25)
 			else
-				love.graphics.setColor(0.20,0.3,0.20)
+				--love.graphics.setColor(0.20,0.3,0.20)
+				love.graphics.setColor(0.20,0.6,0.20)
 			end
 			love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 			
@@ -334,7 +336,8 @@ function love.draw()
 			
 			-- draw curbs
 			if (curbColorVariant == 1) then
-				love.graphics.setColor(0.882,0.263,0)
+				--love.graphics.setColor(0.882,0.263,0)
+				love.graphics.setColor(1,0.263,0)
 			else
 				love.graphics.setColor(1,1,1)
 			end

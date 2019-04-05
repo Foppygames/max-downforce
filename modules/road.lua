@@ -1,5 +1,5 @@
 -- Max Downforce - modules/road.lua
--- 2017 Foppygames
+-- 2017-2019 Foppygames
 
 local road = {}
 
@@ -16,7 +16,6 @@ local aspect = require("modules.aspect")
 road.ROAD_WIDTH = aspect.GAME_WIDTH * 1.60 --1.55
 road.CURB_WIDTH = road.ROAD_WIDTH / 15
 road.STRIPE_WIDTH = road.CURB_WIDTH / 3
-
 
 -- =========================================================
 -- variables

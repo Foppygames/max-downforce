@@ -4,17 +4,8 @@
 local sound = {}
 
 -- =========================================================
--- includes
--- =========================================================
-
---local aspect = require("modules.aspect")
-
--- =========================================================
 -- constants
 -- =========================================================
-
---perspective.GROUND_HEIGHT = aspect.GAME_HEIGHT / 2
---perspective.HORIZON_Y = aspect.GAME_HEIGHT - perspective.GROUND_HEIGHT
 
 sound.ENGINE_IDLE = 1
 sound.ENGINE_POWER = 2
@@ -22,12 +13,6 @@ sound.ENGINE_POWER = 2
 -- =========================================================
 -- variables
 -- =========================================================
-
---perspective.zMap = {}
---perspective.scale = {}
-
---perspective.minZ = nil
---perspective.maxZ = nil
 
 sound.sources = {}
 

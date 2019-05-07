@@ -11,9 +11,10 @@ local sound = require("modules.sound")
 require "classes.entity"
 
 -- local constants
-local MAX_STEER = 35
-local STEER_CHANGE = 45
-local STEER_RETURN_FACTOR = 0.96
+local WIDTH_MODIFIER = 0.85
+local MAX_STEER = 38 --35
+local STEER_CHANGE = 48 --45
+local STEER_RETURN_FACTOR = 0.955 --0.96
 local TOP_SPEED = 90
 local TOP_SPEED_IN_KMH = 360
 local BRAKE = 40
@@ -130,11 +131,11 @@ function Car:new(x,z,isPlayer,performanceFraction)
 		o.topSpeed = TOP_SPEED
 		
 		o.sndEngineIdle = sound.getClone(sound.ENGINE_IDLE)
-		o.sndEngineIdle:setVolume(1)
+		o.sndEngineIdle:setVolume(0.1) --(1)
 		love.audio.play(o.sndEngineIdle)
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
-		o.sndEnginePower:setVolume(0.5)
+		o.sndEnginePower:setVolume(0.05) --(0.5)
 		love.audio.play(o.sndEnginePower)
 		
 		o.gears = 7
@@ -231,7 +232,7 @@ function Car.getAcceleration(speed,topSpeed)
 end
 
 function Car.getBaseTotalCarWidth()
-	return (bodyWidth + frontWheelWidth * 2)
+	return (bodyWidth + frontWheelWidth * 2) * WIDTH_MODIFIER
 end
 
 function Car:updateSteerPlayer(dt)
@@ -454,7 +455,7 @@ function Car:updateEngineSoundCpu()
 	if (volume < 0) then
 		volume = 0
 	end
-	self.sndEnginePower:setVolume(volume * 0.3)
+	self.sndEnginePower:setVolume(volume * 0.03) --0.3)
 end
 
 function Car:updateEngineSound()
@@ -571,7 +572,7 @@ function Car:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previous
 end
 
 function Car:draw()
-	local imageScale = self:computeImageScale()
+	local imageScale = self:computeImageScale() * WIDTH_MODIFIER
 	local newScreenX = self:computeNewScreenX()
 	love.graphics.push()
 	love.graphics.scale(imageScale,imageScale)

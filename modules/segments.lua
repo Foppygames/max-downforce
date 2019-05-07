@@ -20,8 +20,8 @@ segments.FIRST_SEGMENT_LENGTH = 3.79 -- used in setting up starting grid
 segments.TEXTURE_NORMAL = "normal"
 segments.TEXTURE_START_FINISH = "start_finish"
 
-local SMOOTHING_SEGMENT_DDX_STEP = 0.06 --0.08
-local SMOOTHING_SEGMENT_LENGTH = 0.04
+local SMOOTHING_SEGMENT_DDX_STEP = 0.04 --0.06
+local SMOOTHING_SEGMENT_LENGTH = 0.05 --0.04
 
 -- =========================================================
 -- variables

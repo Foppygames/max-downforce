@@ -291,11 +291,11 @@ function love.draw()
 			local z = perspective.zMap[i]
 			
 			-- set colors
-			local roadColor = 0.14 --0.298
+			local roadColor = 0.24 --0.28
 			local curbColorVariant = 1
 			local grassColorVariant = 1
 			if (((z + textureOffset) % 8) > 4) then
-				roadColor = 0.17 --0.314
+				roadColor = 0.26 --0.34
 				curbColorVariant = 2
 				grassColorVariant = 2
 			end

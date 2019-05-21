@@ -1,6 +1,7 @@
 -- Max Downforce - modules/blips.lua
 -- 2018-2019 Foppygames
 
+--[[
 require "classes.car"
 
 local blips = {}
@@ -190,3 +191,4 @@ function blips.update(playerSpeed,dt,trackLength,playerX)
 end
 
 return blips
+]]--

@@ -12,9 +12,9 @@ require "classes.entity"
 
 -- local constants
 local WIDTH_MODIFIER = 0.85
-local MAX_STEER = 38 --35
-local STEER_CHANGE = 48 --45
-local STEER_RETURN_FACTOR = 0.955 --0.96
+local MAX_STEER = 40
+local STEER_CHANGE = 48
+local STEER_RETURN_FACTOR = 0.955
 local TOP_SPEED = 90
 local TOP_SPEED_IN_KMH = 360
 local BRAKE = 40
@@ -23,7 +23,7 @@ local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.30
 local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.40
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
-local AI_MIN_PERFORMANCE_FRACTION = 0.50
+local AI_MIN_PERFORMANCE_FRACTION = 0.65 --0.50
 local AI_MAX_PERFORMANCE_FRACTION = 0.92
 local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.20
 local AI_TOP_SPEED = TOP_SPEED
@@ -91,30 +91,29 @@ function Car.init()
 	frontWheelDy = -imgFrontWheel[1]:getHeight() - 4
 end
 
-function Car.getAiPerformanceFraction(aiNumber,aiTotal)
-	local fraction = AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * (aiNumber / aiTotal)
-	
-	-- every 4th car is randomized
-	if (aiNumber % 4 == 0) then
-		fraction = fraction - AI_PERFORMANCE_FRACTION_RANDOM_RANGE/2 + math.random() * AI_PERFORMANCE_FRACTION_RANDOM_RANGE
-		if (fraction < AI_MIN_PERFORMANCE_FRACTION) then
-			fraction = AI_MIN_PERFORMANCE_FRACTION
-		elseif (fraction > AI_MAX_PERFORMANCE_FRACTION) then
-			fraction = AI_MAX_PERFORMANCE_FRACTION
-		end	
-	end
-	
-	return fraction
-end
-
-function Car:new(x,z,isPlayer,performanceFraction)
+function Car:new(x,z,isPlayer,progress)
 	o = Entity:new(x,z)	
 	setmetatable(o, self)
 	self.__index = self
 	
 	o.isPlayer = isPlayer
-	o.performanceFraction = performanceFraction
-
+	
+	local fastCar
+		
+	if (not isPlayer) then
+		fastCar = (math.random() > 0.8)
+		if (fastCar) then
+			progress = progress + math.random() * 0.5
+			progress = math.min(progress,1)
+		else
+			progress = progress + math.random() * 0.2
+			progress = math.min(progress,0.5)
+		end
+		o.performanceFraction = AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * progress
+	else
+		o.performanceFraction = 1
+	end
+	
 	o.speed = 0
 	o.steer = 0
 	o.steerResult = 0
@@ -141,11 +140,18 @@ function Car:new(x,z,isPlayer,performanceFraction)
 		o.gears = 7
 	else
 		local colorChoices = {0, 0.5, 1}
-		o.color = {
-			colorChoices[love.math.random(#colorChoices)],
-			colorChoices[love.math.random(#colorChoices)],
-			colorChoices[love.math.random(#colorChoices)]
-		}
+		
+		if (fastCar) then
+			o.color = {0,0,0}
+		else
+			o.color = {1,1,1}
+			--[[o.color = {
+				colorChoices[love.math.random(#colorChoices)],
+				colorChoices[love.math.random(#colorChoices)],
+				colorChoices[love.math.random(#colorChoices)]
+			}]]--
+		end
+		
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
@@ -160,7 +166,7 @@ function Car:new(x,z,isPlayer,performanceFraction)
 	o.accEffect = 0
 	o.targetSpeed = 0
 	o.targetX = x
-	o.freshFromBlip = false
+	--o.freshFromBlip = false
 	o.rearWheelIndex = 1
 	o.rearWheelCount = 0
 	o.leftBumpDy = 0
@@ -292,7 +298,7 @@ end
 
 function Car:updateSpeedPlayer(acc,dt)
 	if (self.pause > 0) then
-		self.pause = self.pause - 1 * dt
+		self.pause = self.pause - dt
 	else
 		if love.keyboard.isDown("up") then
 			self.speed = self.speed + acc * dt
@@ -322,7 +328,7 @@ end
 
 function Car:updateSpeedCPU(acc,dt)
 	if (self.pause > 0) then
-		self.pause = self.pause - 1 * dt
+		self.pause = self.pause - dt
 	else
 		if (self.aiBlockingCarSpeed ~= nil) then
 			if (self.speed > self.aiBlockingCarSpeed) then
@@ -500,7 +506,7 @@ function Car:update(dt)
 end
 
 function Car:scroll(playerSpeed,dt)
-	local blip = nil
+	--local blip = nil
 	local lap = false
 	local delete = false
 	
@@ -508,6 +514,7 @@ function Car:scroll(playerSpeed,dt)
 		self.z = self.z - playerSpeed * dt
 		if ((self.z < perspective.minZ) or (self.z > perspective.maxZ)) then
 			-- create blip
+			--[[
 			if (self.z < perspective.minZ) then
 				blip = {
 					x = self.x,
@@ -531,6 +538,7 @@ function Car:scroll(playerSpeed,dt)
 					pause = self.pause
 				}
 			end
+			]]--
 			
 			-- remove car
 			delete = true
@@ -538,7 +546,7 @@ function Car:scroll(playerSpeed,dt)
 	end
 	
 	return {
-		blip = blip,
+		--blip = blip,
 		lap = lap,
 		delete = delete
 	}
@@ -563,12 +571,14 @@ function Car:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previous
 	
 	self.segmentDdx = segment.ddx
 	self.targetSpeed = self.topSpeed - (math.abs(segment.ddxFraction) * self.topSpeed * AI_CURVE_SLOWDOWN_FACTOR)
+	--[[
 	if (self.freshFromBlip) then
 		self.freshFromBlip = false
 		if (self.speed > self.targetSpeed) then
 			self.speed = self.targetSpeed
 		end
 	end
+	]]--
 end
 
 function Car:draw()
@@ -583,15 +593,15 @@ function Car:draw()
 	local bumpDy = 0
 	
 	if ((self.leftBumpDy ~= 0) or (self.rightBumpDy ~= 0)) then
-		bumpDy = (self.leftBumpDy + self.rightBumpDy) * 0.3
+		bumpDy = (self.leftBumpDy + self.rightBumpDy) * 0.9
 		screenY = screenY + bumpDy
 	end
 	
-	local maxSteerPerspectiveEffect = 7
+	local maxSteerPerspectiveEffect = 9
 	local steerPerspectiveEffect = self.steer / MAX_STEER * maxSteerPerspectiveEffect
 	local perspectiveEffect = (aspect.GAME_WIDTH/2-newScreenX)/(aspect.GAME_WIDTH/2) * 9 + steerPerspectiveEffect
 	local frontWheelDy = -imgFrontWheel[1]:getHeight() - 4 * imageScale
-	local accEffect = self.accEffect * 0.01
+	local accEffect = self.accEffect * 0.015
 	
 	-- draw front wheels
 	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy) --frontWheelDy)

@@ -50,7 +50,7 @@ function Entity:scroll(playerSpeed,dt)
 	end
 
 	return {
-		blip = nil,
+		--blip = nil,
 		lap = lap,
 		delete = delete
 	}

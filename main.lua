@@ -13,9 +13,10 @@ require "classes.stadium"
 require "classes.tree"
 
 local aspect = require("modules.aspect")
-local blips = require("modules.blips")
+--local blips = require("modules.blips")
 local entities = require("modules.entities")
 local horizon = require("modules.horizon")
+local opponents = require("modules.opponents")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 local schedule = require("modules.schedule")
@@ -32,8 +33,8 @@ local STATE_RACE = 1
 local STATE_GAME_OVER = 2
 
 local LAP_COUNT = 10
-local CAR_COUNT = 50
-local PLAYER_POS = 50
+local CAR_COUNT = 6
+local PLAYER_POS = 6
 local FINISHED_COUNT = 5
 
 -- =========================================================
@@ -51,6 +52,7 @@ local player = nil
 local playerX = 0
 local playerSpeed = 0
 local lap = 0
+local progress = 0
 local cars = CAR_COUNT
 local pos = PLAYER_POS
 local finished = false
@@ -81,9 +83,10 @@ function setupGame()
 	Tree.init()
 	
 	entities.init()
-	blips.init()
+	--blips.init()
 	horizon.init()
 	perspective.initZMapAndScaling()
+	opponents.init()
 	segments.init()
 	sound.init()
 	aspect.init(fullScreen)
@@ -101,13 +104,15 @@ function switchToState(newState)
 		-- ...
 	elseif (state == STATE_RACE) then
 		lap = 0
+		progress = 0
 		cars = CAR_COUNT
 		pos = PLAYER_POS
 		finished = false
 		finishedCount = 0
 
-		blips.reset()
+		--blips.reset()
 		horizon.reset()
+		opponents.reset()
 		schedule.reset()
 		segments.reset()
 		segments.addFirst()
@@ -144,7 +149,7 @@ function switchToState(newState)
 					z = z + dz / 2
 					x = x * -1
 				end
-				entities.addCar(x,z,false,Car.getAiPerformanceFraction(aiNumber,aiTotal))
+				entities.addCar(x,z,false,0.5)
 				aiNumber = aiNumber + 1
 			end
 		end
@@ -184,15 +189,18 @@ function love.update(dt)
 					finishedCount = FINISHED_COUNT
 				end
 				finished = true
+			else
+				progress = lap / LAP_COUNT
+				
+				print(progress)
 			end
 		end
 		
-		blips.addBlips(entitiesUpdateResult.newBlips)
-		local blipsUpdateResult = blips.update(playerSpeed,dt,segments.totalLength,playerX)
+		opponents.update(playerSpeed,progress,dt)
 		segments.update(playerSpeed,dt)
 		horizon.update(segments.getAtIndex(1).ddx,playerSpeed,dt)
 		
-		pos = entitiesUpdateResult.carsInFrontOfPlayer + blipsUpdateResult.carsInFrontOfPlayer + 1
+		pos = 1 --entitiesUpdateResult.carsInFrontOfPlayer + blipsUpdateResult.carsInFrontOfPlayer + 1
 		
 		if (player ~= nil) then
 			if (player.explodeCount > 0) then
@@ -322,24 +330,21 @@ function love.draw()
 			
 			-- draw grass
 			if (grassColorVariant == 1) then
-				--love.graphics.setColor(0.25,0.4,0.25)
-				love.graphics.setColor(0.25,0.8,0.25)
+				love.graphics.setColor(0.45,0.8,0.25)
 			else
-				--love.graphics.setColor(0.20,0.3,0.20)
-				love.graphics.setColor(0.20,0.6,0.20)
+				love.graphics.setColor(0.36,0.6,0.20)
 			end
 			love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 			
 			-- draw tarmac
-			love.graphics.setColor(roadColor,roadColor,roadColor)
+			love.graphics.setColor(roadColor*1.2,roadColor,roadColor)
 			love.graphics.line(x,screenY,x+roadWidth,screenY)
 			
 			-- draw curbs
 			if (curbColorVariant == 1) then
-				--love.graphics.setColor(0.882,0.263,0)
 				love.graphics.setColor(1,0.263,0)
 			else
-				love.graphics.setColor(1,1,1)
+				love.graphics.setColor(1,0.95,0.95)
 			end
 			love.graphics.line(x,screenY,x+curbWidth,screenY)
 			love.graphics.line(x+roadWidth-curbWidth,screenY,x+roadWidth,screenY)

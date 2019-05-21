@@ -77,8 +77,8 @@ function entities.addBuilding(x,z)
 	return building
 end
 
-function entities.addCar(x,z,isPlayer,performanceFraction)
-	local car = Car:new(x,z,isPlayer,performanceFraction)
+function entities.addCar(x,z,isPlayer,progress)
+	local car = Car:new(x,z,isPlayer,progress)
 	
 	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,car)
@@ -209,7 +209,7 @@ end
 function entities.update(playerSpeed,dt,trackLength)
 	lap = false
 	
-	local newBlips = {}
+	--local newBlips = {}
 	local carsInFrontOfPlayer = 0
 	local carsBehindPlayer = 0
 	local seenPlayer = false
@@ -230,9 +230,11 @@ function entities.update(playerSpeed,dt,trackLength)
 		-- scroll
 		local result = list[i]:scroll(playerSpeed,dt)
 		
+		--[[
 		if (result.blip) then
 			table.insert(newBlips,result.blip)
 		end
+		]]--
 		
 		if (result.lap) then
 			lap = true
@@ -289,7 +291,7 @@ function entities.update(playerSpeed,dt,trackLength)
 	table.sort(list,function(a,b) return a.z < b.z end)
 	
 	return {
-		newBlips = newBlips,
+		--newBlips = newBlips,
 		carsInFrontOfPlayer = carsInFrontOfPlayer,
 		carsBehindPlayer = carsBehindPlayer
 	}

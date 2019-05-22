@@ -166,7 +166,6 @@ function Car:new(x,z,isPlayer,progress)
 	o.accEffect = 0
 	o.targetSpeed = 0
 	o.targetX = x
-	--o.freshFromBlip = false
 	o.rearWheelIndex = 1
 	o.rearWheelCount = 0
 	o.leftBumpDy = 0
@@ -219,18 +218,17 @@ function Car:updateOffRoad(dt)
 	return offRoad
 end
 
--- Note: static function that is also used by blips
-function Car.getAcceleration(speed,topSpeed)
-	local standardDiff = TOP_SPEED-speed
+function Car:getAcceleration()
+	local standardDiff = TOP_SPEED-self.speed
 	if (standardDiff < 0) then
 		standardDiff = 0
 	end
 
-	local carDiff = topSpeed-speed
+	local carDiff = self.topSpeed - self.speed
 	
 	local averagedDiff = (3*standardDiff + carDiff) / 4
 	
-	if (speed < topSpeed*0.96) then
+	if (self.speed < self.topSpeed*0.96) then
 		return averagedDiff / 6
 	else
 		return averagedDiff / 14
@@ -474,7 +472,7 @@ end
 
 function Car:update(dt)
 	local offRoad = self:updateOffRoad(dt)
-	local acc = Car.getAcceleration(self.speed,self.topSpeed)
+	local acc = self:getAcceleration()
 
 	if (offRoad) then
 		acc = acc * OFF_ROAD_ACC_FACTOR
@@ -506,47 +504,18 @@ function Car:update(dt)
 end
 
 function Car:scroll(playerSpeed,dt)
-	--local blip = nil
 	local lap = false
 	local delete = false
 	
 	if (not self.isPlayer) then
 		self.z = self.z - playerSpeed * dt
 		if ((self.z < perspective.minZ) or (self.z > perspective.maxZ)) then
-			-- create blip
-			--[[
-			if (self.z < perspective.minZ) then
-				blip = {
-					x = self.x,
-					z = self.z-perspective.minZ,
-					speed = self.speed,
-					aiTopSpeed = AI_TOP_SPEED,
-					color = self.color,
-					performanceFraction = self.performanceFraction,
-					posToPlayer = self.posToPlayer + 1,
-					pause = self.pause
-				}
-			else
-				blip = {
-					x = self.x,
-					z = self.z-perspective.maxZ,
-					speed = self.speed,
-					aiTopSpeed = AI_TOP_SPEED,
-					color = self.color,
-					performanceFraction = self.performanceFraction,
-					posToPlayer = self.posToPlayer - 1,
-					pause = self.pause
-				}
-			end
-			]]--
-			
 			-- remove car
 			delete = true
 		end
 	end
 	
 	return {
-		--blip = blip,
 		lap = lap,
 		delete = delete
 	}
@@ -568,17 +537,8 @@ end
 
 function Car:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previousScreenY,previousScale,segment)
 	Entity.setupForDraw(self,z,roadX,screenY,scale,previousZ,previousRoadX,previousScreenY,previousScale,segment)
-	
 	self.segmentDdx = segment.ddx
 	self.targetSpeed = self.topSpeed - (math.abs(segment.ddxFraction) * self.topSpeed * AI_CURVE_SLOWDOWN_FACTOR)
-	--[[
-	if (self.freshFromBlip) then
-		self.freshFromBlip = false
-		if (self.speed > self.targetSpeed) then
-			self.speed = self.targetSpeed
-		end
-	end
-	]]--
 end
 
 function Car:draw()

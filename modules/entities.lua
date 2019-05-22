@@ -209,7 +209,6 @@ end
 function entities.update(playerSpeed,dt,trackLength)
 	lap = false
 	
-	--local newBlips = {}
 	local carsInFrontOfPlayer = 0
 	local carsBehindPlayer = 0
 	local seenPlayer = false
@@ -229,12 +228,6 @@ function entities.update(playerSpeed,dt,trackLength)
 		
 		-- scroll
 		local result = list[i]:scroll(playerSpeed,dt)
-		
-		--[[
-		if (result.blip) then
-			table.insert(newBlips,result.blip)
-		end
-		]]--
 		
 		if (result.lap) then
 			lap = true
@@ -291,7 +284,6 @@ function entities.update(playerSpeed,dt,trackLength)
 	table.sort(list,function(a,b) return a.z < b.z end)
 	
 	return {
-		--newBlips = newBlips,
 		carsInFrontOfPlayer = carsInFrontOfPlayer,
 		carsBehindPlayer = carsBehindPlayer
 	}

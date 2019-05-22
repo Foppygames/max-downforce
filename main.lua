@@ -13,7 +13,6 @@ require "classes.stadium"
 require "classes.tree"
 
 local aspect = require("modules.aspect")
---local blips = require("modules.blips")
 local entities = require("modules.entities")
 local horizon = require("modules.horizon")
 local opponents = require("modules.opponents")
@@ -83,7 +82,6 @@ function setupGame()
 	Tree.init()
 	
 	entities.init()
-	--blips.init()
 	horizon.init()
 	perspective.initZMapAndScaling()
 	opponents.init()
@@ -110,7 +108,6 @@ function switchToState(newState)
 		finished = false
 		finishedCount = 0
 
-		--blips.reset()
 		horizon.reset()
 		opponents.reset()
 		schedule.reset()
@@ -200,7 +197,7 @@ function love.update(dt)
 		segments.update(playerSpeed,dt)
 		horizon.update(segments.getAtIndex(1).ddx,playerSpeed,dt)
 		
-		pos = 1 --entitiesUpdateResult.carsInFrontOfPlayer + blipsUpdateResult.carsInFrontOfPlayer + 1
+		pos = 1
 		
 		if (player ~= nil) then
 			if (player.explodeCount > 0) then

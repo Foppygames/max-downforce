@@ -1,5 +1,5 @@
 -- Max Downforce - classes/entity.lua
--- 2018 Foppygames
+-- 2018-2019 Foppygames
 
 -- modules
 local perspective = require("modules.perspective")

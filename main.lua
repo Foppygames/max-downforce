@@ -41,19 +41,14 @@ local FINISHED_COUNT = 5
 -- =========================================================
 
 local state
-
 local fullScreen = false
-
 local textureOffset = 0
 local imageSky = nil
-
 local player = nil
 local playerX = 0
 local playerSpeed = 0
 local lap = 0
 local progress = 0
-local cars = CAR_COUNT
-local pos = PLAYER_POS
 local finished = false
 local finishedCount = 0
 
@@ -103,8 +98,6 @@ function switchToState(newState)
 	elseif (state == STATE_RACE) then
 		lap = 0
 		progress = 0
-		cars = CAR_COUNT
-		pos = PLAYER_POS
 		finished = false
 		finishedCount = 0
 
@@ -114,32 +107,32 @@ function switchToState(newState)
 		segments.reset()
 		segments.addFirst()
 	
-		local aiTotal = cars-1
+		local aiTotal = CAR_COUNT - 1
 		local aiNumber = 1
 		local startZ = perspective.zMap[30];
 		local dz = (perspective.maxZ - perspective.minZ) / 13
 		
 		-- player not on first segment
-		if ((pos * dz) > (segments.FIRST_SEGMENT_LENGTH * perspective.maxZ)) then
+		if ((PLAYER_POS * dz) > (segments.FIRST_SEGMENT_LENGTH * perspective.maxZ)) then
 			print("Warning: player not on first segment")
 		end
 		
 		-- scroll towards player position with respect to end of first segment
-		segments.update(segments.FIRST_SEGMENT_LENGTH * perspective.maxZ - ((pos + 4) * dz), 1)
+		segments.update(segments.FIRST_SEGMENT_LENGTH * perspective.maxZ - ((PLAYER_POS + 4) * dz), 1)
 		
 		-- add player
 		local x = -road.ROAD_WIDTH / 4
-		if (pos % 2 == 0) then
+		if (PLAYER_POS % 2 == 0) then
 			x = -x
 		end
 		local z = startZ
 		player = entities.addCar(x,z,true,1)
 		
 		-- add cpu cars from back to front
-		for i = 1, cars do
-			local cpuPos = cars - (i - 1)
-			if (cpuPos ~= pos) then
-				local relPos = pos - cpuPos
+		for i = 1, CAR_COUNT do
+			local cpuPos = CAR_COUNT - (i - 1)
+			if (cpuPos ~= PLAYER_POS) then
+				local relPos = PLAYER_POS - cpuPos
 				z = startZ + dz * relPos
 				x = road.ROAD_WIDTH / 4
 				if (i % 2 == 0) then
@@ -174,7 +167,8 @@ function love.update(dt)
 		end
 		
 		schedule.update(playerSpeed,dt)
-		local entitiesUpdateResult = entities.update(playerSpeed,dt,segments.totalLength)
+		entities.update(playerSpeed,dt,segments.totalLength)
+		
 		if (entities.checkLap()) then
 			lap = lap + 1
 			if (lap > LAP_COUNT) then
@@ -196,8 +190,6 @@ function love.update(dt)
 		opponents.update(playerSpeed,progress,dt)
 		segments.update(playerSpeed,dt)
 		horizon.update(segments.getAtIndex(1).ddx,playerSpeed,dt)
-		
-		pos = 1
 		
 		if (player ~= nil) then
 			if (player.explodeCount > 0) then
@@ -371,7 +363,7 @@ function love.draw()
 		-- on screen info: player speed
 		if (player ~= nil) then
 			love.graphics.setColor(0.471,0.902,1)
-			love.graphics.print("SPEED",aspect.GAME_WIDTH-80,10)
+			love.graphics.print("SPEED",aspect.GAME_WIDTH-60,10)
 			love.graphics.print(player:getSpeedAsKMH(),aspect.GAME_WIDTH-80,25)
 			love.graphics.print("km/h",aspect.GAME_WIDTH-50,25)
 		end
@@ -387,11 +379,10 @@ function love.draw()
 			love.graphics.print("RACE OVER",20,40)
 		end
 		
-		-- on screen info: current position
-		love.graphics.setColor(0.471,0.902,1)
-		love.graphics.print("POS",aspect.GAME_WIDTH/2-20,10)
-		love.graphics.print(pos,aspect.GAME_WIDTH/2-20,25)
-		love.graphics.print("/ "..cars,aspect.GAME_WIDTH/2,25)
+		-- on screen info: time
+		love.graphics.setColor(1,1,0)
+		love.graphics.print("TIME",aspect.GAME_WIDTH/2-20,10)
+		love.graphics.print("60",aspect.GAME_WIDTH/2-12,25)
 	end
 	
 	if (state == STATE_GAME_OVER) then

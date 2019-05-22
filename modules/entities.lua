@@ -209,10 +209,6 @@ end
 function entities.update(playerSpeed,dt,trackLength)
 	lap = false
 	
-	local carsInFrontOfPlayer = 0
-	local carsBehindPlayer = 0
-	local seenPlayer = false
-	
 	local i = 1
 	while i <= #list do
 		if (list[i]:isCar()) then
@@ -234,39 +230,24 @@ function entities.update(playerSpeed,dt,trackLength)
 		end
 		
 		if (list[i]:isCar()) then
-			if (list[i].isPlayer) then
-				seenPlayer = true
-			elseif (not result.delete) then
-				-- in same lap
-				if (list[i].posToPlayer == 0) then
-					if (seenPlayer) then
-						carsInFrontOfPlayer = carsInFrontOfPlayer + 1
-					else
-						carsBehindPlayer = carsBehindPlayer + 1
-					end
-				-- cpu lap(s) behind player
-				elseif (list[i].posToPlayer > 0) then
-					carsBehindPlayer = carsBehindPlayer + 1
-				-- cpu lap(s) in front of player
-				else
-					carsInFrontOfPlayer = carsInFrontOfPlayer + 1
-				end
-				
-				local lookAheadResult = lookAhead(list[i],list[i].x)
-				
-				-- possible collision detected
-				if (lookAheadResult.collision) then
-					-- check other lane
-					local otherLaneX
-					if (list[i].x < 0) then
-						otherLaneX = road.ROAD_WIDTH/4
-					else
-						otherLaneX = -road.ROAD_WIDTH/4
-					end
-					local otherLaneResult = lookAhead(list[i],otherLaneX)
+			if (not result.delete) then
+				if (not list[i].isPlayer) then
+					local lookAheadResult = lookAhead(list[i],list[i].x)
 					
-					-- consider changing lane
-					list[i]:selectNewLane(lookAheadResult.collisionX,lookAheadResult.collisionDz,lookAheadResult.blockingCarSpeed,otherLaneResult)
+					-- possible collision detected
+					if (lookAheadResult.collision) then
+						-- check other lane
+						local otherLaneX
+						if (list[i].x < 0) then
+							otherLaneX = road.ROAD_WIDTH/4
+						else
+							otherLaneX = -road.ROAD_WIDTH/4
+						end
+						local otherLaneResult = lookAhead(list[i],otherLaneX)
+						
+						-- consider changing lane
+						list[i]:selectNewLane(lookAheadResult.collisionX,lookAheadResult.collisionDz,lookAheadResult.blockingCarSpeed,otherLaneResult)
+					end
 				end
 			end
 		end
@@ -282,11 +263,6 @@ function entities.update(playerSpeed,dt,trackLength)
 	
 	-- sort all entities on increasing z
 	table.sort(list,function(a,b) return a.z < b.z end)
-	
-	return {
-		carsInFrontOfPlayer = carsInFrontOfPlayer,
-		carsBehindPlayer = carsBehindPlayer
-	}
 end
 
 function entities.resetForDraw()

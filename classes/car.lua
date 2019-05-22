@@ -23,7 +23,7 @@ local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.30
 local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.40
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
-local AI_MIN_PERFORMANCE_FRACTION = 0.65 --0.50
+local AI_MIN_PERFORMANCE_FRACTION = 0.65
 local AI_MAX_PERFORMANCE_FRACTION = 0.92
 local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.20
 local AI_TOP_SPEED = TOP_SPEED
@@ -121,7 +121,6 @@ function Car:new(x,z,isPlayer,progress)
 	o.sndEngineIdle = nil
 	o.sndEnginePower = nil
 	o.explodeCount = 0
-	o.posToPlayer = 0
 	o.aiBlockingCarSpeed = nil
 	o.pause = 2
 			
@@ -141,16 +140,11 @@ function Car:new(x,z,isPlayer,progress)
 	else
 		local colorChoices = {0, 0.5, 1}
 		
-		if (fastCar) then
-			o.color = {0,0,0}
-		else
-			o.color = {1,1,1}
-			--[[o.color = {
-				colorChoices[love.math.random(#colorChoices)],
-				colorChoices[love.math.random(#colorChoices)],
-				colorChoices[love.math.random(#colorChoices)]
-			}]]--
-		end
+		o.color = {
+			colorChoices[love.math.random(#colorChoices)],
+			colorChoices[love.math.random(#colorChoices)],
+			colorChoices[love.math.random(#colorChoices)]
+		}
 		
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
 		

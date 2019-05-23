@@ -170,7 +170,7 @@ local function lookAhead(car,x)
 	local baseCarWidth = Car.getBaseTotalCarWidth()
 	local carLength = perspective.maxZ / 50
 	local carWidth = Car.getBaseTotalCarWidth() * car.baseScale
-	local checkDistance = carLength * (1 + 10 * (car.speed / car.topSpeed))
+	local checkDistance = carLength * (1 + 8 * (car.speed / car.topSpeed)) --10
 	
 	if (x == nil) then
 		x = car.x
@@ -239,9 +239,9 @@ function entities.update(playerSpeed,dt,trackLength)
 						-- check other lane
 						local otherLaneX
 						if (list[i].x < 0) then
-							otherLaneX = road.ROAD_WIDTH/4
+							otherLaneX = Car.getXFromLane(1,false)
 						else
-							otherLaneX = -road.ROAD_WIDTH/4
+							otherLaneX = Car.getXFromLane(-1,false)
 						end
 						local otherLaneResult = lookAhead(list[i],otherLaneX)
 						

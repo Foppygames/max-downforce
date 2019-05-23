@@ -24,7 +24,6 @@ local OPPONENT_SPEED = 70
 local minOpponentZ
 local maxOpponentZ
 local opponentZ
-local opponentX
 
 -- =========================================================
 -- public functions
@@ -32,19 +31,11 @@ local opponentX
 
 function opponents.init()
 	minOpponentZ = perspective.maxZ / 20
-	maxOpponentZ = perspective.maxZ / 2
+	maxOpponentZ = perspective.maxZ / 4
 end
 
 function opponents.reset()
 	opponentZ = maxOpponentZ
-	opponentX = math.random(0,2) - 1
-end
-
-local function setNextOpponentX()
-	opponentX = opponentX + math.random(1,2)
-	if (opponentX > 1) then
-		opponentX = -1
-	end
 end
 
 function opponents.update(playerSpeed,progress,dt)
@@ -53,15 +44,11 @@ function opponents.update(playerSpeed,progress,dt)
 	if (opponentZ > maxOpponentZ) then
 		opponentZ = maxOpponentZ
 	elseif (opponentZ < 0) then
-		local car = entities.addCar(opponentX * road.ROAD_WIDTH / 4,perspective.maxZ,false,progress)
+		local car = entities.addCar(-1 + math.random(0,1) * 2,perspective.maxZ,false,progress)
 		car.speed = car.topSpeed * 0.95
 		car.targetSpeed = car.topSpeed
-		
 		opponentZ = math.random(minOpponentZ,maxOpponentZ)
-		
-		setNextOpponentX()
 	end
-	
 end
 
 return opponents

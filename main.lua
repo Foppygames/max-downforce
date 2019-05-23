@@ -33,7 +33,6 @@ local STATE_GAME_OVER = 2
 
 local LAP_COUNT = 10
 local CAR_COUNT = 6
-local PLAYER_POS = 6
 local FINISHED_COUNT = 5
 
 -- =========================================================
@@ -107,40 +106,29 @@ function switchToState(newState)
 		segments.reset()
 		segments.addFirst()
 	
-		local aiTotal = CAR_COUNT - 1
-		local aiNumber = 1
 		local startZ = perspective.zMap[30];
 		local dz = (perspective.maxZ - perspective.minZ) / 13
 		
 		-- player not on first segment
-		if ((PLAYER_POS * dz) > (segments.FIRST_SEGMENT_LENGTH * perspective.maxZ)) then
+		if ((CAR_COUNT * dz) > (segments.FIRST_SEGMENT_LENGTH * perspective.maxZ)) then
 			print("Warning: player not on first segment")
 		end
 		
 		-- scroll towards player position with respect to end of first segment
-		segments.update(segments.FIRST_SEGMENT_LENGTH * perspective.maxZ - ((PLAYER_POS + 4) * dz), 1)
+		segments.update(segments.FIRST_SEGMENT_LENGTH * perspective.maxZ - ((CAR_COUNT + 4) * dz), 1)
 		
-		-- add player
-		local x = -road.ROAD_WIDTH / 4
-		if (PLAYER_POS % 2 == 0) then
-			x = -x
-		end
-		local z = startZ
-		player = entities.addCar(x,z,true,1)
-		
-		-- add cpu cars from back to front
+		-- add cars from back to front
 		for i = 1, CAR_COUNT do
-			local cpuPos = CAR_COUNT - (i - 1)
-			if (cpuPos ~= PLAYER_POS) then
-				local relPos = PLAYER_POS - cpuPos
-				z = startZ + dz * relPos
-				x = road.ROAD_WIDTH / 4
-				if (i % 2 == 0) then
-					z = z + dz / 2
-					x = x * -1
-				end
+			local z = startZ + dz * (i - 1)
+			local x = 1
+			if (i % 2 == 0) then
+				z = z + dz / 2
+				x = -1
+			end
+			if (i == 1) then
+				player = entities.addCar(x,z,true,1)
+			else
 				entities.addCar(x,z,false,0.5)
-				aiNumber = aiNumber + 1
 			end
 		end
 	elseif (state == STATE_GAME_OVER) then

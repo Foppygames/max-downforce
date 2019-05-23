@@ -91,7 +91,9 @@ function Car.init()
 	frontWheelDy = -imgFrontWheel[1]:getHeight() - 4
 end
 
-function Car:new(x,z,isPlayer,progress)
+function Car:new(lane,z,isPlayer,progress)
+	local x = Car.getXFromLane(lane,true)
+	
 	o = Entity:new(x,z)	
 	setmetatable(o, self)
 	self.__index = self
@@ -168,6 +170,14 @@ function Car:new(x,z,isPlayer,progress)
 	o.collided = false
 	
 	return o
+end
+
+function Car.getXFromLane(lane,random)
+	if (random) then
+		return lane * road.ROAD_WIDTH / (4 + math.random() * 2)
+	else
+		return lane * road.ROAD_WIDTH / 5
+	end
 end
 
 function Car:updateOffRoad(dt)
@@ -517,14 +527,14 @@ end
 
 function Car:selectNewLane(collisionX,collisionDz,blockingCarSpeed,otherLaneResult)
 	-- other lane blocked
-	if (otherLaneResult.collision and (otherLaneResult.collisionDz < collisionDz)) then
+	if (otherLaneResult.collision) then
 		-- consider braking
 		self.aiBlockingCarSpeed = blockingCarSpeed
 	else
 		if (collisionX < 0) then
-			self.targetX = road.ROAD_WIDTH/4
+			self.targetX = Car.getXFromLane(1,true)
 		else
-			self.targetX = -road.ROAD_WIDTH/4
+			self.targetX = Car.getXFromLane(-1,true)
 		end
 	end
 end

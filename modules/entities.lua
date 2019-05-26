@@ -170,7 +170,7 @@ local function lookAhead(car,x)
 	local baseCarWidth = Car.getBaseTotalCarWidth()
 	local carLength = perspective.maxZ / 50
 	local carWidth = Car.getBaseTotalCarWidth() * car.baseScale
-	local checkDistance = carLength * (1 + 8 * (car.speed / car.topSpeed)) --10
+	local checkDistance = carLength * (1 + 5 * (car.speed / car.topSpeed)) --8
 	
 	if (x == nil) then
 		x = car.x
@@ -209,6 +209,8 @@ end
 function entities.update(playerSpeed,dt,trackLength)
 	lap = false
 	
+	local aiCarCount = 0
+	
 	local i = 1
 	while i <= #list do
 		if (list[i]:isCar()) then
@@ -232,6 +234,8 @@ function entities.update(playerSpeed,dt,trackLength)
 		if (list[i]:isCar()) then
 			if (not result.delete) then
 				if (not list[i].isPlayer) then
+					aiCarCount = aiCarCount + 1
+				
 					local lookAheadResult = lookAhead(list[i],list[i].x)
 					
 					-- possible collision detected
@@ -263,6 +267,8 @@ function entities.update(playerSpeed,dt,trackLength)
 	
 	-- sort all entities on increasing z
 	table.sort(list,function(a,b) return a.z < b.z end)
+	
+	return aiCarCount
 end
 
 function entities.resetForDraw()

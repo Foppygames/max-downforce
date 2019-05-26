@@ -17,6 +17,8 @@ local road = require("modules.road")
 
 local OPPONENT_SPEED = 70
 
+local MAX_OPPONENTS_ON_SCREEN = 5
+
 -- =========================================================
 -- private variables
 -- =========================================================
@@ -30,23 +32,25 @@ local opponentZ
 -- =========================================================
 
 function opponents.init()
-	minOpponentZ = perspective.maxZ / 20
-	maxOpponentZ = perspective.maxZ / 4
+	minOpponentZ = perspective.maxZ / 10
+	maxOpponentZ = perspective.maxZ / 5
 end
 
 function opponents.reset()
 	opponentZ = maxOpponentZ
 end
 
-function opponents.update(playerSpeed,progress,dt)
+function opponents.update(playerSpeed,progress,aiCarCount,dt)
 	opponentZ = opponentZ + OPPONENT_SPEED * dt - playerSpeed * dt
 
 	if (opponentZ > maxOpponentZ) then
 		opponentZ = maxOpponentZ
 	elseif (opponentZ < 0) then
-		local car = entities.addCar(-1 + math.random(0,1) * 2,perspective.maxZ,false,progress)
-		car.speed = car.topSpeed * 0.95
-		car.targetSpeed = car.topSpeed
+		if (aiCarCount < MAX_OPPONENTS_ON_SCREEN) then
+			local car = entities.addCar(-1 + math.random(0,1) * 2,perspective.maxZ,false,progress)
+			car.speed = car.topSpeed
+			car.targetSpeed = car.topSpeed
+		end
 		opponentZ = math.random(minOpponentZ,maxOpponentZ)
 	end
 end

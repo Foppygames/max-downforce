@@ -128,7 +128,7 @@ function switchToState(newState)
 			if (i == 1) then
 				player = entities.addCar(x,z,true,1)
 			else
-				entities.addCar(x,z,false,0.5)
+				entities.addCar(x,z,false,0.1)
 			end
 		end
 	elseif (state == STATE_GAME_OVER) then
@@ -155,7 +155,7 @@ function love.update(dt)
 		end
 		
 		schedule.update(playerSpeed,dt)
-		entities.update(playerSpeed,dt,segments.totalLength)
+		local aiCarCount = entities.update(playerSpeed,dt,segments.totalLength)
 		
 		if (entities.checkLap()) then
 			lap = lap + 1
@@ -175,7 +175,7 @@ function love.update(dt)
 			end
 		end
 		
-		opponents.update(playerSpeed,progress,dt)
+		opponents.update(playerSpeed,progress,aiCarCount,dt)
 		segments.update(playerSpeed,dt)
 		horizon.update(segments.getAtIndex(1).ddx,playerSpeed,dt)
 		

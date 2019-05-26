@@ -25,12 +25,11 @@ local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
 local AI_MIN_PERFORMANCE_FRACTION = 0.65
 local AI_MAX_PERFORMANCE_FRACTION = 0.92
-local AI_PERFORMANCE_FRACTION_RANDOM_RANGE = 0.20
 local AI_TOP_SPEED = TOP_SPEED
-local AI_CURVE_SLOWDOWN_FACTOR = 0.05
-local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 30
+local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 25 --30
+local AI_MAX_STEER = MAX_STEER * 0.9
 local AI_STEER_CHANGE = STEER_CHANGE * 0.9
-local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.60
+local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.7
 
 -- local variables
 local imgBody = nil
@@ -103,13 +102,11 @@ function Car:new(lane,z,isPlayer,progress)
 	local fastCar
 		
 	if (not isPlayer) then
-		fastCar = (math.random() > 0.8)
+		fastCar = (math.random() > 0.9)
 		if (fastCar) then
-			progress = progress + math.random() * 0.5
-			progress = math.min(progress,1)
+			progress = math.min(1, progress + 0.2 + math.random() * 0.3)
 		else
-			progress = progress + math.random() * 0.2
-			progress = math.min(progress,0.5)
+			progress = math.min(1, progress + 0.2)
 		end
 		o.performanceFraction = AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * progress
 	else
@@ -140,13 +137,17 @@ function Car:new(lane,z,isPlayer,progress)
 		
 		o.gears = 7
 	else
-		local colorChoices = {0, 0.5, 1}
+		local colorChoices = {0,0.5,1}
 		
 		o.color = {
-			colorChoices[love.math.random(#colorChoices)],
-			colorChoices[love.math.random(#colorChoices)],
-			colorChoices[love.math.random(#colorChoices)]
+			colorChoices[math.random(#colorChoices)],
+			colorChoices[math.random(#colorChoices)],
+			colorChoices[math.random(#colorChoices)]
 		}
+		
+		if (fastCar) then
+			o.color = {1,1,1}
+		end
 		
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
 		
@@ -174,7 +175,7 @@ end
 
 function Car.getXFromLane(lane,random)
 	if (random) then
-		return lane * road.ROAD_WIDTH / (4 + math.random() * 2)
+		return lane * road.ROAD_WIDTH / (5 + math.random())
 	else
 		return lane * road.ROAD_WIDTH / 5
 	end
@@ -277,13 +278,13 @@ function Car:updateSteerCpu(dt)
 	-- steer towards target
 	if (self.x > (self.targetX + AI_TARGET_X_MARGIN)) then
 		self.steer = self.steer - AI_STEER_CHANGE * (1 + math.abs(self.segmentDdx)) * dt
-		if (self.steer < -MAX_STEER) then
-			self.steer = -MAX_STEER
+		if (self.steer < -AI_MAX_STEER) then
+			self.steer = -AI_MAX_STEER
 		end
 	elseif (self.x < (self.targetX - AI_TARGET_X_MARGIN)) then
 		self.steer = self.steer + AI_STEER_CHANGE * (1 + math.abs(self.segmentDdx)) * dt
-		if (self.steer > MAX_STEER) then
-			self.steer = MAX_STEER
+		if (self.steer > AI_MAX_STEER) then
+			self.steer = AI_MAX_STEER
 		end
 	elseif (self.steer ~= 0) then
 		self.steer = self.steer * AI_STEER_RETURN_FACTOR
@@ -542,7 +543,7 @@ end
 function Car:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previousScreenY,previousScale,segment)
 	Entity.setupForDraw(self,z,roadX,screenY,scale,previousZ,previousRoadX,previousScreenY,previousScale,segment)
 	self.segmentDdx = segment.ddx
-	self.targetSpeed = self.topSpeed - (math.abs(segment.ddxFraction) * self.topSpeed * AI_CURVE_SLOWDOWN_FACTOR)
+	self.targetSpeed = self.topSpeed
 end
 
 function Car:draw()

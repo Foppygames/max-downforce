@@ -19,8 +19,8 @@ local TOP_SPEED = 90
 local TOP_SPEED_IN_KMH = 360
 local BRAKE = 40
 local IDLE_BRAKE = 2
-local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.30
-local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.40
+local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.35
+local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.45
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
 local AI_MIN_PERFORMANCE_FRACTION = 0.65
@@ -98,6 +98,8 @@ function Car:new(lane,z,isPlayer,progress)
 	self.__index = self
 	
 	o.isPlayer = isPlayer
+	
+	o.name = "CAR"
 	
 	local fastCar
 		

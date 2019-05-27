@@ -288,4 +288,10 @@ function entities.draw()
 	end
 end
 
+function entities.cancelXSmoothing()
+	for i = #list,1,-1 do
+		list[i].smoothX = false
+	end
+end
+
 return entities

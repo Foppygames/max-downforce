@@ -96,6 +96,9 @@ function schedule.add(itemType,dz,count,z)
 				-- set correct distance to next item
 				items[itemType].distance = z - perspective.maxZ
 			end
+			
+			-- cancel entity x smoothing to avoid unwanted movement at start of race
+			entities.cancelXSmoothing()
 		end
 	end
 end

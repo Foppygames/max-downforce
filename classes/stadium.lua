@@ -38,6 +38,7 @@ function Stadium:new(x,z)
 	o.height = o.image:getHeight()
 	o.smoothX = true
 	o.baseScale = 14
+	o.name = "STADIUM"
 	
 	return o
 end

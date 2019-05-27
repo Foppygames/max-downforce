@@ -106,7 +106,7 @@ function switchToState(newState)
 		segments.reset()
 		segments.addFirst()
 	
-		local startZ = perspective.zMap[30];
+		local startZ = perspective.zMap[30]
 		local dz = (perspective.maxZ - perspective.minZ) / 13
 		
 		-- player not on first segment
@@ -155,6 +155,7 @@ function love.update(dt)
 		end
 		
 		schedule.update(playerSpeed,dt)
+		
 		local aiCarCount = entities.update(playerSpeed,dt,segments.totalLength)
 		
 		if (entities.checkLap()) then

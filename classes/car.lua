@@ -39,6 +39,7 @@ local imgDiffuser = nil
 local imgWing = nil
 local imgAirScoop = nil
 local imgHelmet = nil
+local imgShadow = nil
 local bodyWidth = 0
 local bodyHeight = 0
 local frontWheelWidth = 0
@@ -53,6 +54,7 @@ local airScoopWidth = 0
 local airScoopHeight = 0
 local helmetWidth = 0
 local helmetHeight = 0
+local shadowWidth = 0
 local frontWheelLeftDx = 0	
 local frontWheelRightDx = 0	
 local frontWheelDy = 0
@@ -70,6 +72,7 @@ function Car.init()
 	imgWing = love.graphics.newImage("images/car_wing.png")
 	imgAirScoop = love.graphics.newImage("images/car_air_scoop.png")
 	imgHelmet = love.graphics.newImage("images/car_helmet.png")
+	imgShadow = love.graphics.newImage("images/shadow.png")
 
 	bodyWidth = imgBody:getWidth()
 	bodyHeight = imgBody:getHeight()
@@ -85,6 +88,7 @@ function Car.init()
 	airScoopHeight = imgAirScoop:getHeight()
 	helmetWidth = imgHelmet:getWidth()
 	helmetHeight = imgHelmet:getHeight()
+	shadowWidth = imgShadow:getWidth()
 	frontWheelLeftDx = -imgBody:getWidth()/2 + 2 - imgFrontWheel[1]:getWidth()
 	frontWheelRightDx = imgBody:getWidth()/2 - 2
 	frontWheelDy = -imgFrontWheel[1]:getHeight() - 4
@@ -569,6 +573,9 @@ function Car:draw()
 	local perspectiveEffect = (aspect.GAME_WIDTH/2-newScreenX)/(aspect.GAME_WIDTH/2) * 9 + steerPerspectiveEffect
 	local frontWheelDy = -imgFrontWheel[1]:getHeight() - 4 * imageScale
 	local accEffect = self.accEffect * 0.015
+	
+	-- draw shadow
+	love.graphics.draw(imgShadow,screenX - shadowWidth/2 - perspectiveEffect * 0.2, screenY-6)
 	
 	-- draw front wheels
 	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy) --frontWheelDy)

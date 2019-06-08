@@ -21,6 +21,7 @@ local road = require("modules.road")
 local schedule = require("modules.schedule")
 local segments = require("modules.segments")
 local sound = require("modules.sound")
+local timer = require("modules.timer")
 local utils = require("modules.utils")
 
 -- =========================================================

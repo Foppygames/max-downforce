@@ -60,8 +60,8 @@ function entities.checkLap()
 	return lap
 end
 
-function entities.addBanner(x,z)
-	local banner = Banner:new(x,z)
+function entities.addBanner(x,z,forcedImageIndex)
+	local banner = Banner:new(x,z,forcedImageIndex)
 	
 	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,banner)

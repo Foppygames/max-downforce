@@ -16,6 +16,7 @@ local perspective = require("modules.perspective")
 -- =========================================================
 
 schedule.ITEM_BANNER_START = "banner_start"
+schedule.ITEM_BANNER_FOREST_BRIDGE = "banner_forest_bridge"
 schedule.ITEM_BUILDINGS_L = "buildings_l"
 schedule.ITEM_BUILDINGS_R = "buildings_r"
 schedule.ITEM_GRASS_L_R = "grass_l_r"
@@ -45,13 +46,6 @@ function processItem(itemType,z)
 		entities.addGrass(-600,z-4)
 		entities.addGrass(600,z-4)
 		entities.addGrass(1200,z)
-		
-		--[[entities.addGrass(-2000,z,0.6)
-		entities.addGrass(-1300,z+4,0.8)
-		entities.addGrass(-600,z+8,1)
-		entities.addGrass(600,z+8,1)
-		entities.addGrass(1300,z+4,0.8)
-		entities.addGrass(2000,z,0.6)]]--
 	elseif (itemType == schedule.ITEM_SIGN_L) then
 		entities.addSign(-700,z)
 	elseif (itemType == schedule.ITEM_SIGN_R) then
@@ -67,8 +61,10 @@ function processItem(itemType,z)
 		entities.addTree(600,z-8,1)
 		entities.addTree(1300,z-4,0.8)
 		entities.addTree(2000,z,0.6)
+	elseif (itemType == schedule.ITEM_BANNER_FOREST_BRIDGE) then
+		entities.addBanner(0,z,2)
 	elseif (itemType == schedule.ITEM_BANNER_START) then
-		entities.addBanner(0,z)
+		entities.addBanner(0,z,1)
 	end
 end
 

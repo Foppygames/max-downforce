@@ -124,6 +124,12 @@ local track = {
 				startZ = 0.0,
 				dz = 0.2,
 				count = 10
+			},
+			{
+				itemType = schedule.ITEM_BANNER_FOREST_BRIDGE,
+				startZ = 1.9,
+				dz = 0.2,
+				count = 2
 			}
 		},
 		texture = segments.TEXTURE_NORMAL

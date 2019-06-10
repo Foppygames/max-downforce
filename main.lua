@@ -106,6 +106,7 @@ function switchToState(newState)
 		schedule.reset()
 		segments.reset()
 		segments.addFirst()
+		timer.reset(progress,2)
 	
 		local startZ = perspective.zMap[30]
 		local dz = (perspective.maxZ - perspective.minZ) / 13
@@ -162,6 +163,8 @@ function love.update(dt)
 		if (entities.checkLap()) then
 			lap = lap + 1
 			if (lap > LAP_COUNT) then
+				timer.halt()
+			
 				if ((not finished) and (player ~= nil)) then
 					-- turn player car into cpu car
 					player:setIsPlayer(false)
@@ -172,6 +175,10 @@ function love.update(dt)
 				finished = true
 			else
 				progress = lap / LAP_COUNT
+				
+				if (lap > 1) then
+					timer.reset(progress,0)
+				end
 				
 				print(progress)
 			end
@@ -195,6 +202,12 @@ function love.update(dt)
 			if (finishedCount <= 0) then
 				switchToState(STATE_GAME_OVER)
 			end
+		end
+		
+		local timeOk = timer.update(dt)
+		
+		if (not timeOk) then
+			switchToState(STATE_GAME_OVER)
 		end
 	end
 end
@@ -372,7 +385,14 @@ function love.draw()
 		-- on screen info: time
 		love.graphics.setColor(1,1,0)
 		love.graphics.print("TIME",aspect.GAME_WIDTH/2-20,10)
-		love.graphics.print("60",aspect.GAME_WIDTH/2-12,25)
+		local timeScale = 1
+		if (timer.isDangerous()) then
+			timeScale = 2
+		end
+		love.graphics.push()
+		love.graphics.scale(timeScale,timeScale)
+		love.graphics.print(timer.getDisplayTime(),(aspect.GAME_WIDTH/2-12)/timeScale,25/timeScale)
+		love.graphics.pop()
 	end
 	
 	if (state == STATE_GAME_OVER) then

@@ -84,6 +84,12 @@ local track = {
 		ddx = 0.7,
 		length = 1.5,
 		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 2.2,
+				dz = 0.2,
+				count = 20
+			}
 		},
 		texture = segments.TEXTURE_NORMAL
 	},

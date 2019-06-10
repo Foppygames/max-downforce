@@ -10,6 +10,7 @@ local entities = {}
 require "classes.banner"
 require "classes.building"
 require "classes.car"
+require "classes.grass"
 require "classes.sign"
 require "classes.stadium"
 require "classes.tree"
@@ -84,6 +85,15 @@ function entities.addCar(x,z,isPlayer,progress)
 	table.insert(list,car)
 	
 	return car
+end
+
+function entities.addGrass(x,z)
+	local grass = Grass:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,grass)
+	
+	return grass
 end
 
 function entities.addStadium(x,z)

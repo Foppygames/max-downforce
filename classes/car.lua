@@ -20,7 +20,9 @@ local TOP_SPEED_IN_KMH = 360
 local BRAKE = 40
 local IDLE_BRAKE = 2
 local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.35
+local MAX_DIST_BEFORE_CURB_OTHER_WHEEL = road.ROAD_WIDTH*0.50
 local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.45
+local MAX_DIST_BEFORE_GRASS_OTHER_WHEEL = road.ROAD_WIDTH*0.60
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
 local AI_MIN_PERFORMANCE_FRACTION = 0.65
@@ -134,12 +136,16 @@ function Car:new(lane,z,isPlayer,progress)
 		o.topSpeed = TOP_SPEED
 		
 		o.sndEngineIdle = sound.getClone(sound.ENGINE_IDLE)
-		o.sndEngineIdle:setVolume(0.1) --(1)
+		o.sndEngineIdle:setVolume(1) --(0.1)
 		love.audio.play(o.sndEngineIdle)
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
-		o.sndEnginePower:setVolume(0.05) --(0.5)
+		o.sndEnginePower:setVolume(0.5) --(0.05)
 		love.audio.play(o.sndEnginePower)
+		
+		o.sndCurbBump = love.audio.newSource("sounds/curb.wav","static")
+		o.sndCurbBump:setVolume(0.7) --(0.1)
+		o.curbBumpSoundCount = 1
 		
 		o.gears = 7
 	else
@@ -189,6 +195,7 @@ end
 
 function Car:updateOffRoad(dt)
 	local offRoad = false
+	local hitCurb = false
 	
 	if (self.leftBumpDy < 0) then
 		self.leftBumpDy = self.leftBumpDy + self.speed/2 * dt
@@ -204,25 +211,68 @@ function Car:updateOffRoad(dt)
 		end
 	end
 	
+	-- left off tarmac
 	if (self.x < -MAX_DIST_BEFORE_CURB) then
+		-- bump left
 		if (self.leftBumpDy == 0) then
 			self.leftBumpDy = -1
 		end
+		-- left onto grass
 		if (self.x < -MAX_DIST_BEFORE_GRASS) then
 			offRoad = true
+			-- right off tarmac
+			if (self.x < -MAX_DIST_BEFORE_CURB_OTHER_WHEEL) then
+				-- bump right
+				if (self.rightBumpDy == 0) then
+					self.rightBumpDy = -1
+				end
+				-- right on curb
+				if (self.x >= -MAX_DIST_BEFORE_GRASS_OTHER_WHEEL) then
+					hitCurb = true
+				end
+			end
+		-- left on curb
+		else
+			hitCurb = true
 		end
+	-- right off tarmac
 	elseif (self.x > MAX_DIST_BEFORE_CURB) then
+		-- bump right
 		if (self.rightBumpDy == 0) then
 			self.rightBumpDy = -1
 		end
+		-- right onto grass
 		if (self.x > MAX_DIST_BEFORE_GRASS) then
 			offRoad = true
+			-- left off tarmac
+			if (self.x > MAX_DIST_BEFORE_CURB_OTHER_WHEEL) then
+				-- bump left
+				if (self.leftBumpDy == 0) then
+					self.leftBumpDy = -1
+				end
+				-- left on curb
+				if (self.x <= MAX_DIST_BEFORE_GRASS_OTHER_WHEEL) then
+					hitCurb = true
+				end
+			end
+		-- right on curb
+		else
+			hitCurb = true
 		end
 	end
 	
 	if (offRoad) then
 		if (self.speed > OFF_ROAD_MAX_SPEED) then
 			self.speed = self.speed - BRAKE * dt
+		end
+	end
+	
+	if (hitCurb and self.isPlayer) then
+		self.curbBumpSoundCount = self.curbBumpSoundCount - self.speed/2 * dt
+		if (self.curbBumpSoundCount <= 0) then
+			self.sndCurbBump:stop()
+			self.sndCurbBump:play()
+			self.curbBumpSoundCount = self.curbBumpSoundCount + 1
 		end
 	end
 	

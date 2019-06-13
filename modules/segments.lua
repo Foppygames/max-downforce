@@ -198,7 +198,20 @@ local track = {
 	{
 		ddx = -0.2,
 		length = 2,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 0.9,
+				dz = 0.2,
+				count = 6
+			},
+			{
+				itemType = schedule.ITEM_BANNER_FOREST_BRIDGE,
+				startZ = 1,
+				dz = 0.2,
+				count = 2
+			}
+		},
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- medium straight

@@ -366,6 +366,11 @@ function Car:updateSteerCpu(dt)
 	elseif (self.steer ~= 0) then
 		self.steer = self.steer * AI_STEER_RETURN_FACTOR
 	end
+	
+	-- add random steering
+	if (self.speed > 0) then
+		self.steer = self.steer - 0.2 + math.random() * 0.4
+	end
 end
 
 function Car:updateSteer(dt)
@@ -413,25 +418,20 @@ function Car:updateSpeedCPU(acc,dt)
 		if (self.aiBlockingCarSpeed ~= nil) then
 			if (self.speed > self.aiBlockingCarSpeed) then
 				self.speed = self.speed - BRAKE * dt
-				self.accEffect = -BRAKE
 			end
 			self.aiBlockingCarSpeed = nil
 		elseif (self.speed < self.targetSpeed) then
 			self.speed = self.speed + acc * dt
-			self.accEffect = acc
 			if (self.speed > self.topSpeed) then
 				self.speed = self.topSpeed
-				self.accEffect = 0
 			end
 		else
 			if (self.speed > 0) then
 				self.speed = self.speed - BRAKE * dt
-				self.accEffect = -BRAKE
 			end
 			if (self.speed <= 0) then
 				self.speed = 0
 				self.steer = 0
-				self.accEffect = self.accEffect * 0.6
 			end
 		end
 	end
@@ -459,7 +459,7 @@ function Car:updateWheelAnimation(dt)
 end
 
 function Car:updateSteerResultPlayer()
-	local steerUpdateSpeed = 5 --10
+	local steerUpdateSpeed = 5
 	if (self.steerResult < self.steer) then
 		self.steerResult = self.steerResult + steerUpdateSpeed
 		if (self.steerResult > self.steer) then

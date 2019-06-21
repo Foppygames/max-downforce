@@ -98,7 +98,7 @@ function switchToState(newState)
 	
 	-- actions that apply to specific states
 	if (state == STATE_TITLE) then
-		-- ...
+		math.randomseed(os.time())
 	elseif (state == STATE_RACE) then
 		lap = 0
 		progress = 0

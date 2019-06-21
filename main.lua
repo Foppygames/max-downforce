@@ -11,6 +11,7 @@ require "classes.car"
 require "classes.grass"
 require "classes.sign"
 require "classes.stadium"
+require "classes.spark"
 require "classes.tree"
 
 local aspect = require("modules.aspect")
@@ -75,6 +76,7 @@ function setupGame()
 	Car.init()
 	Grass.init()
 	Sign.init()
+	Spark.init()
 	Stadium.init()
 	Tree.init()
 	
@@ -163,6 +165,9 @@ function love.update(dt)
 		local aiCarCount = entities.update(playerSpeed,dt,segments.totalLength)
 		
 		if (entities.checkLap()) then
+		
+			--print("ENTITIES: "..entities.getListLength())
+		
 			lap = lap + 1
 			if (lap > LAP_COUNT) then
 				timer.halt()
@@ -182,7 +187,8 @@ function love.update(dt)
 					timer.reset(progress,0)
 				end
 				
-				print(progress)
+				--print("PROGRESS: "..progress)
+				
 			end
 		end
 		
@@ -293,11 +299,11 @@ function love.draw()
 			local z = perspective.zMap[i]
 			
 			-- set colors
-			local roadColor = 0.24 --0.28
+			local roadColor = 0.28
 			local curbColorVariant = 1
 			local grassColorVariant = 1
 			if (((z + textureOffset) % 8) > 4) then
-				roadColor = 0.26 --0.34
+				roadColor = 0.30
 				curbColorVariant = 2
 				grassColorVariant = 2
 			end
@@ -310,6 +316,7 @@ function love.draw()
 				if (z > segments.getAtIndex(segmentIndex+1).z) then
 					segmentIndex = segmentIndex + 1
 					segment = segments.getAtIndex(segmentIndex)
+					--roadColor = 1
 				end
 			end
 
@@ -331,7 +338,7 @@ function love.draw()
 			love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 			
 			-- draw tarmac
-			love.graphics.setColor(roadColor*1.2,roadColor,roadColor)
+			love.graphics.setColor(roadColor*1.22,roadColor,roadColor)
 			love.graphics.line(x,screenY,x+roadWidth,screenY)
 			
 			-- draw curbs

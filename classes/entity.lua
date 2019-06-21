@@ -20,7 +20,6 @@ function Entity:new(x,z)
 	o.baseScale = 1
 	o.scale = 0
 	o.smoothX = false
-	o.isBanner = false
 	o.solid = true
 	o.image = nil
 	o.width = 0
@@ -30,7 +29,7 @@ function Entity:new(x,z)
 	return o
 end
 
-function Entity:update()
+function Entity:update(dt)
 	-- ...
 end
 

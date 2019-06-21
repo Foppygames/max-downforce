@@ -12,6 +12,7 @@ require "classes.building"
 require "classes.car"
 require "classes.grass"
 require "classes.sign"
+require "classes.spark"
 require "classes.stadium"
 require "classes.tree"
 
@@ -45,6 +46,10 @@ local index = nil
 function entities.init()
 	list = {}
 	index = nil
+end
+
+function entities.getListLength()
+	return #list
 end
 
 function entities.reset()
@@ -94,6 +99,15 @@ function entities.addGrass(x,z)
 	table.insert(list,grass)
 	
 	return grass
+end
+
+function entities.addSpark(x,z,speed,color)
+	local spark = Spark:new(x,z,speed,color)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,spark)
+	
+	return spark
 end
 
 function entities.addStadium(x,z)
@@ -224,10 +238,21 @@ function entities.update(playerSpeed,dt,trackLength)
 	local i = 1
 	while i <= #list do
 		if (list[i]:isCar()) then
+			-- update collided property of car
 			list[i].collided = false
 			local checkCollisionResult = checkCollision(list[i])
 			if (checkCollisionResult.collision) then
 				list[i].collided = true
+			end
+			
+			-- check for sparks to be generated
+			local sparks = list[i]:getSparks()
+			if (sparks ~= nil) then
+				for j = 1,#sparks,1 do
+					entities.addSpark(sparks[j].x,sparks[j].z,sparks[j].speed,sparks[j].color)
+				end
+				
+				list[i]:resetSparks()
 			end
 		end
 		
@@ -245,7 +270,7 @@ function entities.update(playerSpeed,dt,trackLength)
 			if (not result.delete) then
 				if (not list[i].isPlayer) then
 					aiCarCount = aiCarCount + 1
-				
+					
 					local lookAheadResult = lookAhead(list[i],list[i].x)
 					
 					-- possible collision detected

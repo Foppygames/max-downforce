@@ -136,15 +136,15 @@ function Car:new(lane,z,isPlayer,progress)
 		o.topSpeed = TOP_SPEED
 		
 		o.sndEngineIdle = sound.getClone(sound.ENGINE_IDLE)
-		o.sndEngineIdle:setVolume(1) --(0.1)
+		o.sndEngineIdle:setVolume(0.1) --(1)
 		love.audio.play(o.sndEngineIdle)
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
-		o.sndEnginePower:setVolume(0.5) --(0.05)
+		o.sndEnginePower:setVolume(0.05) --(0.5)
 		love.audio.play(o.sndEnginePower)
 		
 		o.sndCurbBump = love.audio.newSource("sounds/curb.wav","static")
-		o.sndCurbBump:setVolume(0.7) --(0.1)
+		o.sndCurbBump:setVolume(0.1) --(0.7)
 		o.curbBumpSoundCount = 1
 		
 		o.gears = 7
@@ -170,6 +170,8 @@ function Car:new(lane,z,isPlayer,progress)
 		o.gears = math.random(3,8)
 	end
 	
+	o.topSpeedForAcceleration = (3 * TOP_SPEED + o.topSpeed) / 4
+	o.speedLimitHigherAcceleration = o.topSpeed*0.96
 	o.segmentDdx = 0
 	o.outwardForce = 0
 	o.accEffect = 0
@@ -181,8 +183,14 @@ function Car:new(lane,z,isPlayer,progress)
 	o.rightBumpDy = 0
 	o.baseScale = 2
 	o.collided = false
+	o.sparkTime = Car.getSparkTime()
+	o.sparks = nil
 	
 	return o
+end
+
+function Car.getSparkTime()
+	return 5 + math.random() * 15
 end
 
 function Car.getXFromLane(lane,random)
@@ -279,20 +287,33 @@ function Car:updateOffRoad(dt)
 	return offRoad
 end
 
-function Car:getAcceleration()
-	local standardDiff = TOP_SPEED-self.speed
-	if (standardDiff < 0) then
-		standardDiff = 0
+function Car:updateSpark(dt)
+	self.sparkTime = self.sparkTime - dt
+	if (self.sparkTime <= 0) then
+		if (self.speed > (self.topSpeed / 2)) then
+			if (self.sparks == nil) then
+				self.sparks = {}
+			end
+			local count = math.random(2,5)
+			for i = 1, count do
+				table.insert(self.sparks,{
+					x = self.x - 10 + math.random(0,20),
+					z = self.z - i * 0.7,
+					speed = self.speed * 0.95,
+					color = {1,1,math.random()}
+				})
+			end
+		end
+		self.sparkTime = Car.getSparkTime()
 	end
+end
 
-	local carDiff = self.topSpeed - self.speed
-	
-	local averagedDiff = (3*standardDiff + carDiff) / 4
-	
-	if (self.speed < self.topSpeed*0.96) then
-		return averagedDiff / 6
+function Car:getAcceleration()
+	local diff = self.topSpeedForAcceleration - self.speed
+	if (self.speed < self.speedLimitHigherAcceleration) then
+		return diff / 6
 	else
-		return averagedDiff / 14
+		return diff / 14
 	end
 end
 
@@ -541,7 +562,7 @@ function Car:update(dt)
 	
 	self:updateSteer(dt)
 	
-	-- collided is managed by entities module
+	-- self.collided is managed from entities module
 	if (not self.collided) then
 		self:updateSpeed(acc,dt)
 	end
@@ -549,6 +570,7 @@ function Car:update(dt)
 	self:updateSteerResult()
 	self:updateOutwardForce()
 	self:updateEngineSound()
+	self:updateSpark(dt)
 	
 	if (not self.isPlayer) then
 		-- update z
@@ -666,6 +688,14 @@ end
 -- used to turn player into cpu car after finish
 function Car:setIsPlayer(isPlayer)
 	self.isPlayer = isPlayer
+end
+
+function Car:getSparks()
+	return self.sparks
+end
+
+function Car:resetSparks()
+	self.sparks = nil
 end
 
 function Car:isCar()

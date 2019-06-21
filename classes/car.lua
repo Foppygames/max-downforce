@@ -34,6 +34,7 @@ local AI_STEER_CHANGE = STEER_CHANGE * 0.9
 local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.7
 
 -- local variables
+local colors = {}
 local imgBody = nil
 local imgFrontWheel = {}
 local imgRearWheel = {}
@@ -65,6 +66,25 @@ local frontWheelDy = 0
 Car = Entity:new()
 
 function Car.init()
+	colors = {
+		{1,0,0}, -- red
+		{0.5,0,0}, -- dark red
+		{0,1,0}, -- green
+		{0,0.5,0}, -- dark green
+		{0,0,1}, -- blue
+		{0,0,0.5}, -- dark blue
+		{1,1,0}, -- yellow
+		{0,0,0}, -- black
+		{0.5,0.5,0.5}, -- grey
+		{0.2,0.2,0.2}, -- dark grey
+		{1,1,1}, -- white
+		{0.5,0,1}, -- purple
+		{1,0,0.5}, -- pink
+		{0,1,1}, -- cyan
+		{1,0.3,0}, -- orange
+		{0.75,1,0.25} -- olive
+	}
+
 	imgBody = love.graphics.newImage("images/car_body.png")
 	for i = 1,4 do
 		imgFrontWheel[i] = love.graphics.newImage("images/car_front_wheel_"..i..".png")
@@ -149,18 +169,19 @@ function Car:new(lane,z,isPlayer,progress)
 		
 		o.gears = 7
 	else
+		--[[
 		local colorChoices = {0,0.5,1}
-		
 		o.color = {
 			colorChoices[math.random(#colorChoices)],
 			colorChoices[math.random(#colorChoices)],
 			colorChoices[math.random(#colorChoices)]
 		}
-		
 		if (fastCar) then
 			o.color = {1,1,1}
 		end
+		]]--
 		
+		o.color = colors[math.random(#colors)]
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
@@ -640,14 +661,14 @@ function Car:draw()
 		screenY = screenY + bumpDy
 	end
 	
-	local maxSteerPerspectiveEffect = 9
+	local maxSteerPerspectiveEffect = 10
 	local steerPerspectiveEffect = self.steer / MAX_STEER * maxSteerPerspectiveEffect
-	local perspectiveEffect = (aspect.GAME_WIDTH/2-newScreenX)/(aspect.GAME_WIDTH/2) * 9 + steerPerspectiveEffect
-	local frontWheelDy = -imgFrontWheel[1]:getHeight() - 4 * imageScale
-	local accEffect = self.accEffect * 0.015
+	local perspectiveEffect = (aspect.GAME_WIDTH/2-newScreenX)/(aspect.GAME_WIDTH/2) * 10 + steerPerspectiveEffect
+	local frontWheelDy = -imgFrontWheel[1]:getHeight() - 5 * imageScale
+	local accEffect = self.accEffect * 0.01
 	
 	-- draw shadow
-	love.graphics.draw(imgShadow,screenX - shadowWidth/2 - perspectiveEffect * 0.2, screenY-6)
+	love.graphics.draw(imgShadow,screenX - shadowWidth/2, screenY - 6)
 	
 	-- draw front wheels
 	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy) --frontWheelDy)
@@ -671,6 +692,7 @@ function Car:draw()
 	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX + bodyWidth/2 - perspectiveEffect,screenY - rearWheelHeight + self.rightBumpDy)
 	
 	-- draw rear wing
+	love.graphics.setColor(self.color)
 	love.graphics.draw(imgWing,screenX - wingWidth/2  - perspectiveEffect * 1.2,screenY - bodyHeight + 4 - wingHeight + accEffect*2.5 + bumpDy)
 	
 	-- draw diffuser

@@ -32,6 +32,8 @@ local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 25 --30
 local AI_MAX_STEER = MAX_STEER * 0.9
 local AI_STEER_CHANGE = STEER_CHANGE * 0.9
 local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.7
+local MAX_WHEEL_SCALE_CHANGE = 0.05
+local MAX_BODY_DEGREES_CHANGE = 4
 
 -- local variables
 local colors = {}
@@ -206,6 +208,7 @@ function Car:new(lane,z,isPlayer,progress)
 	o.collided = false
 	o.sparkTime = Car.getSparkTime()
 	o.sparks = nil
+	o.steerFactor = 0
 	
 	return o
 end
@@ -363,6 +366,7 @@ function Car:updateSteerPlayer(dt)
 	elseif (self.steer ~= 0) then
 		self.steer = self.steer * STEER_RETURN_FACTOR
 	end
+	self.steerFactor = self.steer / MAX_STEER
 end
 
 function Car:updateSteerCpu(dt)
@@ -392,6 +396,8 @@ function Car:updateSteerCpu(dt)
 	if (self.speed > 0) then
 		self.steer = self.steer - 0.2 + math.random() * 0.4
 	end
+	
+	self.steerFactor = self.steer / AI_MAX_STEER
 end
 
 function Car:updateSteer(dt)
@@ -670,13 +676,20 @@ function Car:draw()
 	-- draw shadow
 	love.graphics.draw(imgShadow,screenX - shadowWidth/2, screenY - 6)
 	
+	-- compute body rotation
+	local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
+	local bodyRotation = bodyDegreesChange * math.pi/180
+	
 	-- draw front wheels
-	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy) --frontWheelDy)
-	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelRightDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.rightBumpDy) --frontWheelDy)
+	local wheelScaleChange = bodyDegreesChange / MAX_BODY_DEGREES_CHANGE * MAX_WHEEL_SCALE_CHANGE
+	local leftWheelScale = 1 + wheelScaleChange
+	local rightWheelScale = 1 - wheelScaleChange
+	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
+	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelRightDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 	
 	-- draw body
 	love.graphics.setColor(self.color)
-	love.graphics.draw(imgBody,screenX - bodyWidth/2 - perspectiveEffect * 0.2,screenY - bodyHeight + accEffect)
+	love.graphics.draw(imgBody,screenX - perspectiveEffect * 0.2,screenY - bodyHeight/2 + accEffect, bodyRotation, 1, 1, bodyWidth/2, bodyHeight/2)
 	
 	-- draw helmet
 	love.graphics.setColor(1,1,1)
@@ -688,12 +701,14 @@ function Car:draw()
 	
 	-- draw rear wheels
 	love.graphics.setColor(1,1,1)
-	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect,screenY - rearWheelHeight + self.leftBumpDy)
-	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX + bodyWidth/2 - perspectiveEffect,screenY - rearWheelHeight + self.rightBumpDy)
+	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect,screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
+	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX + bodyWidth/2 - perspectiveEffect,screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 	
 	-- draw rear wing
+	local wingDegreesChange = bodyDegreesChange
+	local wingRotation = wingDegreesChange * math.pi/180
 	love.graphics.setColor(self.color)
-	love.graphics.draw(imgWing,screenX - wingWidth/2  - perspectiveEffect * 1.2,screenY - bodyHeight + 4 - wingHeight + accEffect*2.5 + bumpDy)
+	love.graphics.draw(imgWing,screenX - perspectiveEffect * 1.2,screenY - bodyHeight + 4 + accEffect * 2.5 + bumpDy, wingRotation, 1, 1, wingWidth/2, wingHeight)
 	
 	-- draw diffuser
 	love.graphics.draw(imgDiffuser,screenX - diffuserWidth/2  - perspectiveEffect,screenY - diffuserHeight + accEffect*3)

@@ -127,16 +127,16 @@ function Car:new(lane,z,isPlayer,progress)
 	
 	o.isPlayer = isPlayer
 	
-	o.name = "CAR"
-	
 	local fastCar
 		
 	if (not isPlayer) then
 		fastCar = (math.random() > 0.9)
 		if (fastCar) then
-			progress = math.min(1, progress + 0.2 + math.random() * 0.3)
+			-- fast cars keep getting faster (computed top progress = 1)
+			progress = math.min(1, progress + 0.3 + math.random() * 0.3)
 		else
-			progress = math.min(1, progress + 0.2)
+			-- normal cars do not get faster after game progress 0.3 (computed top progress = 0.6)
+			progress = math.min(1, math.min(0.3, progress) + 0.1 + math.random() * 0.2)
 		end
 		o.performanceFraction = AI_MIN_PERFORMANCE_FRACTION + (AI_MAX_PERFORMANCE_FRACTION - AI_MIN_PERFORMANCE_FRACTION) * progress
 	else

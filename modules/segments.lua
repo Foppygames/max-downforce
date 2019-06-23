@@ -35,12 +35,12 @@ local track = {
 		ddx = 0,
 		length = segments.FIRST_SEGMENT_LENGTH,
 		scheduleItems = {
-			{
+			--[[{
 				itemType = schedule.ITEM_STADIUM_L,
 				startZ = segments.FIRST_SEGMENT_LENGTH - 0.79,
 				dz = 0.1,
 				count = 8
-			},
+			}]]--
 		},
 		texture = segments.TEXTURE_NORMAL
 	},
@@ -51,7 +51,7 @@ local track = {
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_BANNER_START,
-				startZ = 0.01,
+				startZ = 0,
 				dz = 0,
 				count = 1
 			}

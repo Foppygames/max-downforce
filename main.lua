@@ -308,15 +308,10 @@ function love.draw()
 				grassColorVariant = 2
 			end
 			
-			if (segment.texture == segments.TEXTURE_START_FINISH) then
-				roadColor = 1
-			end
-			
 			if (segmentIndex < lastSegmentIndex) then
 				if (z > segments.getAtIndex(segmentIndex+1).z) then
 					segmentIndex = segmentIndex + 1
 					segment = segments.getAtIndex(segmentIndex)
-					--roadColor = 1
 				end
 			end
 

@@ -70,6 +70,8 @@ function Banner:draw()
 	love.graphics.setColor(color)
 	love.graphics.rectangle("fill",x1-poleWidth,y1,poleWidth,poleHeight)
 	love.graphics.rectangle("fill",x1+self.width,y1,poleWidth,poleHeight)
+	love.graphics.setColor(0,0,0,0.3)
+	love.graphics.rectangle("fill",x1,self.screenY/imageScale-2,self.width,2)
 	love.graphics.pop()
 	self.storedScreenX = newScreenX
 end

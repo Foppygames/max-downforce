@@ -9,6 +9,8 @@ require "classes.entity"
 
 -- local variables
 local img = nil
+local shadowImg = nil
+local shadowHeight = 0
 
 -- tree is based on entity
 Tree = Entity:new()
@@ -18,6 +20,9 @@ function Tree.init()
 		love.graphics.newImage("images/tree2.png"),
 		love.graphics.newImage("images/tree3.png")
 	}
+	shadowImg = love.graphics.newImage("images/shadow_tree.png")
+	shadowHalfWidth = shadowImg:getWidth() / 2
+	shadowHalfHeight = shadowImg:getHeight() / 2
 end
 
 function Tree:new(x,z,color)
@@ -33,6 +38,18 @@ function Tree:new(x,z,color)
 	o.color = color
 	
 	return o
+end
+
+function Tree:draw()
+	local imageScale = self:computeImageScale()
+	local newScreenX = self:computeNewScreenX()
+	love.graphics.push()
+	love.graphics.scale(imageScale,imageScale)
+	love.graphics.draw(shadowImg,newScreenX/imageScale - shadowHalfWidth,self.screenY/imageScale - shadowHalfHeight)
+	love.graphics.setColor(self.color,self.color,self.color)
+	love.graphics.draw(self.image,newScreenX/imageScale - self.width/2,self.screenY/imageScale - self.height)
+	love.graphics.pop()
+	self.storedScreenX = newScreenX
 end
 
 -- use reduced collision width for collision with trunk only

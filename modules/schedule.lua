@@ -55,12 +55,12 @@ function processItem(itemType,z)
 	elseif (itemType == schedule.ITEM_STADIUM_R) then
 		entities.addStadium(850,z)
 	elseif (itemType == schedule.ITEM_TREES_L_R) then
-		entities.addTree(-2000,z,0.6)
-		entities.addTree(-1300,z-4,0.8)
-		entities.addTree(-600,z-8,1)
-		entities.addTree(600,z-8,1)
-		entities.addTree(1300,z-4,0.8)
-		entities.addTree(2000,z,0.6)
+		entities.addTree(-2500,z,0.4)
+		entities.addTree(-1300,z-4,0.7)
+		entities.addTree(-505,z-8,1)
+		entities.addTree(505,z-8,1)
+		entities.addTree(1300,z-4,0.7)
+		entities.addTree(2500,z,0.4)
 	elseif (itemType == schedule.ITEM_BANNER_FOREST_BRIDGE) then
 		entities.addBanner(0,z,2)
 	elseif (itemType == schedule.ITEM_BANNER_START) then

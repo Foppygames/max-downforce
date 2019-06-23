@@ -79,6 +79,9 @@ end
 -- note: z parameter is starting z for series of items
 -- if z is smaller than maxZ this means items may have to be processed right away
 function schedule.add(itemType,dz,count,z)
+
+	--print("schedule addItem itemType="..itemType.." z="..z)
+
 	if (count > 0) then
 		if (items[itemType] ~= nil) then
 			items[itemType].dz = dz
@@ -116,14 +119,14 @@ function schedule.update(playerSpeed,dt)
 	for itemType,data in pairs(items) do
 		data.distance = data.distance - playerSpeed * dt
 		if (data.distance <= 0) then
-			data.distance = data.dz
-			processItem(itemType,perspective.maxZ)
+			processItem(itemType,perspective.maxZ + data.distance)
 			if (data.count ~= -1) then
 				data.count = data.count - 1
 				if (data.count <= 0) then
 					items[itemType] = nil
 				end
 			end
+			data.distance = data.dz
 		end
 	end
 end

@@ -15,13 +15,13 @@ local schedule = require("modules.schedule")
 -- =========================================================
 
 segments.MAX_SEGMENT_DDX = 0.0028
-segments.FIRST_SEGMENT_LENGTH = 3.79 -- used in setting up starting grid
+segments.FIRST_SEGMENT_LENGTH = 4 --3.79
 
 segments.TEXTURE_NORMAL = "normal"
 segments.TEXTURE_START_FINISH = "start_finish"
 
-local SMOOTHING_SEGMENT_DDX_STEP = 0.04 --0.06
-local SMOOTHING_SEGMENT_LENGTH = 0.05 --0.04
+local SMOOTHING_SEGMENT_DDX_STEP = 0.04
+local SMOOTHING_SEGMENT_LENGTH = 0.05
 
 -- =========================================================
 -- variables
@@ -30,35 +30,22 @@ local SMOOTHING_SEGMENT_LENGTH = 0.05 --0.04
 -- note: length is written as fraction of maxZ, to be converted in segments.init()
 -- note: dz is written as fraction of maxZ, to be converted in segments.init()
 local track = {
-	-- straight before start/finish
+	-- straight leading up to start/finish
 	{
 		ddx = 0,
 		length = segments.FIRST_SEGMENT_LENGTH,
 		scheduleItems = {
-			--[[{
-				itemType = schedule.ITEM_STADIUM_L,
-				startZ = segments.FIRST_SEGMENT_LENGTH - 0.79,
-				dz = 0.1,
-				count = 8
-			}]]--
-		},
-		texture = segments.TEXTURE_NORMAL
-	},
-	-- piece of straight with start/finish texture plus banner in stadium area
-	{
-		ddx = 0,
-		length = 0.01,
-		scheduleItems = {
 			{
 				itemType = schedule.ITEM_BANNER_START,
-				startZ = 0,
+				startZ = segments.FIRST_SEGMENT_LENGTH,
 				dz = 0,
 				count = 1
 			}
 		},
-		texture = segments.TEXTURE_START_FINISH
+		texture = segments.TEXTURE_NORMAL
 	},
-	-- medium straight after start/finish in stadium area
+	-- medium straight after start/finish
+	-- in stadium area
 	{
 		ddx = 0,
 		length = 2.0,
@@ -288,6 +275,9 @@ segments.totalLength = 0
 -- =========================================================
 
 local function addFromIndex(index,z)
+	
+	--print("segments addFromIndex index="..index.." z="..z)
+
 	local segment = {
 		z = z
 	}
@@ -309,6 +299,9 @@ local function addFromIndex(index,z)
 end
 
 local function addNext(dz)
+
+	--print("segments addNext")
+
 	trackIndex = trackIndex + 1
 	if (trackIndex > #track) then
 		trackIndex = 1
@@ -376,6 +369,9 @@ function segments.reset()
 end
 
 function segments.addFirst()
+
+	--print("segments addFirst")
+
 	trackIndex = 1
 	addFromIndex(trackIndex,0)
 end

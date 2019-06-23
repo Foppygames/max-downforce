@@ -116,12 +116,14 @@ function switchToState(newState)
 		local dz = (perspective.maxZ - perspective.minZ) / 13
 		
 		-- player not on first segment
-		if ((CAR_COUNT * dz) > (segments.FIRST_SEGMENT_LENGTH * perspective.maxZ)) then
+		if ((CAR_COUNT * dz) > (segments.FIRST_SEGMENT_LENGTH * (perspective.maxZ - perspective.minZ))) then
 			print("Warning: player not on first segment")
 		end
 		
 		-- scroll towards player position with respect to end of first segment
-		segments.update(segments.FIRST_SEGMENT_LENGTH * perspective.maxZ - ((CAR_COUNT + 4) * dz), 1)
+		local amountToScrollToReachPlayer = segments.FIRST_SEGMENT_LENGTH * (perspective.maxZ - perspective.minZ) - ((CAR_COUNT + 4) * dz)
+		segments.update(amountToScrollToReachPlayer, 1)
+		schedule.update(amountToScrollToReachPlayer, 1)
 		
 		-- add cars from back to front
 		for i = 1, CAR_COUNT do

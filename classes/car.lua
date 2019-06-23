@@ -214,7 +214,7 @@ function Car:new(lane,z,isPlayer,progress)
 end
 
 function Car.getSparkTime()
-	return 5 + math.random() * 15
+	return 3 + math.random() * 20
 end
 
 function Car.getXFromLane(lane,random)

@@ -32,8 +32,8 @@ perspective.maxZ = nil
 
 function perspective.initZMapAndScaling()
 	for i = 1, perspective.GROUND_HEIGHT do
-		perspective.zMap[i] = -1.0 / (i - perspective.GROUND_HEIGHT*1.05) * 380 --1.05 380
-		perspective.scale[i] = 1.0 / (-1.0 / (i - (perspective.GROUND_HEIGHT*1.01))) --1.01
+		perspective.zMap[i] = -1.0 / (i - perspective.GROUND_HEIGHT * 1.05) * 380 --1.05 380
+		perspective.scale[i] = 1.0 / (-1.0 / (i - (perspective.GROUND_HEIGHT * 1.01))) --1.01
 	end
 
 	-- normalize scaling so that scale 1.0 is used at y=1

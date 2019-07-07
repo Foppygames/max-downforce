@@ -1,5 +1,5 @@
 -- Max Downforce - modules/schedule.lua
--- 2017-2018 Foppygames
+-- 2017-2019 Foppygames
 
 local schedule = {}
 
@@ -9,7 +9,6 @@ local schedule = {}
 
 local entities = require("modules.entities")
 local perspective = require("modules.perspective")
---local utils = require("modules.utils")
 
 -- =========================================================
 -- public constants
@@ -23,6 +22,8 @@ schedule.ITEM_GRASS_L_R = "grass_l_r"
 schedule.ITEM_SIGN_L = "sign_l"
 schedule.ITEM_SIGN_R = "sign_r"
 schedule.ITEM_TREES_L_R = "trees_l_r"
+schedule.ITEM_TUNNEL_END = "tunnel_end"
+schedule.ITEM_TUNNEL_START = "tunnel_start"
 schedule.ITEM_STADIUM_L = "stadium_l"
 schedule.ITEM_STADIUM_R = "stadium_r"
 
@@ -61,6 +62,10 @@ function processItem(itemType,z)
 		entities.addTree(505,z-8,1)
 		entities.addTree(1300,z-4,0.7)
 		entities.addTree(2500,z,0.4)
+	elseif (itemType == schedule.ITEM_TUNNEL_END) then
+		entities.addTunnelEnd(z)
+	elseif (itemType == schedule.ITEM_TUNNEL_START) then
+		entities.addTunnelStart(z)
 	elseif (itemType == schedule.ITEM_BANNER_FOREST_BRIDGE) then
 		entities.addBanner(0,z,2)
 	elseif (itemType == schedule.ITEM_BANNER_START) then
@@ -79,9 +84,6 @@ end
 -- note: z parameter is starting z for series of items
 -- if z is smaller than maxZ this means items may have to be processed right away
 function schedule.add(itemType,dz,count,z)
-
-	--print("schedule addItem itemType="..itemType.." z="..z)
-
 	if (count > 0) then
 		if (items[itemType] ~= nil) then
 			items[itemType].dz = dz
@@ -120,13 +122,13 @@ function schedule.update(playerSpeed,dt)
 		data.distance = data.distance - playerSpeed * dt
 		if (data.distance <= 0) then
 			processItem(itemType,perspective.maxZ + data.distance)
+			data.distance = data.distance + data.dz
 			if (data.count ~= -1) then
 				data.count = data.count - 1
 				if (data.count <= 0) then
 					items[itemType] = nil
 				end
 			end
-			data.distance = data.dz
 		end
 	end
 end

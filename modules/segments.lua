@@ -1,12 +1,13 @@
 -- Max Downforce - modules/segments.lua
--- 2017-2018 Foppygames
+-- 2017-2019 Foppygames
 
 local segments = {}
 
 -- =========================================================
--- includes
+-- modules
 -- =========================================================
 
+local entities = require("modules.entities")
 local perspective = require("modules.perspective")
 local schedule = require("modules.schedule")
 
@@ -14,8 +15,8 @@ local schedule = require("modules.schedule")
 -- constants
 -- =========================================================
 
-segments.MAX_SEGMENT_DDX = 0.0028
-segments.FIRST_SEGMENT_LENGTH = 4 --3.79
+segments.MAX_SEGMENT_DDX = 0.0030
+segments.FIRST_SEGMENT_LENGTH = 0.55
 
 segments.TEXTURE_NORMAL = "normal"
 segments.TEXTURE_START_FINISH = "start_finish"
@@ -42,6 +43,7 @@ local track = {
 				count = 1
 			}
 		},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- medium straight after start/finish
@@ -63,6 +65,7 @@ local track = {
 				count = 40
 			}
 		},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- medium curve right
@@ -71,13 +74,14 @@ local track = {
 		ddx = 0.7,
 		length = 1.5,
 		scheduleItems = {
-			{
+			--[[{
 				itemType = schedule.ITEM_GRASS_L_R,
 				startZ = 2.2,
 				dz = 0.2,
 				count = 20
-			}
+			}]]--
 		},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- long straight
@@ -85,7 +89,7 @@ local track = {
 		ddx = 0,
 		length = 4,
 		scheduleItems = {
-			{
+			--[[{
 				itemType = schedule.ITEM_SIGN_L,
 				startZ = 0.6,
 				dz = 0.6,
@@ -96,8 +100,21 @@ local track = {
 				startZ = 0.9,
 				dz = 0.6,
 				count = 5
-			}
+			},
+			{
+				itemType = schedule.ITEM_TUNNEL_START,
+				startZ = 0,
+				dz = 0,
+				count = 1
+			},
+			{
+				itemType = schedule.ITEM_TUNNEL_END,
+				startZ = 3,
+				dz = 0,
+				count = 1
+			}]]--
 		},
+		tunnel = true,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- easy long curve right
@@ -119,6 +136,7 @@ local track = {
 				count = 2
 			}
 		},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- short straight
@@ -134,6 +152,7 @@ local track = {
 				count = 45 --9/0.2
 			}
 		},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- cicane: right + short straight
@@ -142,12 +161,14 @@ local track = {
 		ddx = 0.6,
 		length = 0.5,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	{
 		ddx = 0.0,
 		length = 0.5,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- cicane: left + short straight
@@ -156,12 +177,14 @@ local track = {
 		ddx = -0.5,
 		length = 0.5,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	{
 		ddx = 0.0,
 		length = 0.5,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- cicane: easy right
@@ -170,6 +193,7 @@ local track = {
 		ddx = 0.4,
 		length = 1.0,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- long easy right
@@ -178,6 +202,7 @@ local track = {
 		ddx = 0.1,
 		length = 3,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- long easy left
@@ -199,6 +224,7 @@ local track = {
 				count = 2
 			}
 		},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- medium straight
@@ -206,6 +232,7 @@ local track = {
 		ddx = 0.0,
 		length = 2,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- sweep right
@@ -213,6 +240,7 @@ local track = {
 		ddx = 0.4,
 		length = 2,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- continuing into harder long sweep right
@@ -220,6 +248,7 @@ local track = {
 		ddx = 0.8,
 		length = 3,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- long straight back towards stadium area
@@ -227,6 +256,7 @@ local track = {
 		ddx = 0.0,
 		length = 5,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- hard right
@@ -234,6 +264,7 @@ local track = {
 		ddx = 0.8,
 		length = 2,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- medium straight into stadium area
@@ -248,6 +279,7 @@ local track = {
 		ddx = -1.0,
 		length = 4,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- medium straight leaving stadiums behind
@@ -255,6 +287,7 @@ local track = {
 		ddx = 0.0,
 		length = 1.5,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- hard very long right onto start/finish straight
@@ -262,11 +295,13 @@ local track = {
 		ddx = 0.8,
 		length = 5,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	}
 }
 local trackIndex
 local active
+local tunnelStarted
 
 segments.totalLength = 0
 
@@ -275,9 +310,6 @@ segments.totalLength = 0
 -- =========================================================
 
 local function addFromIndex(index,z)
-	
-	--print("segments addFromIndex index="..index.." z="..z)
-
 	local segment = {
 		z = z
 	}
@@ -289,6 +321,22 @@ local function addFromIndex(index,z)
 			end
 		else
 			segment[key] = value
+			
+			if (key == "tunnel") then
+				-- segment has tunnel
+				if (value) then
+					if (not tunnelStarted) then
+						entities.addTunnelStart(z)
+						tunnelStarted = true
+					end
+				-- segment has no tunnel
+				else
+					if (tunnelStarted) then
+						entities.addTunnelEnd(z)
+						tunnelStarted = false
+					end
+				end
+			end
 		end
 	end
 	
@@ -299,9 +347,6 @@ local function addFromIndex(index,z)
 end
 
 local function addNext(dz)
-
-	--print("segments addNext")
-
 	trackIndex = trackIndex + 1
 	if (trackIndex > #track) then
 		trackIndex = 1
@@ -366,12 +411,10 @@ end
 
 function segments.reset()
 	active = {}
+	tunnelStarted = false
 end
 
 function segments.addFirst()
-
-	--print("segments addFirst")
-
 	trackIndex = 1
 	addFromIndex(trackIndex,0)
 end

@@ -15,6 +15,8 @@ require "classes.sign"
 require "classes.spark"
 require "classes.stadium"
 require "classes.tree"
+require "classes.tunnelend"
+require "classes.tunnelstart"
 
 local aspect = require("modules.aspect")
 local perspective = require("modules.perspective")
@@ -135,6 +137,18 @@ function entities.addTree(x,z,color)
 	table.insert(list,tree)
 	
 	return tree
+end
+
+function entities.addTunnelEnd(z)
+	local tunnelEnd = TunnelEnd:new(z)
+	table.insert(list,tunnelEnd)
+	return tunnelEnd
+end
+
+function entities.addTunnelStart(z)
+	local tunnelStart = TunnelStart:new(z)
+	table.insert(list,tunnelStart)
+	return tunnelStart
 end
 
 -- checks if car collides with other entity

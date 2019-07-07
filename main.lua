@@ -121,9 +121,9 @@ function switchToState(newState)
 		end
 		
 		-- scroll towards player position with respect to end of first segment
-		local amountToScrollToReachPlayer = segments.FIRST_SEGMENT_LENGTH * (perspective.maxZ - perspective.minZ) - ((CAR_COUNT + 4) * dz)
-		segments.update(amountToScrollToReachPlayer, 1)
-		schedule.update(amountToScrollToReachPlayer, 1)
+		--local amountToScrollToReachPlayer = segments.FIRST_SEGMENT_LENGTH * (perspective.maxZ - perspective.minZ) - ((CAR_COUNT + 4) * dz)
+		--segments.update(amountToScrollToReachPlayer, 1)
+		--schedule.update(amountToScrollToReachPlayer, 1)
 		
 		-- add cars from back to front
 		for i = 1, CAR_COUNT do
@@ -231,6 +231,9 @@ function love.keypressed(key)
 		if (key == "space") then
 			switchToState(STATE_RACE)
 		end
+		if (key == "escape") then
+			love.event.quit()
+		end
 	end
 	if (state == STATE_RACE) then
 		if (key == "escape") then
@@ -254,11 +257,21 @@ function love.draw()
 			love.graphics.print("Max Downforce",110,20+i*8)	
 		end
 		
+		--love.graphics.setColor(1,1,0)
+		--love.graphics.print("work in progress demo",85,70)
+		--love.graphics.print("please do not distribute",75,80)
+		
 		love.graphics.setColor(0.470,0.902,1)
-		love.graphics.print("W = windowed / full screen",75,120)
+		love.graphics.print("W = windowed / full screen",75,100)
 		
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("Press space to start",90,170)
+		love.graphics.print("Controls: arrow keys",90,120)
+		
+		love.graphics.setColor(1,1,1)
+		love.graphics.print("Press space to start",90,140)
+		
+		love.graphics.setColor(1,1,0)
+		love.graphics.print("Foppygames 2019",100,175)
 	end
 	
 	if (state == STATE_RACE) then
@@ -314,6 +327,7 @@ function love.draw()
 				if (z > segments.getAtIndex(segmentIndex+1).z) then
 					segmentIndex = segmentIndex + 1
 					segment = segments.getAtIndex(segmentIndex)
+					--roadColor = 1
 				end
 			end
 
@@ -328,11 +342,11 @@ function love.draw()
 			
 			-- draw grass
 			if (grassColorVariant == 1) then
-				--love.graphics.setColor(0.45,0.8,0.25)
-				love.graphics.setColor(0.2,0.8,0.2)
+				love.graphics.setColor(0.45,0.8,0.25)
+				--love.graphics.setColor(0.2,0.8,0.2)
 			else
-				--love.graphics.setColor(0.36,0.6,0.20)
-				love.graphics.setColor(0.15,0.7,0.15)
+				love.graphics.setColor(0.36,0.6,0.20)
+				--love.graphics.setColor(0.15,0.7,0.15)
 			end
 			love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 			

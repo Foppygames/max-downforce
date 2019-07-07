@@ -53,6 +53,7 @@ local lap = 0
 local progress = 0
 local finished = false
 local finishedCount = 0
+local tunnelWallDistance = 0
 
 -- =========================================================
 -- functions
@@ -104,7 +105,7 @@ function switchToState(newState)
 		progress = 0
 		finished = false
 		finishedCount = 0
-
+		
 		horizon.reset()
 		opponents.reset()
 		schedule.reset()
@@ -119,11 +120,6 @@ function switchToState(newState)
 		if ((CAR_COUNT * dz) > (segments.FIRST_SEGMENT_LENGTH * (perspective.maxZ - perspective.minZ))) then
 			print("Warning: player not on first segment")
 		end
-		
-		-- scroll towards player position with respect to end of first segment
-		--local amountToScrollToReachPlayer = segments.FIRST_SEGMENT_LENGTH * (perspective.maxZ - perspective.minZ) - ((CAR_COUNT + 4) * dz)
-		--segments.update(amountToScrollToReachPlayer, 1)
-		--schedule.update(amountToScrollToReachPlayer, 1)
 		
 		-- add cars from back to front
 		for i = 1, CAR_COUNT do
@@ -167,7 +163,9 @@ function love.update(dt)
 		local aiCarCount = entities.update(playerSpeed,dt,segments.totalLength)
 		
 		if (entities.checkLap()) then
-		
+			-- note: in the case of multiple tunnels this should be reset for each tunnel
+			tunnelWallDistance = 0
+
 			--print("ENTITIES: "..entities.getListLength())
 		
 			lap = lap + 1
@@ -190,13 +188,21 @@ function love.update(dt)
 				end
 				
 				--print("PROGRESS: "..progress)
-				
 			end
 		end
 		
 		opponents.update(playerSpeed,progress,aiCarCount,dt)
 		segments.update(playerSpeed,dt)
 		horizon.update(segments.getAtIndex(1).ddx,playerSpeed,dt)
+		
+		local lastSegment = segments.getAtIndex(segments.getLastIndex())
+		if (lastSegment.tunnel) then
+			tunnelWallDistance = tunnelWallDistance + playerSpeed * dt
+			while (tunnelWallDistance > 3) do
+				tunnelWallDistance = tunnelWallDistance - 3
+				entities.addTunnelEnd(perspective.maxZ - tunnelWallDistance)
+			end
+		end
 		
 		if (player ~= nil) then
 			if (player.explodeCount > 0) then
@@ -327,8 +333,11 @@ function love.draw()
 				if (z > segments.getAtIndex(segmentIndex+1).z) then
 					segmentIndex = segmentIndex + 1
 					segment = segments.getAtIndex(segmentIndex)
-					--roadColor = 1
 				end
+			end
+			
+			if (segment.tunnel) then
+				roadColor = roadColor / 2.8
 			end
 
 			local roadWidth = road.ROAD_WIDTH * perspective.scale[i]
@@ -341,30 +350,43 @@ function love.draw()
 			entities.setupForDraw(z,screenX,screenY,perspective.scale[i],previousZ,previousScreenX,previousScreenY,previousScale,segment)
 			
 			-- draw grass
-			if (grassColorVariant == 1) then
-				love.graphics.setColor(0.45,0.8,0.25)
-				--love.graphics.setColor(0.2,0.8,0.2)
+			if (true) then --(not segment.tunnel) then
+				if (grassColorVariant == 1) then
+					love.graphics.setColor(0.45,0.8,0.25)
+				else
+					love.graphics.setColor(0.36,0.6,0.20)
+				end
 			else
-				love.graphics.setColor(0.36,0.6,0.20)
-				--love.graphics.setColor(0.15,0.7,0.15)
+				love.graphics.setColor(0,0,0)
 			end
 			love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 			
 			-- draw tarmac
-			love.graphics.setColor(roadColor*1.22,roadColor,roadColor)
+			if (not segment.tunnel) then
+				love.graphics.setColor(roadColor*1.22,roadColor,roadColor)
+			else
+				love.graphics.setColor(roadColor,roadColor,roadColor*1.3)
+			end
 			love.graphics.line(x,screenY,x+roadWidth,screenY)
 			
 			-- draw curbs
-			if (curbColorVariant == 1) then
-				love.graphics.setColor(1,0.263,0)
+			if (not segment.tunnel) then
+				if (curbColorVariant == 1) then
+					love.graphics.setColor(1,0.263,0)
+				elseif (curbColorVariant == 2) then
+					love.graphics.setColor(1,0.95,0.95)
+				end
 			else
-				love.graphics.setColor(1,0.95,0.95)
+				love.graphics.setColor(0.8,0.8,0)
 			end
 			love.graphics.line(x,screenY,x+curbWidth,screenY)
 			love.graphics.line(x+roadWidth-curbWidth,screenY,x+roadWidth,screenY)
 			
 			-- draw stripes
-			if (curbColorVariant == 2) then
+			if (curbColorVariant ~= 1) then
+				if (segment.tunnel) then
+					love.graphics.setColor(0.8,0.8,0)
+				end
 				love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
 			end
 			

@@ -38,7 +38,7 @@ function TunnelStart:draw()
 	local height = 200 * imageScale
 	local y = self.screenY - height
 	local rightX = newScreenX + road.ROAD_WIDTH / 2 * imageScale
-	local roofHeight = 50 * imageScale
+	local roofHeight = 110 * imageScale
 	
 	love.graphics.setColor(1,1,1)
 	love.graphics.rectangle("fill",0,y,leftWidth,height)

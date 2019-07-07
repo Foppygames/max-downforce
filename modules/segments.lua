@@ -31,7 +31,7 @@ local SMOOTHING_SEGMENT_LENGTH = 0.05
 -- note: length is written as fraction of maxZ, to be converted in segments.init()
 -- note: dz is written as fraction of maxZ, to be converted in segments.init()
 local track = {
-	-- straight leading up to start/finish
+	-- starting grid straight leading up to start/finish
 	{
 		ddx = 0,
 		length = segments.FIRST_SEGMENT_LENGTH,
@@ -74,12 +74,12 @@ local track = {
 		ddx = 0.7,
 		length = 1.5,
 		scheduleItems = {
-			--[[{
+			{
 				itemType = schedule.ITEM_GRASS_L_R,
 				startZ = 2.2,
 				dz = 0.2,
 				count = 20
-			}]]--
+			}
 		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
@@ -89,7 +89,7 @@ local track = {
 		ddx = 0,
 		length = 4,
 		scheduleItems = {
-			--[[{
+			{
 				itemType = schedule.ITEM_SIGN_L,
 				startZ = 0.6,
 				dz = 0.6,
@@ -100,21 +100,9 @@ local track = {
 				startZ = 0.9,
 				dz = 0.6,
 				count = 5
-			},
-			{
-				itemType = schedule.ITEM_TUNNEL_START,
-				startZ = 0,
-				dz = 0,
-				count = 1
-			},
-			{
-				itemType = schedule.ITEM_TUNNEL_END,
-				startZ = 3,
-				dz = 0,
-				count = 1
-			}]]--
+			}
 		},
-		tunnel = true,
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- easy long curve right
@@ -254,17 +242,41 @@ local track = {
 	-- long straight back towards stadium area
 	{
 		ddx = 0.0,
-		length = 5,
+		length = 4,
 		scheduleItems = {},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
-	-- hard right
+	-- short straight, start of tunnel
 	{
-		ddx = 0.8,
+		ddx = 0,
+		length = 0.8,
+		scheduleItems = {},
+		tunnel = true,
+		texture = segments.TEXTURE_NORMAL
+	},
+	-- hard right, tunnel
+	{
+		ddx = 0.6,
 		length = 2,
 		scheduleItems = {},
-		tunnel = false,
+		tunnel = true,
+		texture = segments.TEXTURE_NORMAL
+	},
+	-- short straight, tunnel
+	{
+		ddx = 0,
+		length = 0.5,
+		scheduleItems = {},
+		tunnel = true,
+		texture = segments.TEXTURE_NORMAL
+	},
+	-- easy left, tunnel
+	{
+		ddx = -0.2,
+		length = 1,
+		scheduleItems = {},
+		tunnel = true,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- medium straight into stadium area
@@ -272,6 +284,7 @@ local track = {
 		ddx = 0.0,
 		length = 1.5,
 		scheduleItems = {},
+		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	-- very hard left through stadiums
@@ -290,10 +303,18 @@ local track = {
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
-	-- hard very long right onto start/finish straight
+	-- hard very long right onto straight
 	{
 		ddx = 0.8,
 		length = 5,
+		scheduleItems = {},
+		tunnel = false,
+		texture = segments.TEXTURE_NORMAL
+	},
+	-- straight towards starting grid
+	{
+		ddx = 0,
+		length = 2,
 		scheduleItems = {},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
@@ -368,6 +389,7 @@ function segments.init()
 		if ((track[i].ddx ~= 0) and (nextDdx == 0)) then
 			local texture = track[i].texture
 			local ddx = track[i].ddx
+			local tunnel = track[i].tunnel
 			local j = 1
 			if (ddx > 0) then
 				ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
@@ -376,7 +398,8 @@ function segments.init()
 						ddx = ddx,
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
-						texture = texture
+						texture = texture,
+						tunnel = tunnel
 					})
 					ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1
@@ -388,7 +411,8 @@ function segments.init()
 						ddx = ddx,
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
-						texture = texture
+						texture = texture,
+						tunnel = tunnel
 					})
 					ddx = ddx + SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1

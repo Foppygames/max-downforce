@@ -21,8 +21,10 @@ local BRAKE = 40
 local IDLE_BRAKE = 2
 local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.35
 local MAX_DIST_BEFORE_CURB_OTHER_WHEEL = road.ROAD_WIDTH*0.50
+local MAX_DIST_BEFORE_TUNNEL_WALL = road.ROAD_WIDTH*0.40
 local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.45
 local MAX_DIST_BEFORE_GRASS_OTHER_WHEEL = road.ROAD_WIDTH*0.60
+local HIT_TUNNEL_WALL_MAX_SPEED = TOP_SPEED * 0.85
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5
 local AI_MIN_PERFORMANCE_FRACTION = 0.65
@@ -152,6 +154,7 @@ function Car:new(lane,z,isPlayer,progress)
 	o.explodeCount = 0
 	o.aiBlockingCarSpeed = nil
 	o.pause = 2
+	o.inTunnel = false
 			
 	if (o.isPlayer) then
 		o.color = {1,0,0}
@@ -171,18 +174,6 @@ function Car:new(lane,z,isPlayer,progress)
 		
 		o.gears = 7
 	else
-		--[[
-		local colorChoices = {0,0.5,1}
-		o.color = {
-			colorChoices[math.random(#colorChoices)],
-			colorChoices[math.random(#colorChoices)],
-			colorChoices[math.random(#colorChoices)]
-		}
-		if (fastCar) then
-			o.color = {1,1,1}
-		end
-		]]--
-		
 		o.color = colors[math.random(#colors)]
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
 		
@@ -228,6 +219,8 @@ end
 function Car:updateOffRoad(dt)
 	local offRoad = false
 	local hitCurb = false
+	local hitTunnelWallLeft = false
+	local hitTunnelWallRight = false
 	
 	if (self.leftBumpDy < 0) then
 		self.leftBumpDy = self.leftBumpDy + self.speed/2 * dt
@@ -249,23 +242,33 @@ function Car:updateOffRoad(dt)
 		if (self.leftBumpDy == 0) then
 			self.leftBumpDy = -1
 		end
-		-- left onto grass
-		if (self.x < -MAX_DIST_BEFORE_GRASS) then
-			offRoad = true
-			-- right off tarmac
-			if (self.x < -MAX_DIST_BEFORE_CURB_OTHER_WHEEL) then
-				-- bump right
-				if (self.rightBumpDy == 0) then
-					self.rightBumpDy = -1
+		-- not in tunnel
+		if (not self.inTunnel) then
+			-- left onto grass
+			if (self.x < -MAX_DIST_BEFORE_GRASS) then
+				offRoad = true
+				-- right off tarmac
+				if (self.x < -MAX_DIST_BEFORE_CURB_OTHER_WHEEL) then
+					-- bump right
+					if (self.rightBumpDy == 0) then
+						self.rightBumpDy = -1
+					end
+					-- right on curb
+					if (self.x >= -MAX_DIST_BEFORE_GRASS_OTHER_WHEEL) then
+						hitCurb = true
+					end
 				end
-				-- right on curb
-				if (self.x >= -MAX_DIST_BEFORE_GRASS_OTHER_WHEEL) then
-					hitCurb = true
-				end
+			-- left on curb
+			else
+				hitCurb = true
 			end
-		-- left on curb
+		-- in tunnel
 		else
-			hitCurb = true
+			-- hit wall
+			if (self.x < -MAX_DIST_BEFORE_TUNNEL_WALL) then
+				self.x = -MAX_DIST_BEFORE_TUNNEL_WALL + math.random() * 10
+				hitTunnelWallLeft = true
+			end
 		end
 	-- right off tarmac
 	elseif (self.x > MAX_DIST_BEFORE_CURB) then
@@ -273,29 +276,65 @@ function Car:updateOffRoad(dt)
 		if (self.rightBumpDy == 0) then
 			self.rightBumpDy = -1
 		end
-		-- right onto grass
-		if (self.x > MAX_DIST_BEFORE_GRASS) then
-			offRoad = true
-			-- left off tarmac
-			if (self.x > MAX_DIST_BEFORE_CURB_OTHER_WHEEL) then
-				-- bump left
-				if (self.leftBumpDy == 0) then
-					self.leftBumpDy = -1
-				end
-				-- left on curb
-				if (self.x <= MAX_DIST_BEFORE_GRASS_OTHER_WHEEL) then
-					hitCurb = true
-				end
+		-- not in tunnel
+		if (not self.inTunnel) then
+			-- right onto grass
+			if (self.x > MAX_DIST_BEFORE_GRASS) then
+				offRoad = true
+				-- left off tarmac
+				if (self.x > MAX_DIST_BEFORE_CURB_OTHER_WHEEL) then
+					-- bump left
+					if (self.leftBumpDy == 0) then
+						self.leftBumpDy = -1
+					end
+					-- left on curb
+					if (self.x <= MAX_DIST_BEFORE_GRASS_OTHER_WHEEL) then
+						hitCurb = true
+					end
+				end		
+			-- right on curb
+			else
+				hitCurb = true
 			end
-		-- right on curb
+		-- in tunnel
 		else
-			hitCurb = true
+			-- hit wall
+			if (self.x > MAX_DIST_BEFORE_TUNNEL_WALL) then
+				self.x = MAX_DIST_BEFORE_TUNNEL_WALL - math.random() * 10
+				hitTunnelWallRight = true
+			end
 		end
 	end
 	
 	if (offRoad) then
 		if (self.speed > OFF_ROAD_MAX_SPEED) then
 			self.speed = self.speed - BRAKE * dt
+		end
+	end
+	
+	if (hitTunnelWallLeft or hitTunnelWallRight) then
+		if (self.speed > HIT_TUNNEL_WALL_MAX_SPEED) then
+			self.speed = self.speed - BRAKE * dt
+		end
+		
+		-- create wall scrape sparks
+		if (self.sparks == nil) then
+			self.sparks = {}
+		end
+		local count = math.random(1,3)
+		local sparkDx
+		if (hitTunnelWallLeft) then
+			sparkDx = -bodyWidth * 2
+		else
+			sparkDx = bodyWidth * 2
+		end
+		for i = 1, count do
+			table.insert(self.sparks,{
+				x = self.x + sparkDx - 5 + math.random(0,10),
+				z = self.z + 3 - i * 0.7,
+				speed = self.speed * 0.95,
+				color = {1,1,math.random()}
+			})
 		end
 	end
 	
@@ -649,6 +688,7 @@ function Car:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previous
 	Entity.setupForDraw(self,z,roadX,screenY,scale,previousZ,previousRoadX,previousScreenY,previousScale,segment)
 	self.segmentDdx = segment.ddx
 	self.targetSpeed = self.topSpeed
+	self.inTunnel = segment.tunnel
 end
 
 function Car:draw()

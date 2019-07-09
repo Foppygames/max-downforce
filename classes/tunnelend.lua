@@ -28,12 +28,12 @@ function TunnelEnd:new(z)
 	self.__index = self
 	
 	o.solid = false
-	o.color = math.cos(math.rad(colorAngle)) / 15
+	o.color = math.cos(math.rad(colorAngle)) / 25
 	
 	if (math.random() > 0.92) then
-		colorAngle = colorAngle + 55
+		colorAngle = colorAngle + 24
 	else
-		colorAngle = colorAngle + 9
+		colorAngle = colorAngle + 8
 	end
 	if (colorAngle > 360) then
 		colorAngle = 0
@@ -58,7 +58,7 @@ function TunnelEnd:draw()
 	
 	local roofHeight = 120 * imageScale
 	
-	love.graphics.setColor(self.color,self.color,self.color*1.4)
+	love.graphics.setColor(self.color,self.color,self.color*1.3)
 	if (self.z < (perspective.maxZ * 0.9)) then
 		love.graphics.rectangle("fill",leftX1,y,wallWidth,wallHeight)
 		love.graphics.rectangle("fill",rightX1,y,wallWidth,wallHeight)

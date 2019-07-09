@@ -350,7 +350,7 @@ function love.draw()
 			entities.setupForDraw(z,screenX,screenY,perspective.scale[i],previousZ,previousScreenX,previousScreenY,previousScale,segment)
 			
 			-- draw grass
-			if (true) then --(not segment.tunnel) then
+			if (not segment.tunnel) then
 				if (grassColorVariant == 1) then
 					love.graphics.setColor(0.45,0.8,0.25)
 				else

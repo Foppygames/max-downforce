@@ -112,6 +112,7 @@ function switchToState(newState)
 		segments.reset()
 		segments.addFirst()
 		timer.reset(progress,2)
+		TunnelEnd.reset()
 	
 		local startZ = perspective.zMap[30]
 		local dz = (perspective.maxZ - perspective.minZ) / 13
@@ -165,6 +166,7 @@ function love.update(dt)
 		if (entities.checkLap()) then
 			-- note: in the case of multiple tunnels this should be reset for each tunnel
 			tunnelWallDistance = 0
+			TunnelEnd.reset()
 
 			--print("ENTITIES: "..entities.getListLength())
 		

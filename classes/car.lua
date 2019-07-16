@@ -779,6 +779,10 @@ function Car:isCar()
 	return true
 end
 
+function Car:outsideTunnelBounds()
+	return (self.x < -MAX_DIST_BEFORE_TUNNEL_WALL) or (self.x > MAX_DIST_BEFORE_TUNNEL_WALL)
+end
+
 function Car:clean()
 	if (self.sndEngineIdle ~= nil) then
 		love.audio.stop(self.sndEngineIdle)

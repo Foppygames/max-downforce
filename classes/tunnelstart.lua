@@ -26,7 +26,7 @@ function TunnelStart:new(z)
 	setmetatable(o, self)
 	self.__index = self
 	
-	o.solid = false
+	o.solid = true
 	
 	return o
 end
@@ -44,4 +44,8 @@ function TunnelStart:draw()
 	love.graphics.rectangle("fill",0,y,leftWidth,height)
 	love.graphics.rectangle("fill",rightX,y,aspect.WINDOW_WIDTH-rightX,height)
 	love.graphics.rectangle("fill",0,y-roofHeight,aspect.WINDOW_WIDTH,roofHeight)
+end
+
+function TunnelStart:isTunnelStart()
+	return true
 end

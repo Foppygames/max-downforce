@@ -87,11 +87,15 @@ function Entity:draw()
 	self.storedScreenX = newScreenX
 end
 
+function Entity:isCar()
+	return false
+end
+
 function Entity:isStartBanner()
 	return false
 end
 
-function Entity:isCar()
+function Entity:isTunnelStart()
 	return false
 end
 

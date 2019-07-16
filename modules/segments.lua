@@ -257,7 +257,7 @@ local track = {
 	},
 	-- hard right, tunnel
 	{
-		ddx = 0.6,
+		ddx = 0.8,
 		length = 2,
 		scheduleItems = {},
 		tunnel = true,
@@ -271,9 +271,25 @@ local track = {
 		tunnel = true,
 		texture = segments.TEXTURE_NORMAL
 	},
-	-- easy left, tunnel
+	-- medium left, tunnel
 	{
-		ddx = -0.2,
+		ddx = -0.4,
+		length = 2,
+		scheduleItems = {},
+		tunnel = true,
+		texture = segments.TEXTURE_NORMAL
+	},
+	-- short straight, tunnel
+	{
+		ddx = 0,
+		length = 0.8,
+		scheduleItems = {},
+		tunnel = true,
+		texture = segments.TEXTURE_NORMAL
+	},
+	-- easy right, tunnel
+	{
+		ddx = 0.2,
 		length = 1,
 		scheduleItems = {},
 		tunnel = true,

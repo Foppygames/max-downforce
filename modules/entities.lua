@@ -163,19 +163,30 @@ local function checkCollision(car)
 		if (other ~= car) then
 			-- other entity is scenery
 			if (not other:isCar()) then
-				if (other.solid) then
-					-- collision on z
-					if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
-						local dX = math.abs(other.x - car.x)
-						-- collision on x
-						if (dX < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then 
-							-- car is halted
-							car.speed = 0
-							car.accEffect = 0
-							--if (entity.explodeCount == 0) then
-							--	entity.explodeCount = 2
-							--end
-							return {collision = true}
+				-- car is not in tunnel
+				if (not car.inTunnel) then
+					if (other.solid) then
+						-- collision on z
+						if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
+							-- other entity is start of tunnel
+							if (other:isTunnelStart()) then
+								if (car:outsideTunnelBounds()) then
+									-- car is halted
+									car.speed = 0
+									car.accEffect = 0
+									return {collision = true}
+								end
+							-- other entity is not tunnel start
+							else
+								local dX = math.abs(other.x - car.x)
+								-- collision on x
+								if (dX < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then 
+									-- car is halted
+									car.speed = 0
+									car.accEffect = 0
+									return {collision = true}
+								end
+							end
 						end
 					end
 				end

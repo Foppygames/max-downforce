@@ -35,13 +35,13 @@ function TunnelEnd:new(z)
 	count =	count + 1
 
 	o.solid = false
-	o.color = math.cos(math.rad(colorAngle)) / 25
+	o.color = math.cos(math.rad(colorAngle)) / 50
 	o.lamp = (count % 5 == 0)
 	
 	if (math.random() > 0.92) then
 		colorAngle = colorAngle + 24
 	else
-		colorAngle = colorAngle + 8
+		colorAngle = colorAngle + 16
 	end
 	if (colorAngle > 360) then
 		colorAngle = 0

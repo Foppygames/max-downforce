@@ -151,7 +151,8 @@ function entities.addTunnelStart(z)
 	return tunnelStart
 end
 
--- checks if car collides with other entity
+-- returns collision speed if car collides with other entity, nil otherwise
+-- Note: this function modifies car speed in case of collision
 local function checkCollision(car)
 	local baseCarWidth = Car.getBaseTotalCarWidth()
 	local carLength = perspective.maxZ / 50
@@ -168,24 +169,32 @@ local function checkCollision(car)
 					if (other.solid) then
 						-- collision on z
 						if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
+							local collision = false
+							local collisionDx = 0
 							-- other entity is start of tunnel
 							if (other:isTunnelStart()) then
-								if (car:outsideTunnelBounds()) then
-									-- car is halted
-									car.speed = 0
-									car.accEffect = 0
-									return {collision = true}
-								end
-							-- other entity is not tunnel start
-							else
-								local dX = math.abs(other.x - car.x)
 								-- collision on x
-								if (dX < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then 
-									-- car is halted
-									car.speed = 0
-									car.accEffect = 0
-									return {collision = true}
+								if (car:outsideTunnelBounds()) then
+									collision = true
 								end
+							-- other entity is not start of tunnel
+							else
+								local dx = math.abs(other.x - car.x)
+								-- collision on x
+								if (dx < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then
+									collision = true
+									collisionDx = dx
+								end
+							end
+							if (collision) then
+								-- car is halted
+								local speed = car.speed
+								car.speed = 0
+								car.accEffect = 0
+								return {
+									speed = speed,
+									dx = collisionDx
+								}
 							end
 						end
 					end
@@ -196,13 +205,17 @@ local function checkCollision(car)
 				if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
 					-- closing in on each other
 					if (car.speed > other.speed) then
-						local dX = math.abs(other.x - car.x)
+						local dx = math.abs(other.x - car.x)
 						-- collision on x
-						if (dX < (baseCarWidth * other.baseScale / 2 + carWidth / 2)) then 
+						if (dx < (baseCarWidth * other.baseScale / 2 + carWidth / 2)) then 
 							-- car is blocked
-							car.speed = other.speed * 0.8
+							local speed = car.speed - other.speed
+							car.speed = other.speed * 0.90
 							car.accEffect = 0
-							return {collision = true}
+							return {
+								speed = speed,
+								dx = dx/2
+							}
 						end
 					end
 				end
@@ -211,7 +224,7 @@ local function checkCollision(car)
 		i = i + 1
 	end	
 	
-	return {collision = false}
+	return nil
 end
 
 -- checks if a car is ahead
@@ -263,12 +276,8 @@ function entities.update(playerSpeed,dt,trackLength)
 	local i = 1
 	while i <= #list do
 		if (list[i]:isCar()) then
-			-- update collided property of car
-			list[i].collided = false
-			local checkCollisionResult = checkCollision(list[i])
-			if (checkCollisionResult.collision) then
-				list[i].collided = true
-			end
+			-- update collision property of car
+			list[i].collision = checkCollision(list[i])
 			
 			-- check for sparks to be generated
 			local sparks = list[i]:getSparks()
@@ -276,23 +285,24 @@ function entities.update(playerSpeed,dt,trackLength)
 				for j = 1,#sparks,1 do
 					entities.addSpark(sparks[j].x,sparks[j].z,sparks[j].speed,sparks[j].color)
 				end
-				
 				list[i]:resetSparks()
 			end
 		end
 		
 		-- update
-		list[i]:update(dt)
+		local delete = list[i]:update(dt)
 		
 		-- scroll
-		local result = list[i]:scroll(playerSpeed,dt)
+		result = list[i]:scroll(playerSpeed,dt)
+		
+		delete = delete or result.delete
 		
 		if (result.lap) then
 			lap = true
 		end
 		
 		if (list[i]:isCar()) then
-			if (not result.delete) then
+			if (not delete) then
 				if (not list[i].isPlayer) then
 					aiCarCount = aiCarCount + 1
 					
@@ -316,7 +326,7 @@ function entities.update(playerSpeed,dt,trackLength)
 			end
 		end
 		
-		if (result.delete) then
+		if (delete) then
 			list[i]:clean()
 		
 			table.remove(list,i)

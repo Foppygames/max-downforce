@@ -163,6 +163,10 @@ function love.update(dt)
 		
 		local aiCarCount = entities.update(playerSpeed,dt,segments.totalLength)
 		
+		if (player == nil) then
+			print("game over")
+		end
+		
 		if (entities.checkLap()) then
 			-- note: in the case of multiple tunnels this should be reset for each tunnel
 			tunnelWallDistance = 0
@@ -371,18 +375,16 @@ function love.draw()
 			end
 			love.graphics.line(x,screenY,x+roadWidth,screenY)
 			
-			-- draw curbs
+			-- draw curbs when not in tunnel
 			if (not segment.tunnel) then
 				if (curbColorVariant == 1) then
 					love.graphics.setColor(1,0.263,0)
 				elseif (curbColorVariant == 2) then
 					love.graphics.setColor(1,0.95,0.95)
 				end
-			else
-				love.graphics.setColor(0.8,0.8,0)
+				love.graphics.line(x,screenY,x+curbWidth,screenY)
+				love.graphics.line(x+roadWidth-curbWidth,screenY,x+roadWidth,screenY)
 			end
-			love.graphics.line(x,screenY,x+curbWidth,screenY)
-			love.graphics.line(x+roadWidth-curbWidth,screenY,x+roadWidth,screenY)
 			
 			-- draw stripes
 			if (curbColorVariant ~= 1) then

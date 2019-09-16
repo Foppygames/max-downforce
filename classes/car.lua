@@ -196,7 +196,7 @@ function Car:new(lane,z,isPlayer,progress)
 	o.leftBumpDy = 0
 	o.rightBumpDy = 0
 	o.baseScale = 2
-	o.collided = false
+	o.collision = nil
 	o.sparkTime = Car.getSparkTime()
 	o.sparks = nil
 	o.steerFactor = 0
@@ -238,12 +238,12 @@ function Car:updateOffRoad(dt)
 	
 	-- left off tarmac
 	if (self.x < -MAX_DIST_BEFORE_CURB) then
-		-- bump left
-		if (self.leftBumpDy == 0) then
-			self.leftBumpDy = -1
-		end
 		-- not in tunnel
 		if (not self.inTunnel) then
+			-- bump left
+			if (self.leftBumpDy == 0) then
+				self.leftBumpDy = -1
+			end
 			-- left onto grass
 			if (self.x < -MAX_DIST_BEFORE_GRASS) then
 				offRoad = true
@@ -272,12 +272,12 @@ function Car:updateOffRoad(dt)
 		end
 	-- right off tarmac
 	elseif (self.x > MAX_DIST_BEFORE_CURB) then
-		-- bump right
-		if (self.rightBumpDy == 0) then
-			self.rightBumpDy = -1
-		end
 		-- not in tunnel
 		if (not self.inTunnel) then
+			-- bump right
+			if (self.rightBumpDy == 0) then
+				self.rightBumpDy = -1
+			end
 			-- right onto grass
 			if (self.x > MAX_DIST_BEFORE_GRASS) then
 				offRoad = true
@@ -619,6 +619,7 @@ function Car:updateEngineSound()
 end
 
 function Car:update(dt)
+	local delete = false
 	local offRoad = self:updateOffRoad(dt)
 	local acc = self:getAcceleration()
 
@@ -628,9 +629,13 @@ function Car:update(dt)
 	
 	self:updateSteer(dt)
 	
-	-- self.collided is managed from entities module
-	if (not self.collided) then
+	-- Note: self.collision is set in entities module
+	if (self.collision == nil) then
 		self:updateSpeed(acc,dt)
+	else
+		if (self.collision.speed > self.topSpeed * 0.05) then
+			
+		end
 	end
 	
 	self:updateSteerResult()
@@ -650,6 +655,16 @@ function Car:update(dt)
 	
 	-- apply steer result to x
 	self.x = self.x + self.steerResult
+	
+	if (self.x < -(road.ROAD_WIDTH * 2)) then
+		self.x = -road.ROAD_WIDTH * 2
+		self.steer = 0
+	elseif (self.x > (road.ROAD_WIDTH * 2)) then
+		self.x = road.ROAD_WIDTH * 2
+		self.steer = 0
+	end
+	
+	return delete
 end
 
 function Car:scroll(playerSpeed,dt)

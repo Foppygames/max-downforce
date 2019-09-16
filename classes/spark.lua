@@ -66,7 +66,5 @@ function Spark:update(dt)
 		self.image = img[self.imageIndex]
 		self.imageTime = self.imageTime + 1
 	end
-	if (delete) then
-		self.z = perspective.minZ - 1
-	end
+	return delete
 end

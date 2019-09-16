@@ -239,17 +239,24 @@ local track = {
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
-	-- long straight back towards stadium area
+	-- long slightly curved straight back towards stadium area
 	{
-		ddx = 0.0,
-		length = 4,
+		ddx = 0.0, --0.0
+		length = 1,
 		scheduleItems = {},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
-	-- short straight, start of tunnel
 	{
-		ddx = 0,
+		ddx = 0.1, --0.0
+		length = 3,
+		scheduleItems = {},
+		tunnel = false,
+		texture = segments.TEXTURE_NORMAL
+	},
+	-- short slightly curved straight, start of tunnel
+	{
+		ddx = 0.1,
 		length = 0.8,
 		scheduleItems = {},
 		tunnel = true,

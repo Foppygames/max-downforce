@@ -29,8 +29,9 @@ function Entity:new(x,z)
 	return o
 end
 
+-- returns whether entity is to be deleted
 function Entity:update(dt)
-	-- ...
+	return false
 end
 
 function Entity:scroll(playerSpeed,dt)

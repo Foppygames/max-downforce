@@ -15,9 +15,9 @@ local utils = require("modules.utils")
 
 -- note: reasonably quick lap is around 50 seconds
 
-local MAX_TIME = 80 -- time available for first lap
+local MAX_TIME = 70 -- time available for first lap
 local MIN_TIME = 50 -- time available for last lap
-local CARRY_FACTOR = 0.5 -- factor of remaining time carried to next lap
+local CARRY_FACTOR = 0.1 -- factor of remaining time carried to next lap
 local TIME_DANGEROUS = 9
 
 -- =========================================================

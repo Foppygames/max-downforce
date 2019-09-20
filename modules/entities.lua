@@ -10,6 +10,7 @@ local entities = {}
 require "classes.banner"
 require "classes.building"
 require "classes.car"
+require "classes.flag"
 require "classes.grass"
 require "classes.sign"
 require "classes.spark"
@@ -92,6 +93,15 @@ function entities.addCar(x,z,isPlayer,progress)
 	table.insert(list,car)
 	
 	return car
+end
+
+function entities.addFlag(x,z)
+	local flag = Flag:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,flag)
+	
+	return flag
 end
 
 function entities.addGrass(x,z)

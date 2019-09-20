@@ -18,6 +18,8 @@ schedule.ITEM_BANNER_START = "banner_start"
 schedule.ITEM_BANNER_FOREST_BRIDGE = "banner_forest_bridge"
 schedule.ITEM_BUILDINGS_L = "buildings_l"
 schedule.ITEM_BUILDINGS_R = "buildings_r"
+schedule.ITEM_FLAG_L = "flag_l"
+schedule.ITEM_FLAG_R = "flag_r"
 schedule.ITEM_GRASS_L_R = "grass_l_r"
 schedule.ITEM_SIGN_L = "sign_l"
 schedule.ITEM_SIGN_R = "sign_r"
@@ -42,6 +44,10 @@ function processItem(itemType,z)
 		entities.addBuilding(-900,z)
 	elseif (itemType == schedule.ITEM_BUILDINGS_R) then
 		entities.addBuilding(900,z)
+	elseif (itemType == schedule.ITEM_FLAG_L) then
+		entities.addFlag(-600,z)
+	elseif (itemType == schedule.ITEM_FLAG_R) then
+		entities.addFlag(600,z)
 	elseif (itemType == schedule.ITEM_GRASS_L_R) then
 		entities.addGrass(-1200,z)
 		entities.addGrass(-600,z-4)

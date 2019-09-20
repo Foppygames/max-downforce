@@ -8,6 +8,7 @@
 require "classes.banner"
 require "classes.building"
 require "classes.car"
+require "classes.flag"
 require "classes.grass"
 require "classes.sign"
 require "classes.stadium"
@@ -75,6 +76,7 @@ function setupGame()
 	Banner.init()
 	Building.init()
 	Car.init()
+	Flag.init()
 	Grass.init()
 	Sign.init()
 	Spark.init()

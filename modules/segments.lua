@@ -37,6 +37,18 @@ local track = {
 		length = segments.FIRST_SEGMENT_LENGTH,
 		scheduleItems = {
 			{
+				itemType = schedule.ITEM_STADIUM_L,
+				startZ = 0.25,
+				dz = 0.1,
+				count = 3
+			},
+			{
+				itemType = schedule.ITEM_STADIUM_R,
+				startZ = 0.25,
+				dz = 0.1,
+				count = 3
+			},
+			{
 				itemType = schedule.ITEM_BANNER_START,
 				startZ = segments.FIRST_SEGMENT_LENGTH,
 				dz = 0,
@@ -52,6 +64,24 @@ local track = {
 		ddx = 0,
 		length = 2.0,
 		scheduleItems = {
+			{
+				itemType = schedule.ITEM_FLAG_L,
+				startZ = 0.05,
+				dz = 0.2,
+				count = 10
+			},
+			{
+				itemType = schedule.ITEM_FLAG_R,
+				startZ = 2.05,
+				dz = 0.2,
+				count = 10
+			},
+			--[[{
+				itemType = schedule.ITEM_FLAG_L,
+				startZ = 0.85,
+				dz = 0.2,
+				count = 6
+			},]]--
 			{
 				itemType = schedule.ITEM_STADIUM_L,
 				startZ = 0.0,
@@ -247,16 +277,29 @@ local track = {
 	},
 	-- long slightly curved straight back towards stadium area
 	{
-		ddx = 0.0, --0.0
+		ddx = 0.0,
 		length = 1,
 		scheduleItems = {},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
 	{
-		ddx = 0.1, --0.0
+		ddx = 0.1,
 		length = 3,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_FLAG_L,
+				startZ = 2.75,
+				dz = 0.1,
+				count = 2
+			},
+			{
+				itemType = schedule.ITEM_FLAG_R,
+				startZ = 2.75,
+				dz = 0.1,
+				count = 2
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},

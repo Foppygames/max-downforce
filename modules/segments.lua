@@ -75,10 +75,16 @@ local track = {
 		length = 1.5,
 		scheduleItems = {
 			{
-				itemType = schedule.ITEM_GRASS_L_R,
+				itemType = schedule.ITEM_TREES_L_R,
 				startZ = 2.2,
 				dz = 0.2,
-				count = 20
+				count = 2
+			},
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 2.4,
+				dz = 0.2,
+				count = 19
 			}
 		},
 		tunnel = false,

@@ -9,6 +9,8 @@ local sound = {}
 
 sound.ENGINE_IDLE = 1
 sound.ENGINE_POWER = 2
+sound.EXPLOSION = 3
+sound.COLLISION = 4
 
 -- =========================================================
 -- variables
@@ -26,6 +28,15 @@ function sound.init()
 		
 	sound.sources[sound.ENGINE_POWER] = love.audio.newSource("sounds/power3.ogg","static")
 	sound.sources[sound.ENGINE_POWER]:setLooping(true)
+	
+	sound.sources[sound.EXPLOSION] = love.audio.newSource("sounds/explosion.wav","static")
+	
+	sound.sources[sound.COLLISION] = love.audio.newSource("sounds/collision.wav","static")
+end
+
+function sound.play(index)
+	love.audio.stop(sound.sources[index])
+	love.audio.play(sound.sources[index])
 end
 
 function sound.getClone(index)

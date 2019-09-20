@@ -30,12 +30,15 @@ local OFF_ROAD_ACC_FACTOR = 0.5
 local AI_MIN_PERFORMANCE_FRACTION = 0.65
 local AI_MAX_PERFORMANCE_FRACTION = 0.92
 local AI_TOP_SPEED = TOP_SPEED
-local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 25 --30
+local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 25
 local AI_MAX_STEER = MAX_STEER * 0.9
 local AI_STEER_CHANGE = STEER_CHANGE * 0.9
 local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.7
 local MAX_WHEEL_SCALE_CHANGE = 0.05
 local MAX_BODY_DEGREES_CHANGE = 2
+local EXPLOSION_SCALE = 4
+local EXPLOSION_TIME = 0.4
+local EXPLOSION_WAIT = 0.4
 
 -- local variables
 local colors = {}
@@ -47,6 +50,7 @@ local imgWing = nil
 local imgAirScoop = nil
 local imgHelmet = nil
 local imgShadow = nil
+local imgExplosion = {}
 local bodyWidth = 0
 local bodyHeight = 0
 local frontWheelWidth = 0
@@ -99,7 +103,10 @@ function Car.init()
 	imgAirScoop = love.graphics.newImage("images/car_air_scoop.png")
 	imgHelmet = love.graphics.newImage("images/car_helmet.png")
 	imgShadow = love.graphics.newImage("images/shadow.png")
-
+	for i = 1,6 do
+		table.insert(imgExplosion, love.graphics.newImage("images/explosion"..i..".png"))
+	end
+	
 	bodyWidth = imgBody:getWidth()
 	bodyHeight = imgBody:getHeight()
 	frontWheelWidth = imgFrontWheel[1]:getWidth()
@@ -151,7 +158,6 @@ function Car:new(lane,z,isPlayer,progress)
 	o.smoothX = false
 	o.sndEngineIdle = nil
 	o.sndEnginePower = nil
-	o.explodeCount = 0
 	o.aiBlockingCarSpeed = nil
 	o.pause = 2
 	o.inTunnel = false
@@ -161,15 +167,15 @@ function Car:new(lane,z,isPlayer,progress)
 		o.topSpeed = TOP_SPEED
 		
 		o.sndEngineIdle = sound.getClone(sound.ENGINE_IDLE)
-		o.sndEngineIdle:setVolume(0.1) --(1)
+		o.sndEngineIdle:setVolume(1) --(0.1)
 		love.audio.play(o.sndEngineIdle)
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
-		o.sndEnginePower:setVolume(0.05) --(0.5)
+		o.sndEnginePower:setVolume(0.5) --(0.05)
 		love.audio.play(o.sndEnginePower)
 		
 		o.sndCurbBump = love.audio.newSource("sounds/curb.wav","static")
-		o.sndCurbBump:setVolume(0.1) --(0.7)
+		o.sndCurbBump:setVolume(0.7) --(0.1)
 		o.curbBumpSoundCount = 1
 		
 		o.gears = 7
@@ -182,6 +188,11 @@ function Car:new(lane,z,isPlayer,progress)
 		love.audio.play(o.sndEnginePower)
 		
 		o.gears = math.random(3,8)
+	end
+	
+	o.colorInTunnel = {}
+	for i = 1,3 do
+		o.colorInTunnel[i] = o.color[i] / 2
 	end
 	
 	o.topSpeedForAcceleration = (3 * TOP_SPEED + o.topSpeed) / 4
@@ -200,6 +211,7 @@ function Car:new(lane,z,isPlayer,progress)
 	o.sparkTime = Car.getSparkTime()
 	o.sparks = nil
 	o.steerFactor = 0
+	o.explosionTime = 0
 	
 	return o
 end
@@ -607,7 +619,7 @@ function Car:updateEngineSoundCpu()
 	if (volume < 0) then
 		volume = 0
 	end
-	self.sndEnginePower:setVolume(volume * 0.03) --0.3)
+	self.sndEnginePower:setVolume(volume * 0.3) --0.03)
 end
 
 function Car:updateEngineSound()
@@ -616,6 +628,34 @@ function Car:updateEngineSound()
 	else
 		self:updateEngineSoundCpu()
 	end
+end
+
+function Car:explode()
+	if (self.isPlayer) then
+		self.sndEngineIdle:setVolume(0)
+		self.sndEnginePower:setVolume(0)
+	end
+	sound.play(sound.EXPLOSION)
+	self.speed = 0
+	self.explosionTime = EXPLOSION_TIME + EXPLOSION_WAIT
+end
+
+function Car:updateExplosion(dt)
+	local delete = false
+	self.explosionTime = self.explosionTime - dt
+	if (self.explosionTime <= 0) then
+		if (self.isPlayer) then
+			self.sndEngineIdle:setVolume(1)
+			self.sndEnginePower:setVolume(0.5)
+			self.steer = 0
+			self.x = 0
+			-- ...
+		else
+			delete = true
+		end
+		self.explosionTime = 0
+	end
+	return delete
 end
 
 function Car:update(dt)
@@ -627,21 +667,34 @@ function Car:update(dt)
 		acc = acc * OFF_ROAD_ACC_FACTOR
 	end
 	
-	self:updateSteer(dt)
+	if (self.explosionTime == 0) then
+		self:updateSteer(dt)
 	
-	-- Note: self.collision is set in entities module
-	if (self.collision == nil) then
-		self:updateSpeed(acc,dt)
-	else
-		if (self.collision.speed > self.topSpeed * 0.05) then
-			
+		if (self.collision == nil) then
+			self:updateSpeed(acc,dt)
+		else
+			-- 50% crash
+			if (self.collision.speed > (self.topSpeed * 0.5)) then
+				self:explode()
+			-- 20% crash
+			elseif (self.collision.speed > (self.topSpeed * 0.2)) then
+				sound.play(sound.COLLISION)
+			-- light touch
+			else
+				-- ...
+			end
 		end
 	end
 	
-	self:updateSteerResult()
-	self:updateOutwardForce()
-	self:updateEngineSound()
-	self:updateSpark(dt)
+	if (self.explosionTime == 0) then
+		self:updateSteerResult()
+		self:updateOutwardForce()
+		self:updateSpark(dt)
+	else
+		delete = self:updateExplosion(dt)
+	end
+	
+	self:updateEngineSound()	
 	
 	if (not self.isPlayer) then
 		-- update z
@@ -650,11 +703,13 @@ function Car:update(dt)
 	
 	self:updateWheelAnimation(dt)
 	
-	-- apply outward force to x
-	self.x = self.x - self.outwardForce
+	if (self.explosionTime == 0) then
+		-- apply outward force to x
+		self.x = self.x - self.outwardForce
 	
-	-- apply steer result to x
-	self.x = self.x + self.steerResult
+		-- apply steer result to x
+		self.x = self.x + self.steerResult
+	end
 	
 	if (self.x < -(road.ROAD_WIDTH * 2)) then
 		self.x = -road.ROAD_WIDTH * 2
@@ -715,58 +770,75 @@ function Car:draw()
 	
 	local screenX = newScreenX/imageScale
 	local screenY = self.screenY/imageScale
-	local bumpDy = 0
 	
-	if ((self.leftBumpDy ~= 0) or (self.rightBumpDy ~= 0)) then
-		bumpDy = (self.leftBumpDy + self.rightBumpDy) * 0.9
-		screenY = screenY + bumpDy
+	if ((self.explosionTime == 0) or (self.explosionTime > EXPLOSION_WAIT + EXPLOSION_TIME/2)) then
+		local bumpDy = 0
+		
+		if ((self.leftBumpDy ~= 0) or (self.rightBumpDy ~= 0)) then
+			bumpDy = (self.leftBumpDy + self.rightBumpDy) * 0.9
+			screenY = screenY + bumpDy
+		end
+		
+		local maxSteerPerspectiveEffect = 10
+		local steerPerspectiveEffect = self.steer / MAX_STEER * maxSteerPerspectiveEffect
+		local perspectiveEffect = (aspect.GAME_WIDTH/2-newScreenX)/(aspect.GAME_WIDTH/2) * 10 + steerPerspectiveEffect
+		local frontWheelDy = -imgFrontWheel[1]:getHeight() - 5 * imageScale
+		local accEffect = self.accEffect * 0.01
+		
+		-- draw shadow
+		love.graphics.draw(imgShadow,screenX - shadowWidth/2, screenY - 6)
+		
+		-- compute body rotation
+		local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
+		local bodyRotation = bodyDegreesChange * math.pi/180
+		
+		-- draw front wheels
+		local wheelScaleChange = bodyDegreesChange / MAX_BODY_DEGREES_CHANGE * MAX_WHEEL_SCALE_CHANGE
+		local leftWheelScale = 1 + wheelScaleChange
+		local rightWheelScale = 1 - wheelScaleChange
+		love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
+		love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelRightDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
+		
+		local mainColor = self.color
+		if (self.inTunnel) then
+			mainColor = self.colorInTunnel
+		end
+		
+		-- draw body
+		love.graphics.setColor(mainColor)
+		love.graphics.draw(imgBody,screenX - perspectiveEffect * 0.2,screenY - bodyHeight/2 + accEffect, bodyRotation, 1, 1, bodyWidth/2, bodyHeight/2)
+		
+		-- draw helmet
+		love.graphics.setColor(1,1,1)
+		love.graphics.draw(imgHelmet,screenX - helmetWidth/2  - perspectiveEffect * 0.2,screenY - bodyHeight - helmetHeight + accEffect)
+		
+		-- draw air scoop
+		love.graphics.setColor(mainColor)
+		love.graphics.draw(imgAirScoop,screenX - airScoopWidth/2  - perspectiveEffect * 0.6,screenY - bodyHeight - airScoopHeight + accEffect)
+		
+		-- draw rear wheels
+		love.graphics.setColor(1,1,1)
+		love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect,screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
+		love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX + bodyWidth/2 - perspectiveEffect,screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
+		
+		-- draw rear wing
+		local wingDegreesChange = bodyDegreesChange
+		local wingRotation = wingDegreesChange * math.pi/180
+		love.graphics.setColor(mainColor)
+		love.graphics.draw(imgWing,screenX - perspectiveEffect * 1.2,screenY - bodyHeight + 4 + accEffect * 2.5 + bumpDy, wingRotation, 1, 1, wingWidth/2, wingHeight)
+		
+		-- draw diffuser
+		love.graphics.draw(imgDiffuser,screenX - diffuserWidth/2  - perspectiveEffect,screenY - diffuserHeight + accEffect*3)
 	end
 	
-	local maxSteerPerspectiveEffect = 10
-	local steerPerspectiveEffect = self.steer / MAX_STEER * maxSteerPerspectiveEffect
-	local perspectiveEffect = (aspect.GAME_WIDTH/2-newScreenX)/(aspect.GAME_WIDTH/2) * 10 + steerPerspectiveEffect
-	local frontWheelDy = -imgFrontWheel[1]:getHeight() - 5 * imageScale
-	local accEffect = self.accEffect * 0.01
-	
-	-- draw shadow
-	love.graphics.draw(imgShadow,screenX - shadowWidth/2, screenY - 6)
-	
-	-- compute body rotation
-	local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
-	local bodyRotation = bodyDegreesChange * math.pi/180
-	
-	-- draw front wheels
-	local wheelScaleChange = bodyDegreesChange / MAX_BODY_DEGREES_CHANGE * MAX_WHEEL_SCALE_CHANGE
-	local leftWheelScale = 1 + wheelScaleChange
-	local rightWheelScale = 1 - wheelScaleChange
-	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
-	love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelRightDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
-	
-	-- draw body
-	love.graphics.setColor(self.color)
-	love.graphics.draw(imgBody,screenX - perspectiveEffect * 0.2,screenY - bodyHeight/2 + accEffect, bodyRotation, 1, 1, bodyWidth/2, bodyHeight/2)
-	
-	-- draw helmet
-	love.graphics.setColor(1,1,1)
-	love.graphics.draw(imgHelmet,screenX - helmetWidth/2  - perspectiveEffect * 0.2,screenY - bodyHeight - helmetHeight + accEffect)
-	
-	-- draw air scoop
-	love.graphics.setColor(self.color)
-	love.graphics.draw(imgAirScoop,screenX - airScoopWidth/2  - perspectiveEffect * 0.6,screenY - bodyHeight - airScoopHeight + accEffect)
-	
-	-- draw rear wheels
-	love.graphics.setColor(1,1,1)
-	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect,screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
-	love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX + bodyWidth/2 - perspectiveEffect,screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
-	
-	-- draw rear wing
-	local wingDegreesChange = bodyDegreesChange
-	local wingRotation = wingDegreesChange * math.pi/180
-	love.graphics.setColor(self.color)
-	love.graphics.draw(imgWing,screenX - perspectiveEffect * 1.2,screenY - bodyHeight + 4 + accEffect * 2.5 + bumpDy, wingRotation, 1, 1, wingWidth/2, wingHeight)
-	
-	-- draw diffuser
-	love.graphics.draw(imgDiffuser,screenX - diffuserWidth/2  - perspectiveEffect,screenY - diffuserHeight + accEffect*3)
+	if (self.explosionTime > EXPLOSION_WAIT) then
+		local progress = 1 - ((self.explosionTime - EXPLOSION_WAIT) / EXPLOSION_TIME)
+		local total = #imgExplosion
+		local i = math.ceil(total * progress)
+		
+		love.graphics.setColor(1,1,1)
+		love.graphics.draw(imgExplosion[i], screenX - imgExplosion[i]:getWidth() / 2 * EXPLOSION_SCALE, screenY - imgExplosion[i]:getHeight() * EXPLOSION_SCALE, 0, EXPLOSION_SCALE, EXPLOSION_SCALE)
+	end
 	
 	love.graphics.pop()
 	self.storedScreenX = newScreenX

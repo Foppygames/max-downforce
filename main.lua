@@ -211,12 +211,14 @@ function love.update(dt)
 		end
 		
 		if (player ~= nil) then
+			--[[
 			if (player.explodeCount > 0) then
 				player.explodeCount = player.explodeCount - dt
 				if (player.explodeCount <= 0) then
 					switchToState(STATE_GAME_OVER)
 				end
 			end
+			]]--
 		end
 		
 		if (finishedCount > 0) then

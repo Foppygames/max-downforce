@@ -69,7 +69,15 @@ function setupGame()
 	love.graphics.setDefaultFilter("nearest","nearest",1)
 	love.graphics.setLineStyle("rough")
 	
-	love.audio.setVolume(0.8)
+	love.audio.setVolume(0.4)
+	
+	love.audio.setEffect("tunnel_echo",{
+		type = "echo",
+		volume = 1,
+		delay = 0.2,
+		feedback = 0.7,
+		spread = 1
+	})
 	
 	imageSky = love.graphics.newImage("images/sky.png")
 	

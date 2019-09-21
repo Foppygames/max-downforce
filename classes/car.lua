@@ -39,6 +39,9 @@ local MAX_BODY_DEGREES_CHANGE = 2
 local EXPLOSION_SCALE = 4
 local EXPLOSION_TIME = 0.4
 local EXPLOSION_WAIT = 0.4
+local PLAYER_ENGINE_SOUND_POWER_VOLUME = 0.8
+local PLAYER_ENGINE_SOUND_IDLE_VOLUME = 0.8
+local AI_ENGINE_SOUND_POWER_VOLUME = 0.3
 
 -- local variables
 local colors = {}
@@ -158,6 +161,7 @@ function Car:new(lane,z,isPlayer,progress)
 	o.smoothX = false
 	o.sndEngineIdle = nil
 	o.sndEnginePower = nil
+	o.echoEnabled = false
 	o.aiBlockingCarSpeed = nil
 	o.pause = 2
 	o.inTunnel = false
@@ -167,15 +171,15 @@ function Car:new(lane,z,isPlayer,progress)
 		o.topSpeed = TOP_SPEED
 		
 		o.sndEngineIdle = sound.getClone(sound.ENGINE_IDLE)
-		o.sndEngineIdle:setVolume(1) --(0.1)
+		o.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME)
 		love.audio.play(o.sndEngineIdle)
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
-		o.sndEnginePower:setVolume(0.5) --(0.05)
+		o.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME)
 		love.audio.play(o.sndEnginePower)
 		
 		o.sndCurbBump = love.audio.newSource("sounds/curb.wav","static")
-		o.sndCurbBump:setVolume(0.7) --(0.1)
+		o.sndCurbBump:setVolume(0.7)
 		o.curbBumpSoundCount = 1
 		
 		o.gears = 7
@@ -184,7 +188,7 @@ function Car:new(lane,z,isPlayer,progress)
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
-		o.sndEnginePower:setVolume(0)
+		o.sndEnginePower:setVolume(AI_ENGINE_SOUND_POWER_VOLUME)
 		love.audio.play(o.sndEnginePower)
 		
 		o.gears = math.random(3,8)
@@ -605,6 +609,18 @@ function Car:updateEngineSoundPlayer()
 	local gearSpeed = (self.speed - (gear*(self.topSpeed/self.gears))) / (self.topSpeed/self.gears)
 	self.sndEngineIdle:setPitch(1 + 2.5 * (self.speed/self.topSpeed))
 	self.sndEnginePower:setPitch(0.5 + gear * 0.045 + gearSpeed * 0.4)
+	
+	if (self.inTunnel) then
+		if (not self.echoEnabled) then
+			self.sndEnginePower:setEffect("tunnel_echo")
+			self.echoEnabled = true
+		end
+	else
+		if (self.echoEnabled) then
+			self.sndEnginePower:setEffect("tunnel_echo",false)
+			self.echoEnabled = false
+		end
+	end
 end
 
 function Car:updateEngineSoundCpu()
@@ -619,7 +635,7 @@ function Car:updateEngineSoundCpu()
 	if (volume < 0) then
 		volume = 0
 	end
-	self.sndEnginePower:setVolume(volume * 0.3) --0.03)
+	self.sndEnginePower:setVolume(volume * AI_ENGINE_SOUND_POWER_VOLUME)
 end
 
 function Car:updateEngineSound()
@@ -645,8 +661,8 @@ function Car:updateExplosion(dt)
 	self.explosionTime = self.explosionTime - dt
 	if (self.explosionTime <= 0) then
 		if (self.isPlayer) then
-			self.sndEngineIdle:setVolume(1)
-			self.sndEnginePower:setVolume(0.5)
+			self.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME)
+			self.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME)
 			self.steer = 0
 			self.x = 0
 			-- ...

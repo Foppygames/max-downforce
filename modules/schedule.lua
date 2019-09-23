@@ -20,7 +20,12 @@ schedule.ITEM_BUILDINGS_L = "buildings_l"
 schedule.ITEM_BUILDINGS_R = "buildings_r"
 schedule.ITEM_FLAG_L = "flag_l"
 schedule.ITEM_FLAG_R = "flag_r"
+schedule.ITEM_GRASS_L = "grass_l"
 schedule.ITEM_GRASS_L_R = "grass_l_r"
+schedule.ITEM_GRASS_R = "grass_r"
+schedule.ITEM_LIGHT_L = "light_l"
+schedule.ITEM_LIGHT_L_R = "light_l_r"
+schedule.ITEM_LIGHT_R = "light_r"
 schedule.ITEM_SIGN_L = "sign_l"
 schedule.ITEM_SIGN_R = "sign_r"
 schedule.ITEM_TREES_L_R = "trees_l_r"
@@ -48,11 +53,24 @@ function processItem(itemType,z)
 		entities.addFlag(-600,z)
 	elseif (itemType == schedule.ITEM_FLAG_R) then
 		entities.addFlag(600,z)
+	elseif (itemType == schedule.ITEM_GRASS_L) then
+		entities.addGrass(-1200,z)
+		entities.addGrass(-600,z-4)
 	elseif (itemType == schedule.ITEM_GRASS_L_R) then
 		entities.addGrass(-1200,z)
 		entities.addGrass(-600,z-4)
 		entities.addGrass(600,z-4)
 		entities.addGrass(1200,z)
+	elseif (itemType == schedule.ITEM_GRASS_R) then
+		entities.addGrass(600,z-4)
+		entities.addGrass(1200,z)
+	elseif (itemType == schedule.ITEM_LIGHT_L) then
+		entities.addLight(-450,z)
+	elseif (itemType == schedule.ITEM_LIGHT_L_R) then
+		entities.addLight(-450,z)
+		entities.addLight(450,z)
+	elseif (itemType == schedule.ITEM_LIGHT_R) then
+		entities.addLight(450,z)
 	elseif (itemType == schedule.ITEM_SIGN_L) then
 		entities.addSign(-700,z)
 	elseif (itemType == schedule.ITEM_SIGN_R) then

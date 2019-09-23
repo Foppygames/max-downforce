@@ -41,7 +41,7 @@ local EXPLOSION_TIME = 0.4
 local EXPLOSION_WAIT = 0.4
 local PLAYER_ENGINE_SOUND_POWER_VOLUME = 0.8
 local PLAYER_ENGINE_SOUND_IDLE_VOLUME = 0.8
-local AI_ENGINE_SOUND_POWER_VOLUME = 0.3
+local AI_ENGINE_SOUND_POWER_VOLUME = 0.4
 
 -- local variables
 local colors = {}
@@ -139,13 +139,12 @@ function Car:new(lane,z,isPlayer,progress)
 	
 	o.isPlayer = isPlayer
 	
-	local fastCar
-		
 	if (not isPlayer) then
-		fastCar = (math.random() > 0.9)
-		if (fastCar) then
+		-- car is fast
+		if ((math.random() > 0.8)) then
 			-- fast cars keep getting faster (computed top progress = 1)
-			progress = math.min(1, progress + 0.3 + math.random() * 0.3)
+			progress = math.min(1, progress + 0.4 + math.random() * 0.3)
+		-- car is normal
 		else
 			-- normal cars do not get faster after game progress 0.3 (computed top progress = 0.6)
 			progress = math.min(1, math.min(0.3, progress) + 0.1 + math.random() * 0.2)
@@ -348,7 +347,7 @@ function Car:updateOffRoad(dt)
 			table.insert(self.sparks,{
 				x = self.x + sparkDx - 5 + math.random(0,10),
 				z = self.z + 3 - i * 0.7,
-				speed = self.speed * 0.95,
+				speed = 0,
 				color = {1,1,math.random()}
 			})
 		end
@@ -378,7 +377,7 @@ function Car:updateSpark(dt)
 				table.insert(self.sparks,{
 					x = self.x - 10 + math.random(0,20),
 					z = self.z - i * 0.7,
-					speed = self.speed * 0.95,
+					speed = 0,
 					color = {1,1,math.random()}
 				})
 			end

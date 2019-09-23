@@ -76,12 +76,6 @@ local track = {
 				dz = 0.2,
 				count = 10
 			},
-			--[[{
-				itemType = schedule.ITEM_FLAG_L,
-				startZ = 0.85,
-				dz = 0.2,
-				count = 6
-			},]]--
 			{
 				itemType = schedule.ITEM_STADIUM_L,
 				startZ = 0.0,
@@ -255,7 +249,14 @@ local track = {
 	{
 		ddx = 0.0,
 		length = 2,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 0.0,
+				dz = 0.2,
+				count = 25
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
@@ -263,7 +264,20 @@ local track = {
 	{
 		ddx = 0.4,
 		length = 2,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_SIGN_L,
+				startZ = 0.6,
+				dz = 0.6,
+				count = 4
+			},
+			{
+				itemType = schedule.ITEM_SIGN_R,
+				startZ = 0.9,
+				dz = 0.6,
+				count = 3
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
@@ -271,7 +285,14 @@ local track = {
 	{
 		ddx = 0.8,
 		length = 3,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_TREES_L_R,
+				startZ = 1.0,
+				dz = 0.2,
+				count = 20
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
@@ -287,6 +308,30 @@ local track = {
 		ddx = 0.1,
 		length = 3,
 		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 0.0,
+				dz = 0.4,
+				count = 7
+			},
+			{
+				itemType = schedule.ITEM_LIGHT_L_R,
+				startZ = 1.0,
+				dz = 0.2,
+				count = 5
+			},
+			{
+				itemType = schedule.ITEM_SIGN_L,
+				startZ = 2.6,
+				dz = 0,
+				count = 1
+			},
+			{
+				itemType = schedule.ITEM_SIGN_R,
+				startZ = 2.6,
+				dz = 0,
+				count = 1
+			},
 			{
 				itemType = schedule.ITEM_FLAG_L,
 				startZ = 2.75,
@@ -355,7 +400,32 @@ local track = {
 	{
 		ddx = 0.0,
 		length = 1.5,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_L,
+				startZ = 0.0,
+				dz = 0.2,
+				count = 7
+			},
+			{
+				itemType = schedule.ITEM_GRASS_R,
+				startZ = 0.0,
+				dz = 0.2,
+				count = 5
+			},
+			{
+				itemType = schedule.ITEM_LIGHT_L,
+				startZ = 1.0,
+				dz = 0.2,
+				count = 20
+			},
+			{
+				itemType = schedule.ITEM_STADIUM_R,
+				startZ = 1.0,
+				dz = 0.1,
+				count = 40
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
@@ -363,7 +433,14 @@ local track = {
 	{
 		ddx = -1.0,
 		length = 4,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_L,
+				startZ = 0.0,
+				dz = 0.2,
+				count = 20
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
@@ -371,7 +448,20 @@ local track = {
 	{
 		ddx = 0.0,
 		length = 1.5,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_LIGHT_R,
+				startZ = 1.0,
+				dz = 0.2,
+				count = 20
+			},
+			{
+				itemType = schedule.ITEM_STADIUM_L,
+				startZ = 1.0,
+				dz = 0.1,
+				count = 40
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},

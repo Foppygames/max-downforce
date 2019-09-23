@@ -12,6 +12,7 @@ require "classes.building"
 require "classes.car"
 require "classes.flag"
 require "classes.grass"
+require "classes.light"
 require "classes.sign"
 require "classes.spark"
 require "classes.stadium"
@@ -111,6 +112,15 @@ function entities.addGrass(x,z)
 	table.insert(list,grass)
 	
 	return grass
+end
+
+function entities.addLight(x,z)
+	local light = Light:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,light)
+	
+	return light
 end
 
 function entities.addSpark(x,z,speed,color)

@@ -10,6 +10,7 @@ require "classes.building"
 require "classes.car"
 require "classes.flag"
 require "classes.grass"
+require "classes.light"
 require "classes.sign"
 require "classes.stadium"
 require "classes.spark"
@@ -86,6 +87,7 @@ function setupGame()
 	Car.init()
 	Flag.init()
 	Grass.init()
+	Light.init()
 	Sign.init()
 	Spark.init()
 	Stadium.init()
@@ -181,6 +183,8 @@ function love.update(dt)
 			-- note: in the case of multiple tunnels this should be reset for each tunnel
 			tunnelWallDistance = 0
 			TunnelEnd.reset()
+			
+			Sign.resetIndex()
 
 			--print("ENTITIES: "..entities.getListLength())
 		
@@ -397,11 +401,13 @@ function love.draw()
 				love.graphics.line(x,screenY,x+curbWidth,screenY)
 				love.graphics.line(x+roadWidth-curbWidth,screenY,x+roadWidth,screenY)
 			end
-			
+				
 			-- draw stripes
 			if (curbColorVariant ~= 1) then
 				if (segment.tunnel) then
 					love.graphics.setColor(0.8,0.8,0)
+				else
+					love.graphics.setColor(1,0.95,0.95)
 				end
 				love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
 			end

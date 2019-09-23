@@ -22,6 +22,10 @@ function Sign.init()
 	}
 end
 
+function Sign.resetIndex()
+	imgIndex = 1
+end
+
 function Sign:new(x,z)
 	o = Entity:new(x,z)	
 	setmetatable(o, self)

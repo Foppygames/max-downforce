@@ -211,7 +211,8 @@ function Car:new(lane,z,isPlayer,progress)
 	o.rightBumpDy = 0
 	o.baseScale = 2
 	o.collision = nil
-	o.sparkTime = Car.getSparkTime()
+	o.broken = false
+	o.sparkTime = Car.getSparkTime(o.broken)
 	o.sparks = nil
 	o.steerFactor = 0
 	o.explosionTime = 0
@@ -219,8 +220,12 @@ function Car:new(lane,z,isPlayer,progress)
 	return o
 end
 
-function Car.getSparkTime()
-	return 3 + math.random() * 20
+function Car.getSparkTime(broken)
+	if (not broken) then
+		return 3 + math.random() * 20
+	else
+		return 0.1 + math.random() * 0.3
+	end
 end
 
 function Car.getXFromLane(lane,random)
@@ -382,7 +387,7 @@ function Car:updateSpark(dt)
 				})
 			end
 		end
-		self.sparkTime = Car.getSparkTime()
+		self.sparkTime = Car.getSparkTime(self.broken)
 	end
 end
 
@@ -867,6 +872,15 @@ end
 -- used to turn player into cpu car after finish
 function Car:setIsPlayer(isPlayer)
 	self.isPlayer = isPlayer
+end
+
+function Car:breakDown(lane)
+	self.broken = true
+	self.sparkTime = 0
+	self.topSpeed = self.topSpeed * 0.7
+	self.speed = self.topSpeed
+	self.targetSpeed = self.topSpeed
+	self.targetX = self.targetX + lane * road.ROAD_WIDTH / 3
 end
 
 function Car:getSparks()

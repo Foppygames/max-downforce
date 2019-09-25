@@ -105,6 +105,15 @@ function entities.addFlag(x,z)
 	return flag
 end
 
+function entities.addFlagger(x,z)
+	local flagger = Flagger:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,flagger)
+	
+	return flagger
+end
+
 function entities.addGrass(x,z)
 	local grass = Grass:new(x,z)
 	

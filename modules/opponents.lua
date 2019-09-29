@@ -19,7 +19,7 @@ local segments = require("modules.segments")
 local OPPONENT_SPEED = 70
 local MAX_OPPONENTS_ON_SCREEN = 5
 local YELLOW_MIN_TRACK_LENGTHS = 0.6
-local YELLOW_MAX_TRACK_LENGTHS = 2.8
+local YELLOW_MAX_TRACK_LENGTHS = 2.6
 
 -- =========================================================
 -- private variables

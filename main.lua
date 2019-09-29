@@ -71,8 +71,6 @@ function setupGame()
 	love.graphics.setDefaultFilter("nearest","nearest",1)
 	love.graphics.setLineStyle("rough")
 	
-	love.audio.setVolume(0.4)
-	
 	love.audio.setEffect("tunnel_echo",{
 		type = "echo",
 		volume = 1,
@@ -105,6 +103,11 @@ function setupGame()
 end
 
 function switchToState(newState)
+	if (state == STATE_RACE) then
+		-- stop music
+		sound.stop(sound.RACE_MUSIC)
+	end
+
 	state = newState
 	
 	-- actions that apply to all states
@@ -150,6 +153,9 @@ function switchToState(newState)
 				entities.addCar(x,z,false,0.1)
 			end
 		end
+		
+		-- start music
+		sound.play(sound.RACE_MUSIC)
 	elseif (state == STATE_GAME_OVER) then
 		-- ...
 	end

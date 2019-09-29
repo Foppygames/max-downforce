@@ -170,11 +170,11 @@ function Car:new(lane,z,isPlayer,progress)
 		o.topSpeed = TOP_SPEED
 		
 		o.sndEngineIdle = sound.getClone(sound.ENGINE_IDLE)
-		o.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME)
+		o.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME * sound.VOLUME_EFFECTS)
 		love.audio.play(o.sndEngineIdle)
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
-		o.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME)
+		o.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
 		love.audio.play(o.sndEnginePower)
 		
 		o.sndCurbBump = love.audio.newSource("sounds/curb.wav","static")
@@ -187,7 +187,7 @@ function Car:new(lane,z,isPlayer,progress)
 		o.topSpeed = o.performanceFraction * AI_TOP_SPEED
 		
 		o.sndEnginePower = sound.getClone(sound.ENGINE_POWER)
-		o.sndEnginePower:setVolume(AI_ENGINE_SOUND_POWER_VOLUME)
+		o.sndEnginePower:setVolume(AI_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
 		love.audio.play(o.sndEnginePower)
 		
 		o.gears = math.random(3,8)
@@ -618,11 +618,17 @@ function Car:updateEngineSoundPlayer()
 		if (not self.echoEnabled) then
 			self.sndEnginePower:setEffect("tunnel_echo")
 			self.echoEnabled = true
+			
+			-- change music volume
+			sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC_IN_TUNNEL)
 		end
 	else
 		if (self.echoEnabled) then
 			self.sndEnginePower:setEffect("tunnel_echo",false)
 			self.echoEnabled = false
+			
+			-- reset music volume
+			sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC)
 		end
 	end
 end
@@ -639,7 +645,7 @@ function Car:updateEngineSoundCpu()
 	if (volume < 0) then
 		volume = 0
 	end
-	self.sndEnginePower:setVolume(volume * AI_ENGINE_SOUND_POWER_VOLUME)
+	self.sndEnginePower:setVolume(volume * AI_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
 end
 
 function Car:updateEngineSound()
@@ -665,8 +671,8 @@ function Car:updateExplosion(dt)
 	self.explosionTime = self.explosionTime - dt
 	if (self.explosionTime <= 0) then
 		if (self.isPlayer) then
-			self.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME)
-			self.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME)
+			self.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME * sound.VOLUME_EFFECTS)
+			self.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
 			self.steer = 0
 			self.x = 0
 			-- ...

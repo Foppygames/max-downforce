@@ -42,3 +42,7 @@ function Stadium:new(x,z)
 	
 	return o
 end
+
+function Stadium:isStadium()
+	return true
+end

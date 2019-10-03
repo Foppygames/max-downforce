@@ -57,6 +57,7 @@ local progress = 0
 local finished = false
 local finishedCount = 0
 local tunnelWallDistance = 0
+local crowdVolume = 0
 
 -- =========================================================
 -- functions
@@ -106,6 +107,9 @@ function switchToState(newState)
 	if (state == STATE_RACE) then
 		-- stop music
 		sound.stop(sound.RACE_MUSIC)
+		
+		-- stop crowd cheering
+		sound.stop(sound.CROWD)
 	end
 
 	state = newState
@@ -161,6 +165,28 @@ function switchToState(newState)
 	end
 end
 
+function updateCrowd(stadiumNear,dt)
+	if (stadiumNear) then
+		crowdVolume = crowdVolume + 0.35 * dt
+		if (crowdVolume > sound.VOLUME_EFFECTS) then
+			crowdVolume = sound.VOLUME_EFFECTS
+		end
+		sound.setVolume(sound.CROWD,crowdVolume)
+		if (not sound.isPlaying(sound.CROWD)) then
+			sound.play(sound.CROWD)
+		end
+	else
+		if (sound.isPlaying(sound.CROWD)) then
+			crowdVolume = crowdVolume - 0.15 * dt
+			if (crowdVolume <= 0) then
+				crowdVolume = 0
+				sound.stop(sound.CROWD)
+			end
+			sound.setVolume(sound.CROWD,crowdVolume)
+		end
+	end
+end
+
 function love.update(dt)
 	if (state == STATE_RACE) then
 		local playerX
@@ -181,7 +207,9 @@ function love.update(dt)
 		
 		schedule.update(playerSpeed,dt)
 		
-		local aiCarCount = entities.update(playerSpeed,dt,segments.totalLength)
+		local entitiesUpdateResult = entities.update(playerSpeed,dt,segments.totalLength)
+		
+		updateCrowd(entitiesUpdateResult.stadiumNear,dt)
 		
 		if (player == nil) then
 			print("game over")
@@ -219,7 +247,7 @@ function love.update(dt)
 			end
 		end
 		
-		opponents.update(playerSpeed,progress,aiCarCount,dt)
+		opponents.update(playerSpeed,progress,entitiesUpdateResult.aiCarCount,dt)
 		segments.update(playerSpeed,dt)
 		horizon.update(segments.getAtIndex(1).ddx,playerSpeed,dt)
 		

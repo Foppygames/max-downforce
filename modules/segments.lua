@@ -403,13 +403,13 @@ local track = {
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_GRASS_L,
-				startZ = 0.0,
+				startZ = 0.1,
 				dz = 0.2,
 				count = 7
 			},
 			{
 				itemType = schedule.ITEM_GRASS_R,
-				startZ = 0.0,
+				startZ = 0.1,
 				dz = 0.2,
 				count = 5
 			},

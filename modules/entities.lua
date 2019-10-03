@@ -300,6 +300,7 @@ end
 function entities.update(playerSpeed,dt,trackLength)
 	lap = false
 	
+	local stadiumNear = false
 	local aiCarCount = 0
 	
 	local i = 1
@@ -353,6 +354,12 @@ function entities.update(playerSpeed,dt,trackLength)
 					end
 				end
 			end
+		elseif (list[i]:isStadium()) then
+			if (stadiumNear == false) then
+				if (list[i].z < (perspective.maxZ / 2)) then
+					stadiumNear = true
+				end
+			end
 		end
 		
 		if (delete) then
@@ -367,7 +374,10 @@ function entities.update(playerSpeed,dt,trackLength)
 	-- sort all entities on increasing z
 	table.sort(list,function(a,b) return a.z < b.z end)
 	
-	return aiCarCount
+	return {
+		aiCarCount = aiCarCount,
+		stadiumNear = stadiumNear
+	}
 end
 
 function entities.resetForDraw()

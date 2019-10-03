@@ -12,6 +12,7 @@ sound.ENGINE_POWER = 2
 sound.EXPLOSION = 3
 sound.COLLISION = 4
 sound.RACE_MUSIC = 5
+sound.CROWD = 6
 
 sound.VOLUME_EFFECTS = 0.3
 sound.VOLUME_MUSIC = 1.0
@@ -57,6 +58,10 @@ function sound.init()
 	else
 		sound.sources[sound.RACE_MUSIC] = nil
 	end
+	
+	sound.sources[sound.CROWD] = love.audio.newSource("sounds/crowd.wav","static")
+	sound.sources[sound.CROWD]:setLooping(true)
+	sound.sources[sound.CROWD]:setVolume(sound.VOLUME_EFFECTS)
 end
 
 function sound.play(index)
@@ -70,6 +75,10 @@ function sound.stop(index)
 	if (sound.sources[index] ~= nil) then
 		love.audio.stop(sound.sources[index])
 	end
+end
+
+function sound.isPlaying(index)
+	return sound.sources[index]:isPlaying()
 end
 
 function sound.setVolume(index,volume)

@@ -92,6 +92,10 @@ function Entity:isCar()
 	return false
 end
 
+function Entity:isStadium()
+	return false
+end
+
 function Entity:isStartBanner()
 	return false
 end

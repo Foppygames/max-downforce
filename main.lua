@@ -105,11 +105,12 @@ end
 
 function switchToState(newState)
 	if (state == STATE_RACE) then
-		-- stop music
 		sound.stop(sound.RACE_MUSIC)
-		
-		-- stop crowd cheering
 		sound.stop(sound.CROWD)
+	end
+	
+	if (state == STATE_TITLE) then
+		sound.stop(sound.TITLE_MUSIC)
 	end
 
 	state = newState
@@ -121,6 +122,7 @@ function switchToState(newState)
 	-- actions that apply to specific states
 	if (state == STATE_TITLE) then
 		math.randomseed(os.time())
+		sound.play(sound.TITLE_MUSIC)
 	elseif (state == STATE_RACE) then
 		lap = 0
 		progress = 0
@@ -158,7 +160,6 @@ function switchToState(newState)
 			end
 		end
 		
-		-- start music
 		sound.play(sound.RACE_MUSIC)
 	elseif (state == STATE_GAME_OVER) then
 		-- ...
@@ -315,24 +316,27 @@ function love.draw()
 	aspect.apply()
 	
 	if (state == STATE_TITLE) then
-		for i = 1, 5 do
-			local color = 1-(5-i)*0.2
-			love.graphics.setColor(color,color,color)
-			love.graphics.print("Max Downforce",110,20+i*8)	
+		local title = "MAX DOWNFORCE"
+		love.graphics.push()
+		love.graphics.scale(2,2)
+		for i = 1, string.len(title) do
+			love.graphics.setColor(1,0,0)
+			love.graphics.print(string.sub(title,i,i),8 + i * 10,10)	
 		end
+		love.graphics.pop()
 		
-		--love.graphics.setColor(1,1,0)
-		--love.graphics.print("work in progress demo",85,70)
-		--love.graphics.print("please do not distribute",75,80)
+		love.graphics.setColor(1,1,1)
+		love.graphics.print("Written by Robbert Prins",75,60)
+		love.graphics.print("Music from PlayOnLoop.com",70,80)
 		
 		love.graphics.setColor(0.470,0.902,1)
-		love.graphics.print("W = windowed / full screen",75,100)
+		love.graphics.print("W = windowed / full screen",75,105)
 		
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("Controls: arrow keys",90,120)
+		love.graphics.print("Controls: arrow keys",90,125)
 		
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("Press space to start",90,140)
+		love.graphics.print("Press space to start",90,145)
 		
 		love.graphics.setColor(1,1,0)
 		love.graphics.print("Foppygames 2019",100,175)

@@ -43,9 +43,15 @@ function aspect.init(fullScreen)
 		local width, height = love.window.getDesktopDimensions(flags.display)
 		windowWidth = width
 		windowHeight = height
+		
+		-- hide mouse
+		love.mouse.setVisible(false)
 	else
 		windowWidth = aspect.WINDOW_WIDTH
 		windowHeight = aspect.WINDOW_HEIGHT
+		
+		-- show mouse
+		love.mouse.setVisible(true)
 	end
 
 	bars = {}

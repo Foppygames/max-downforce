@@ -130,7 +130,7 @@ function Car.init()
 	frontWheelDy = -imgFrontWheel[1]:getHeight() - 4
 end
 
-function Car:new(lane,z,isPlayer,progress)
+function Car:new(lane,z,isPlayer,progress,pause)
 	local x = Car.getXFromLane(lane,true)
 	
 	o = Entity:new(x,z)	
@@ -162,7 +162,7 @@ function Car:new(lane,z,isPlayer,progress)
 	o.sndEnginePower = nil
 	o.echoEnabled = false
 	o.aiBlockingCarSpeed = nil
-	o.pause = 2
+	o.pause = pause
 	o.inTunnel = false
 			
 	if (o.isPlayer) then

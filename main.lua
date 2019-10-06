@@ -40,6 +40,8 @@ local STATE_GAME_OVER = 2
 local LAP_COUNT = 10
 local CAR_COUNT = 6
 local FINISHED_COUNT = 5
+local RACE_START_PAUSE = 2.5
+local TIME_BEFORE_BEEPS = 0.7
 
 -- =========================================================
 -- variables
@@ -58,6 +60,8 @@ local finished = false
 local finishedCount = 0
 local tunnelWallDistance = 0
 local crowdVolume = 0
+local beepTimer = 0
+local beepCounter = 0
 
 -- =========================================================
 -- functions
@@ -134,7 +138,7 @@ function switchToState(newState)
 		schedule.reset()
 		segments.reset()
 		segments.addFirst()
-		timer.reset(progress,2)
+		timer.reset(progress,RACE_START_PAUSE)
 		TunnelEnd.reset()
 	
 		local startZ = perspective.zMap[30]
@@ -154,13 +158,15 @@ function switchToState(newState)
 				x = -1
 			end
 			if (i == 1) then
-				player = entities.addCar(x,z,true,1)
+				player = entities.addCar(x,z,true,1,RACE_START_PAUSE)
 			else
-				entities.addCar(x,z,false,0.1)
+				entities.addCar(x,z,false,0.1,RACE_START_PAUSE)
 			end
 		end
 		
-		sound.play(sound.RACE_MUSIC)
+		--sound.play(sound.RACE_MUSIC)
+		beepTimer = TIME_BEFORE_BEEPS
+		beepCounter = 0
 	elseif (state == STATE_GAME_OVER) then
 		-- ...
 	end
@@ -190,6 +196,22 @@ end
 
 function love.update(dt)
 	if (state == STATE_RACE) then
+	
+		if (beepTimer > 0) then
+			beepTimer = beepTimer - dt
+			if (beepTimer <= 0) then
+				beepCounter = beepCounter + 1
+				if (beepCounter == 3) then
+					sound.play(sound.BEEP_2)
+					beepTimer = 0
+					sound.play(sound.RACE_MUSIC)
+				else
+					sound.play(sound.BEEP_1)
+					beepTimer = (RACE_START_PAUSE - TIME_BEFORE_BEEPS) / 2
+				end
+			end
+		end
+		
 		local playerX
 		
 		if (player ~= nil) then

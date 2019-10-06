@@ -60,7 +60,7 @@ function opponents.update(playerSpeed,progress,aiCarCount,dt)
 		opponentZ = minOpponentZ
 	elseif (opponentZ < 0) then
 		if (aiCarCount < MAX_OPPONENTS_ON_SCREEN) then
-			local car = entities.addCar(-1 + math.random(0,1) * 2,perspective.maxZ,false,progress)
+			local car = entities.addCar(-1 + math.random(0,1) * 2,perspective.maxZ,false,progress,0)
 			car.speed = car.topSpeed
 			car.targetSpeed = car.topSpeed
 		end
@@ -77,7 +77,7 @@ function opponents.update(playerSpeed,progress,aiCarCount,dt)
 				yellowFlagDistance = 0
 			end
 		else
-			local car = entities.addCar(yellowFlagSide,perspective.maxZ,false,progress)
+			local car = entities.addCar(yellowFlagSide,perspective.maxZ,false,progress,0)
 			car:breakDown(yellowFlagSide)
 			opponents.resetYellowFlag()
 		end

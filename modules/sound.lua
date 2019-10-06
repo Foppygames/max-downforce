@@ -14,8 +14,11 @@ sound.COLLISION = 4
 sound.RACE_MUSIC = 5
 sound.CROWD = 6
 sound.TITLE_MUSIC = 7
+sound.BEEP_1 = 8
+sound.BEEP_2 = 9
 
 sound.VOLUME_EFFECTS = 0.3
+sound.VOLUME_EFFECTS_BEEPS = 0.9
 sound.VOLUME_MUSIC = 1.0
 sound.VOLUME_MUSIC_IN_TUNNEL = 0.5
 
@@ -77,6 +80,12 @@ function sound.init()
 	sound.sources[sound.CROWD] = love.audio.newSource("sounds/crowd.wav","static")
 	sound.sources[sound.CROWD]:setLooping(true)
 	sound.sources[sound.CROWD]:setVolume(sound.VOLUME_EFFECTS)
+	
+	sound.sources[sound.BEEP_1] = love.audio.newSource("sounds/beep1.wav","static")
+	sound.sources[sound.BEEP_1]:setVolume(sound.VOLUME_EFFECTS_BEEPS)
+	
+	sound.sources[sound.BEEP_2] = love.audio.newSource("sounds/beep2.wav","static")
+	sound.sources[sound.BEEP_2]:setVolume(sound.VOLUME_EFFECTS_BEEPS)
 end
 
 function sound.play(index)

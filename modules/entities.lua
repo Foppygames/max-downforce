@@ -87,8 +87,8 @@ function entities.addBuilding(x,z)
 	return building
 end
 
-function entities.addCar(x,z,isPlayer,progress)
-	local car = Car:new(x,z,isPlayer,progress)
+function entities.addCar(x,z,isPlayer,progress,pause)
+	local car = Car:new(x,z,isPlayer,progress,pause)
 	
 	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,car)

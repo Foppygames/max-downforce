@@ -50,7 +50,6 @@ local TIME_BEFORE_BEEPS = 0.7
 local state
 local fullScreen = false
 local textureOffset = 0
-local imageSky = nil
 local player = nil
 local playerX = 0
 local playerSpeed = 0
@@ -62,6 +61,13 @@ local tunnelWallDistance = 0
 local crowdVolume = 0
 local beepTimer = 0
 local beepCounter = 0
+local titleShineTimer = 0
+local titleShineIndex = 0
+
+local imageSky = nil
+local imageTrophyBronze = nil
+local imageTrophySilver = nil
+local imageTrophyGold = nil
 
 -- =========================================================
 -- functions
@@ -73,6 +79,8 @@ function love.load()
 end
 
 function setupGame()
+	love.window.setTitle("Max Downforce")
+
 	love.graphics.setDefaultFilter("nearest","nearest",1)
 	love.graphics.setLineStyle("rough")
 	
@@ -85,6 +93,9 @@ function setupGame()
 	})
 	
 	imageSky = love.graphics.newImage("images/sky.png")
+	imageTrophyBronze = love.graphics.newImage("images/trophy_bronze.png")
+	imageTrophySilver = love.graphics.newImage("images/trophy_silver.png")
+	imageTrophyGold = love.graphics.newImage("images/trophy_gold.png")
 	
 	Banner.init()
 	Building.init()
@@ -127,6 +138,7 @@ function switchToState(newState)
 	if (state == STATE_TITLE) then
 		math.randomseed(os.time())
 		sound.play(sound.TITLE_MUSIC)
+		titleShineIndex = 0
 	elseif (state == STATE_RACE) then
 		lap = 0
 		progress = 0
@@ -196,7 +208,6 @@ end
 
 function love.update(dt)
 	if (state == STATE_RACE) then
-	
 		if (beepTimer > 0) then
 			beepTimer = beepTimer - dt
 			if (beepTimer <= 0) then
@@ -248,6 +259,9 @@ function love.update(dt)
 			--print("ENTITIES: "..entities.getListLength())
 		
 			lap = lap + 1
+			
+			print(lap)
+			
 			if (lap > LAP_COUNT) then
 				timer.halt()
 			
@@ -306,6 +320,15 @@ function love.update(dt)
 		if (not timeOk) then
 			switchToState(STATE_GAME_OVER)
 		end
+	elseif (state == STATE_TITLE) then
+		titleShineTimer = titleShineTimer + 20 * dt
+		if (titleShineTimer >= 1) then
+			titleShineTimer = 0
+			titleShineIndex = titleShineIndex + 1
+			if (titleShineIndex > 150) then
+				titleShineIndex = 0
+			end
+		end
 	end
 end
 
@@ -342,7 +365,14 @@ function love.draw()
 		love.graphics.push()
 		love.graphics.scale(2,2)
 		for i = 1, string.len(title) do
-			love.graphics.setColor(1,0,0)
+			local diff = math.abs(i - titleShineIndex)
+			if (diff > 1) then
+				love.graphics.setColor(1,0,0)
+			elseif (diff == 1) then
+				love.graphics.setColor(1,0.5,0.5)
+			else
+				love.graphics.setColor(1,1,1)
+			end
 			love.graphics.print(string.sub(title,i,i),8 + i * 10,10)	
 		end
 		love.graphics.pop()
@@ -526,9 +556,57 @@ function love.draw()
 	if (state == STATE_GAME_OVER) then
 		love.graphics.setColor(1,1,1)
 		if (not finished) then
-			love.graphics.print("GAME OVER",130,60)
+			love.graphics.push()
+			love.graphics.scale(2,2)
+			love.graphics.print("GAME OVER",45,20)
+			love.graphics.pop()
+			
+			-- still in first lap
+			if (lap < 2) then
+				love.graphics.print("Don't give up!",120,70)
+			-- beyond first lap
+			else
+				love.graphics.setColor(1,1,0)
+				-- in second lap
+				if (lap == 2) then
+					love.graphics.print("You completed 1 full lap",85,70)
+					love.graphics.setColor(1,1,1)
+					love.graphics.print("Well done!",131,95)
+				-- beyond second lap
+				else
+					love.graphics.print("You completed "..(lap-1).." full laps",80,70)
+					-- completed more than one lap
+					if (lap > 2) then
+						love.graphics.setColor(1,1,1)
+						
+						-- completed nine laps
+						if (lap == 10) then
+							love.graphics.print("You win the silver cup!",89,95)
+							love.graphics.draw(imageTrophySilver,aspect.GAME_WIDTH/2-imageTrophySilver:getWidth()/2,120)
+						-- completed eight laps
+						elseif (lap == 9) then
+							love.graphics.print("You win the bronze cup!",85,95)
+							love.graphics.draw(imageTrophyBronze,aspect.GAME_WIDTH/2-imageTrophyBronze:getWidth()/2,120)
+						-- completed between two and seven laps
+						else
+							love.graphics.print("Well done!",131,95)
+						end
+					end
+				end
+			end
 		else
-			love.graphics.print("CONGRATULATIONS!",95,60)
+			love.graphics.push()
+			love.graphics.scale(2,2)
+			love.graphics.print("CONGRATULATIONS!",15,20)
+			love.graphics.pop()
+			love.graphics.setColor(1,1,0)
+			love.graphics.print("You finished the race",92,70)
+			love.graphics.setColor(1,1,1)
+			love.graphics.print("You win the gold cup!",95,95)
+			love.graphics.draw(imageTrophyGold,aspect.GAME_WIDTH/2-imageTrophyGold:getWidth()/2,120)
+			love.graphics.setColor(0.471,0.902,1)
+			love.graphics.print("You may consider yourself a member of",30,150)
+			love.graphics.print("an elite group of grand prix racers",40,170)
 		end
 	end
 	

@@ -68,6 +68,10 @@ function timer.update(dt)
 	return (remaining > 0)
 end
 
+function timer.getTimeDangerous()
+	return TIME_DANGEROUS
+end
+
 function timer.isDangerous()
 	return (remaining < TIME_DANGEROUS)
 end

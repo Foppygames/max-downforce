@@ -33,6 +33,8 @@ local utils = require("modules.utils")
 -- constants
 -- =========================================================
 
+local VERSION = "V1.00"
+
 local STATE_TITLE = 0
 local STATE_RACE = 1
 local STATE_GAME_OVER = 2
@@ -63,6 +65,7 @@ local beepTimer = 0
 local beepCounter = 0
 local titleShineTimer = 0
 local titleShineIndex = 0
+local previousDisplayTime = nil
 
 local imageSky = nil
 local imageTrophyBronze = nil
@@ -89,6 +92,14 @@ function setupGame()
 		volume = 1,
 		delay = 0.2,
 		feedback = 0.7,
+		spread = 1
+	})
+	
+	love.audio.setEffect("countdown_echo",{
+		type = "echo",
+		volume = 0.8,
+		delay = 0.2,
+		feedback = 0.5,
 		spread = 1
 	})
 	
@@ -144,6 +155,7 @@ function switchToState(newState)
 		progress = 0
 		finished = false
 		finishedCount = 0
+		previousDisplayTime = nil
 		
 		horizon.reset()
 		opponents.reset()
@@ -176,7 +188,6 @@ function switchToState(newState)
 			end
 		end
 		
-		--sound.play(sound.RACE_MUSIC)
 		beepTimer = TIME_BEFORE_BEEPS
 		beepCounter = 0
 	elseif (state == STATE_GAME_OVER) then
@@ -215,6 +226,10 @@ function love.update(dt)
 				if (beepCounter == 3) then
 					sound.play(sound.BEEP_2)
 					beepTimer = 0
+					
+					-- reset music volume after possible countdown
+					sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC)
+					
 					sound.play(sound.RACE_MUSIC)
 				else
 					sound.play(sound.BEEP_1)
@@ -245,22 +260,25 @@ function love.update(dt)
 		
 		updateCrowd(entitiesUpdateResult.stadiumNear,dt)
 		
-		if (player == nil) then
-			print("game over")
-		end
+		--if (player == nil) then
+		--	print("game over")
+		--end
 		
 		if (entities.checkLap()) then
+			-- reset music volume after possible countdown
+			sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC)
+			
 			-- note: in the case of multiple tunnels this should be reset for each tunnel
 			tunnelWallDistance = 0
 			TunnelEnd.reset()
 			
 			Sign.resetIndex()
 
-			--print("ENTITIES: "..entities.getListLength())
-		
 			lap = lap + 1
 			
-			print(lap)
+			if (lap > 1) then
+				sound.play(sound.LAP)
+			end
 			
 			if (lap > LAP_COUNT) then
 				timer.halt()
@@ -316,6 +334,21 @@ function love.update(dt)
 		end
 		
 		local timeOk = timer.update(dt)
+		
+		if (timer.isDangerous()) then
+			local displayTime = timer.getDisplayTime()
+			--if (displayTime > 0) then
+				if (displayTime ~= previousDisplayTime) then
+					local steps = timer.getTimeDangerous()
+					local stepsTaken = steps - displayTime
+					local volume = sound.VOLUME_COUNTDOWN_MIN + stepsTaken * ((sound.VOLUME_COUNTDOWN_MAX - sound.VOLUME_COUNTDOWN_MIN) / steps)
+					sound.setVolume(sound.COUNTDOWN,volume)
+					sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_COUNTDOWN_MAX - volume)
+					sound.play(sound.COUNTDOWN)
+					previousDisplayTime = displayTime
+				end
+			--end
+		end
 		
 		if (not timeOk) then
 			switchToState(STATE_GAME_OVER)
@@ -376,6 +409,9 @@ function love.draw()
 			love.graphics.print(string.sub(title,i,i),8 + i * 10,10)	
 		end
 		love.graphics.pop()
+		
+		love.graphics.setColor(0.1,0.1,0.3)
+		love.graphics.print(VERSION,272,6)
 		
 		love.graphics.setColor(1,1,1)
 		love.graphics.print("Written by Robbert Prins",75,60)

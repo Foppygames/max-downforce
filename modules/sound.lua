@@ -16,11 +16,15 @@ sound.CROWD = 6
 sound.TITLE_MUSIC = 7
 sound.BEEP_1 = 8
 sound.BEEP_2 = 9
+sound.LAP = 10
+sound.COUNTDOWN = 11
 
 sound.VOLUME_EFFECTS = 0.3
 sound.VOLUME_EFFECTS_BEEPS = 0.9
 sound.VOLUME_MUSIC = 1.0
 sound.VOLUME_MUSIC_IN_TUNNEL = 0.5
+sound.VOLUME_COUNTDOWN_MIN = 0.3
+sound.VOLUME_COUNTDOWN_MAX = 1.0
 
 -- Note: treating music file differently - missing from repository for licensing reasons
 sound.RACE_MUSIC_PATH = "music/POL-galactic-chase-long.wav"
@@ -86,11 +90,19 @@ function sound.init()
 	
 	sound.sources[sound.BEEP_2] = love.audio.newSource("sounds/beep2.wav","static")
 	sound.sources[sound.BEEP_2]:setVolume(sound.VOLUME_EFFECTS_BEEPS)
+	
+	sound.sources[sound.LAP] = love.audio.newSource("sounds/lap.wav","static")
+	sound.sources[sound.LAP]:setVolume(sound.VOLUME_EFFECTS_BEEPS)
+	
+	sound.sources[sound.COUNTDOWN] = love.audio.newSource("sounds/countdown.wav","static")
+	sound.sources[sound.COUNTDOWN]:setEffect("countdown_echo")
 end
 
 function sound.play(index)
 	if (sound.sources[index] ~= nil) then
-		love.audio.stop(sound.sources[index])
+		if (sound.sources[index]:isPlaying()) then
+			love.audio.stop(sound.sources[index])
+		end
 		love.audio.play(sound.sources[index])
 	end
 end

@@ -78,8 +78,17 @@ function entities.addBanner(x,z,forcedImageIndex)
 	return banner
 end
 
-function entities.addBuilding(x,z)
-	local building = Building:new(x,z)
+function entities.addHighBuilding(x,z)
+	local building = Building:new(x,z,true)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,building)
+	
+	return building
+end
+
+function entities.addLowBuilding(x,z)
+	local building = Building:new(x,z,false)
 	
 	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,building)

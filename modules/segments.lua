@@ -438,13 +438,19 @@ local track = {
 				itemType = schedule.ITEM_GRASS_L,
 				startZ = 0.0,
 				dz = 0.2,
-				count = 20
+				count = 32
+			},
+			{
+				itemType = schedule.ITEM_GRASS_R,
+				startZ = 3.5,
+				dz = 0.2,
+				count = 13
 			}
 		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
-	-- medium straight leaving stadiums behind
+	-- stadiums
 	{
 		ddx = 0.0,
 		length = 1.5,
@@ -469,7 +475,20 @@ local track = {
 	{
 		ddx = 0.8,
 		length = 5,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_R,
+				startZ = 3.5,
+				dz = 0.2,
+				count = 12
+			},
+			{
+				itemType = schedule.ITEM_TREES_L,
+				startZ = 3.6,
+				dz = 0.2,
+				count = 20
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	},
@@ -477,7 +496,38 @@ local track = {
 	{
 		ddx = 0,
 		length = 2,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_R,
+				startZ = 0,
+				dz = 0.15,
+				count = 10
+			},
+			{
+				itemType = schedule.ITEM_LOW_BUILDING_L,
+				startZ = 1.6,
+				dz = 0.2,
+				count = 3
+			},
+			{
+				itemType = schedule.ITEM_LIGHT_R,
+				startZ = 1.6,
+				dz = 0.2,
+				count = 2
+			},
+			{
+				itemType = schedule.ITEM_HIGH_BUILDING_R,
+				startZ = 2.0,
+				dz = 0,
+				count = 1
+			},
+			{
+				itemType = schedule.ITEM_TREES_L_R,
+				startZ = 2.2,
+				dz = 0,
+				count = 1
+			}
+		},
 		tunnel = false,
 		texture = segments.TEXTURE_NORMAL
 	}

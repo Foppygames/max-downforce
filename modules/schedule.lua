@@ -16,8 +16,8 @@ local perspective = require("modules.perspective")
 
 schedule.ITEM_BANNER_START = "banner_start"
 schedule.ITEM_BANNER_FOREST_BRIDGE = "banner_forest_bridge"
-schedule.ITEM_BUILDINGS_L = "buildings_l"
-schedule.ITEM_BUILDINGS_R = "buildings_r"
+schedule.ITEM_LOW_BUILDING_L = "low_building_l"
+schedule.ITEM_HIGH_BUILDING_R = "high_building_r"
 schedule.ITEM_FLAG_L = "flag_l"
 schedule.ITEM_FLAG_R = "flag_r"
 schedule.ITEM_GRASS_L = "grass_l"
@@ -28,6 +28,7 @@ schedule.ITEM_LIGHT_L_R = "light_l_r"
 schedule.ITEM_LIGHT_R = "light_r"
 schedule.ITEM_SIGN_L = "sign_l"
 schedule.ITEM_SIGN_R = "sign_r"
+schedule.ITEM_TREES_L = "trees_l"
 schedule.ITEM_TREES_L_R = "trees_l_r"
 schedule.ITEM_TUNNEL_END = "tunnel_end"
 schedule.ITEM_TUNNEL_START = "tunnel_start"
@@ -45,10 +46,10 @@ local items = {}
 -- =========================================================
 
 function processItem(itemType,z)
-	if (itemType == schedule.ITEM_BUILDINGS_L) then
-		entities.addBuilding(-900,z)
-	elseif (itemType == schedule.ITEM_BUILDINGS_R) then
-		entities.addBuilding(900,z)
+	if (itemType == schedule.ITEM_LOW_BUILDING_L) then
+		entities.addLowBuilding(-700,z)
+	elseif (itemType == schedule.ITEM_HIGH_BUILDING_R) then
+		entities.addHighBuilding(700,z)
 	elseif (itemType == schedule.ITEM_FLAG_L) then
 		entities.addFlag(-600,z)
 	elseif (itemType == schedule.ITEM_FLAG_R) then
@@ -79,6 +80,10 @@ function processItem(itemType,z)
 		entities.addStadium(-850,z)
 	elseif (itemType == schedule.ITEM_STADIUM_R) then
 		entities.addStadium(850,z)
+	elseif (itemType == schedule.ITEM_TREES_L) then
+		entities.addTree(-2500,z,0.4)
+		entities.addTree(-1300,z-4,0.7)
+		entities.addTree(-505,z-8,1)
 	elseif (itemType == schedule.ITEM_TREES_L_R) then
 		entities.addTree(-2500,z,0.4)
 		entities.addTree(-1300,z-4,0.7)

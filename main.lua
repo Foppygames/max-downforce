@@ -18,6 +18,7 @@ require "classes.spark"
 require "classes.tree"
 
 local aspect = require("modules.aspect")
+local controls = require("modules.controls")
 local entities = require("modules.entities")
 local horizon = require("modules.horizon")
 local opponents = require("modules.opponents")
@@ -120,6 +121,7 @@ function setupGame()
 	Stadium.init()
 	Tree.init()
 	
+	controls.init()
 	entities.init()
 	horizon.init()
 	perspective.initZMapAndScaling()
@@ -315,17 +317,6 @@ function love.update(dt)
 			end
 		end
 		
-		if (player ~= nil) then
-			--[[
-			if (player.explodeCount > 0) then
-				player.explodeCount = player.explodeCount - dt
-				if (player.explodeCount <= 0) then
-					switchToState(STATE_GAME_OVER)
-				end
-			end
-			]]--
-		end
-		
 		if (finishedCount > 0) then
 			finishedCount = finishedCount - dt
 			if (finishedCount <= 0) then
@@ -337,17 +328,15 @@ function love.update(dt)
 		
 		if (timer.isDangerous()) then
 			local displayTime = timer.getDisplayTime()
-			--if (displayTime > 0) then
-				if (displayTime ~= previousDisplayTime) then
-					local steps = timer.getTimeDangerous()
-					local stepsTaken = steps - displayTime
-					local volume = sound.VOLUME_COUNTDOWN_MIN + stepsTaken * ((sound.VOLUME_COUNTDOWN_MAX - sound.VOLUME_COUNTDOWN_MIN) / steps)
-					sound.setVolume(sound.COUNTDOWN,volume)
-					sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_COUNTDOWN_MAX - volume)
-					sound.play(sound.COUNTDOWN)
-					previousDisplayTime = displayTime
-				end
-			--end
+			if (displayTime ~= previousDisplayTime) then
+				local steps = timer.getTimeDangerous()
+				local stepsTaken = steps - displayTime
+				local volume = sound.VOLUME_COUNTDOWN_MIN + stepsTaken * ((sound.VOLUME_COUNTDOWN_MAX - sound.VOLUME_COUNTDOWN_MIN) / steps)
+				sound.setVolume(sound.COUNTDOWN,volume)
+				sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_COUNTDOWN_MAX - volume)
+				sound.play(sound.COUNTDOWN)
+				previousDisplayTime = displayTime
+			end
 		end
 		
 		if (not timeOk) then
@@ -371,6 +360,9 @@ function love.keypressed(key)
 			fullScreen = not fullScreen
 			aspect.init(fullScreen)
 		end
+		if (key == "c") then
+			controls.selectNextAvailable()
+		end
 		if (key == "space") then
 			switchToState(STATE_RACE)
 		end
@@ -388,6 +380,14 @@ function love.keypressed(key)
 			switchToState(STATE_TITLE)
 		end
 	end
+end
+
+function love.joystickadded(joystick)
+	controls.init()
+end
+
+function love.joystickremoved(joystick)
+	controls.init()
 end
 
 function love.draw()
@@ -420,9 +420,16 @@ function love.draw()
 		love.graphics.setColor(0.470,0.902,1)
 		love.graphics.print("W = windowed / full screen",75,105)
 		
-		love.graphics.setColor(1,1,1)
-		love.graphics.print("Controls: arrow keys",90,125)
-		
+		-- more than one control method available
+		if (controls.getAvailableCount() > 1) then
+			love.graphics.setColor(0.470,0.902,1)
+			love.graphics.print("C = controls: "..controls.getSelected().label,80+controls.getSelected().labelDx,125)
+		-- one control method available (note: assuming there is never less than one)
+		else
+			love.graphics.setColor(1,1,1)
+			love.graphics.print("Controls: "..controls.getSelected().label,90+controls.getSelected().labelDx,125)
+		end
+
 		love.graphics.setColor(1,1,1)
 		love.graphics.print("Press space to start",90,145)
 		

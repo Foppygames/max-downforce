@@ -34,7 +34,7 @@ local utils = require("modules.utils")
 -- constants
 -- =========================================================
 
-local VERSION = "V1.00"
+local VERSION = "1.0.0"
 
 local STATE_TITLE = 0
 local STATE_RACE = 1
@@ -72,6 +72,10 @@ local imageSky = nil
 local imageTrophyBronze = nil
 local imageTrophySilver = nil
 local imageTrophyGold = nil
+local imageGamepadModeR = nil
+local imageGamepadModeL = nil
+
+local selectedJoystick
 
 -- =========================================================
 -- functions
@@ -108,7 +112,9 @@ function setupGame()
 	imageTrophyBronze = love.graphics.newImage("images/trophy_bronze.png")
 	imageTrophySilver = love.graphics.newImage("images/trophy_silver.png")
 	imageTrophyGold = love.graphics.newImage("images/trophy_gold.png")
-	
+	imageGamepadModeR = love.graphics.newImage("images/gamepad_r.png")
+	imageGamepadModeL = love.graphics.newImage("images/gamepad_l.png")
+
 	Banner.init()
 	Building.init()
 	Car.init()
@@ -121,7 +127,8 @@ function setupGame()
 	Stadium.init()
 	Tree.init()
 	
-	controls.init()
+	selectedJoystick = controls.init()
+
 	entities.init()
 	horizon.init()
 	perspective.initZMapAndScaling()
@@ -361,7 +368,7 @@ function love.keypressed(key)
 			aspect.init(fullScreen)
 		end
 		if (key == "c") then
-			controls.selectNextAvailable()
+			selectedJoystick = controls.selectNextAvailable()
 		end
 		if (key == "space") then
 			switchToState(STATE_RACE)
@@ -382,12 +389,32 @@ function love.keypressed(key)
 	end
 end
 
+function love.gamepadpressed(joystick,button)
+	if (joystick == selectedJoystick) then
+		if (state == STATE_TITLE) then
+			if ((button == "a") or (button == "start")) then
+				switchToState(STATE_RACE)
+			end
+		end
+		if (state == STATE_RACE) then
+			if (button == "back") then
+				switchToState(STATE_TITLE)
+			end
+		end
+		if (state == STATE_GAME_OVER) then
+			if ((button == "a") or (button == "start")) then
+				switchToState(STATE_TITLE)
+			end
+		end
+	end
+end
+
 function love.joystickadded(joystick)
-	controls.init()
+	selectedJoystick = controls.init()
 end
 
 function love.joystickremoved(joystick)
-	controls.init()
+	selectedJoystick = controls.init()
 end
 
 function love.draw()
@@ -424,17 +451,29 @@ function love.draw()
 		if (controls.getAvailableCount() > 1) then
 			love.graphics.setColor(0.470,0.902,1)
 			love.graphics.print("C = controls: "..controls.getSelected().label,80+controls.getSelected().labelDx,125)
+			if (controls.getSelected().mode ~= nil) then
+				--love.graphics.print(controls.getSelected().mode,90+controls.getSelected().labelDx+10,125)
+			end
 		-- one control method available (note: assuming there is never less than one)
 		else
 			love.graphics.setColor(1,1,1)
 			love.graphics.print("Controls: "..controls.getSelected().label,90+controls.getSelected().labelDx,125)
 		end
 
+		if (controls.getSelected().type == controls.GAMEPAD) then
+			love.graphics.setColor(1,1,1)
+			if (controls.getSelected().mode == controls.GAMEPAD_MODE_R) then
+				love.graphics.draw(imageGamepadModeR,240,125)
+			else
+				love.graphics.draw(imageGamepadModeL,240,125)
+			end
+		end
+
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("Press space to start",90,145)
+		love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,145)
 		
 		love.graphics.setColor(1,1,0)
-		love.graphics.print("Foppygames 2019",100,175)
+		love.graphics.print("Foppygames 2019",102,175)
 	end
 	
 	if (state == STATE_RACE) then

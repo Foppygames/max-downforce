@@ -3,6 +3,7 @@
 
 -- modules
 local aspect = require("modules.aspect")
+local controls = require("modules.controls")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 local sound = require("modules.sound")
@@ -12,30 +13,33 @@ require "classes.entity"
 
 -- local constants
 local WIDTH_MODIFIER = 0.85
-local MAX_STEER = 40
+local MAX_STEER_KEYBOARD = 40
+local MAX_STEER_GAMEPAD = MAX_STEER_KEYBOARD * 0.65
+local GAMEPAD_STEER_DEADZONE = 0.5
 local STEER_CHANGE = 48
-local STEER_RETURN_FACTOR = 0.955
+local STEER_RETURN_FACTOR = 57
 local TOP_SPEED = 90
 local TOP_SPEED_IN_KMH = 360
 local BRAKE = 40
 local IDLE_BRAKE = 2
-local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH*0.35
-local MAX_DIST_BEFORE_CURB_OTHER_WHEEL = road.ROAD_WIDTH*0.50
-local MAX_DIST_BEFORE_TUNNEL_WALL = road.ROAD_WIDTH*0.40
-local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH*0.45
-local MAX_DIST_BEFORE_GRASS_OTHER_WHEEL = road.ROAD_WIDTH*0.60
+local MAX_DIST_BEFORE_CURB = road.ROAD_WIDTH * 0.35
+local MAX_DIST_BEFORE_CURB_OTHER_WHEEL = road.ROAD_WIDTH * 0.50
+local MAX_DIST_BEFORE_TUNNEL_WALL = road.ROAD_WIDTH * 0.40
+local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH * 0.45
+local MAX_DIST_BEFORE_GRASS_OTHER_WHEEL = road.ROAD_WIDTH * 0.60
 local HIT_TUNNEL_WALL_MAX_SPEED = TOP_SPEED * 0.85
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
-local OFF_ROAD_ACC_FACTOR = 0.5
+local OFF_ROAD_ACC_FACTOR = 0.5 
 local AI_MIN_PERFORMANCE_FRACTION = 0.65
 local AI_MAX_PERFORMANCE_FRACTION = 0.92
 local AI_TOP_SPEED = TOP_SPEED
 local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 25
-local AI_MAX_STEER = MAX_STEER * 0.9
+local AI_MAX_STEER = MAX_STEER_KEYBOARD * 0.9
 local AI_STEER_CHANGE = STEER_CHANGE * 0.9
 local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.7
 local MAX_WHEEL_SCALE_CHANGE = 0.05
 local MAX_BODY_DEGREES_CHANGE = 2
+local MAX_STEER_PERSPECTIVE_EFFECT = 8
 local EXPLOSION_SCALE = 4
 local EXPLOSION_TIME = 0.4
 local EXPLOSION_WAIT = 0.4
@@ -404,28 +408,57 @@ function Car.getBaseTotalCarWidth()
 	return (bodyWidth + frontWheelWidth * 2) * WIDTH_MODIFIER
 end
 
-function Car:updateSteerPlayer(dt)
+function Car:updateSteerPlayerKeyboard(dt)
 	local steerBackHardFactor = 1
 	if love.keyboard.isDown("left") then
 		if (self.steer > 0) then
-			steerBackHardFactor = 1 + (2 * self.steer/MAX_STEER)
+			steerBackHardFactor = 1 + (2 * self.steer/MAX_STEER_KEYBOARD)
 		end
 		self.steer = self.steer - STEER_CHANGE * steerBackHardFactor * dt
-		if (self.steer < -MAX_STEER) then
-			self.steer = -MAX_STEER
+		if (self.steer < -MAX_STEER_KEYBOARD) then
+			self.steer = -MAX_STEER_KEYBOARD
 		end
 	elseif love.keyboard.isDown("right") then
 		if (self.steer < 0) then
-			steerBackHardFactor = 1 + math.abs(self.steer)/MAX_STEER
+			steerBackHardFactor = 1 + math.abs(self.steer)/MAX_STEER_KEYBOARD
 		end
 		self.steer = self.steer + STEER_CHANGE * steerBackHardFactor * dt
-		if (self.steer > MAX_STEER) then
-			self.steer = MAX_STEER
+		if (self.steer > MAX_STEER_KEYBOARD) then
+			self.steer = MAX_STEER_KEYBOARD
 		end
 	elseif (self.steer ~= 0) then
-		self.steer = self.steer * STEER_RETURN_FACTOR
+		self.steer = self.steer * STEER_RETURN_FACTOR * dt
 	end
-	self.steerFactor = self.steer / MAX_STEER
+	self.steerFactor = self.steer / MAX_STEER_KEYBOARD
+end
+
+function Car:updateSteerPlayerGamepad(dt)
+	if (controls.joystick ~= nil) then
+		local steerBackHardFactor = 1
+		local gamepadX = controls.joystick:getGamepadAxis(controls.joystickSteerAxis)
+		if ((gamepadX ~= 0) and (math.abs(gamepadX) <= controls.GAMEPAD_X_DEADZONE)) then
+			gamepadX = 0
+		end
+		local targetSteer = gamepadX * MAX_STEER_GAMEPAD
+		if (self.steer > targetSteer) then
+			if ((self.steer > 0) and (targetSteer < 0)) then
+				steerBackHardFactor = 1 + (2 * self.steer/MAX_STEER_GAMEPAD)
+			end
+			self.steer = self.steer - STEER_CHANGE * steerBackHardFactor * dt
+			if (self.steer < targetSteer) then
+				self.steer = targetSteer
+			end
+		elseif (self.steer < targetSteer) then
+			if ((self.steer < 0) and (targetSteer > 0)) then
+				steerBackHardFactor = 1 + (2 * -self.steer/MAX_STEER_GAMEPAD)
+			end
+			self.steer = self.steer + STEER_CHANGE * steerBackHardFactor * dt
+			if (self.steer > targetSteer) then
+				self.steer = targetSteer
+			end
+		end
+		self.steerFactor = self.steer / MAX_STEER_GAMEPAD
+	end
 end
 
 function Car:updateSteerCpu(dt)
@@ -448,7 +481,7 @@ function Car:updateSteerCpu(dt)
 			self.steer = AI_MAX_STEER
 		end
 	elseif (self.steer ~= 0) then
-		self.steer = self.steer * AI_STEER_RETURN_FACTOR
+		self.steer = self.steer * AI_STEER_RETURN_FACTOR * dt
 	end
 	
 	-- add random steering
@@ -461,13 +494,19 @@ end
 
 function Car:updateSteer(dt)
 	if (self.isPlayer) then
-		self:updateSteerPlayer(dt)
+		if (controls.selected ~= nil) then
+			if (controls.selected.type == controls.KEYBOARD) then
+				self:updateSteerPlayerKeyboard(dt)
+			elseif (controls.selected.type == controls.GAMEPAD) then
+				self:updateSteerPlayerGamepad(dt)
+			end
+		end
 	else
 		self:updateSteerCpu(dt)
 	end
 end
 
-function Car:updateSpeedPlayer(acc,dt)
+function Car:updateSpeedPlayerKeyboard(acc,dt)
 	if (self.pause > 0) then
 		self.pause = self.pause - dt
 	else
@@ -492,6 +531,61 @@ function Car:updateSpeedPlayer(acc,dt)
 				self.speed = 0
 				self.steer = 0
 				self.accEffect = self.accEffect * 0.6
+			end
+		end
+	end
+end
+
+function Car:updateSpeedPlayerGamepad(acc,dt)
+	if (self.pause > 0) then
+		self.pause = self.pause - dt
+	else
+		if (controls.joystick ~= nil) then
+			local throttle = -controls.joystick:getGamepadAxis(controls.joystickThrottleAxis)
+			local relSpeed = self.speed / self.topSpeed
+			
+			if (throttle == 0) then
+				local triggerLeft = controls.joystick:getGamepadAxis("triggerleft")
+				local triggerRight = controls.joystick:getGamepadAxis("triggerright")
+				if (triggerLeft > 0) then
+					throttle = -triggerLeft
+				elseif (triggerRight > 0) then
+					throttle = triggerRight
+				end
+			end
+
+			-- player wants to go faster
+			if (throttle > relSpeed) then
+				local howMuchFaster = (throttle-relSpeed) / (1-relSpeed)
+				local appliedAcc = acc * howMuchFaster
+				self.speed = self.speed + appliedAcc * dt
+				self.accEffect = appliedAcc
+				if (self.speed > (self.topSpeed * throttle)) then
+					self.speed = (self.topSpeed * throttle)
+					self.accEffect = 0
+				end
+			-- player wants to go slower or remain at this speed
+			else
+				if (self.speed > 0) then
+					-- applying the brakes
+					if (throttle < 0) then
+						self.speed = self.speed - BRAKE * dt
+						self.accEffect = -BRAKE
+					-- reducing throttle
+					else
+						local targetSpeed = throttle * self.topSpeed
+						self.speed = self.speed - IDLE_BRAKE * dt
+						if (self.speed < targetSpeed) then
+							self.speed = targetSpeed
+						end
+						self.accEffect = self.accEffect * 0.9
+					end
+				end
+				if (self.speed <= 0) then
+					self.speed = 0
+					self.steer = 0
+					self.accEffect = self.accEffect * 0.6
+				end
 			end
 		end
 	end
@@ -525,7 +619,13 @@ end
 
 function Car:updateSpeed(acc,dt)
 	if (self.isPlayer) then
-		self:updateSpeedPlayer(acc,dt)
+		if (controls.selected ~= nil) then
+			if (controls.selected.type == controls.KEYBOARD) then
+				self:updateSpeedPlayerKeyboard(acc,dt)
+			elseif (controls.selected.type == controls.GAMEPAD) then
+				self:updateSpeedPlayerGamepad(acc,dt)
+			end
+		end
 	else
 		self:updateSpeedCPU(acc,dt)
 	end
@@ -544,46 +644,46 @@ function Car:updateWheelAnimation(dt)
 	end
 end
 
-function Car:updateSteerResultPlayer()
-	local steerUpdateSpeed = 5
+function Car:updateSteerResultPlayer(dt)
+	local steerUpdateSpeed = 300
 	if (self.steerResult < self.steer) then
-		self.steerResult = self.steerResult + steerUpdateSpeed
+		self.steerResult = self.steerResult + steerUpdateSpeed * dt
 		if (self.steerResult > self.steer) then
 			self.steerResult = self.steer
 		end
 	elseif (self.steerResult > self.steer) then
-		self.steerResult = self.steerResult - steerUpdateSpeed
+		self.steerResult = self.steerResult - steerUpdateSpeed * dt
 		if (self.steerResult < self.steer) then
 			self.steerResult = self.steer
 		end
 	end
 end
 
-function Car:updateSteerResultCpu()
-	local steerUpdateSpeed = 20
+function Car:updateSteerResultCpu(dt)
+	local steerUpdateSpeed = 1200
 	if (self.steerResult < self.steer) then
-		self.steerResult = self.steerResult + steerUpdateSpeed
+		self.steerResult = self.steerResult + steerUpdateSpeed * dt
 		if (self.steerResult > self.steer) then
 			self.steerResult = self.steer
 		end
 	elseif (self.steerResult > self.steer) then
-		self.steerResult = self.steerResult - steerUpdateSpeed
+		self.steerResult = self.steerResult - steerUpdateSpeed * dt
 		if (self.steerResult < self.steer) then
 			self.steerResult = self.steer
 		end
 	end
 end
 
-function Car:updateSteerResult()
+function Car:updateSteerResult(dt)
 	if (self.isPlayer) then
-		self:updateSteerResultPlayer()
+		self:updateSteerResultPlayer(dt)
 	else
-		self:updateSteerResultCpu()
+		self:updateSteerResultCpu(dt)
 	end
 end
 
-function Car:updateOutwardForcePlayer()
-	local newOutwardForce = self.segmentDdx*self.speed*self.speed*1.40
+function Car:updateOutwardForcePlayer(dt)
+	local newOutwardForce = self.segmentDdx*self.speed*self.speed*84*dt
 	if (math.abs(newOutwardForce) < math.abs(self.outwardForce)) then
 		self.outwardForce = newOutwardForce
 	else
@@ -591,8 +691,8 @@ function Car:updateOutwardForcePlayer()
 	end	
 end
 
-function Car:updateOutwardForceCpu()
-	local newOutwardForce = self.segmentDdx*self.speed*self.speed*0.9
+function Car:updateOutwardForceCpu(dt)
+	local newOutwardForce = self.segmentDdx*self.speed*self.speed*54*dt
 	if (math.abs(newOutwardForce) < math.abs(self.outwardForce)) then
 		self.outwardForce = newOutwardForce
 	else
@@ -600,11 +700,11 @@ function Car:updateOutwardForceCpu()
 	end	
 end
 
-function Car:updateOutwardForce()
+function Car:updateOutwardForce(dt)
 	if (self.isPlayer) then
-		self:updateOutwardForcePlayer()
+		self:updateOutwardForcePlayer(dt)
 	else
-		self:updateOutwardForceCpu()
+		self:updateOutwardForceCpu(dt)
 	end
 end
 
@@ -618,16 +718,12 @@ function Car:updateEngineSoundPlayer()
 		if (not self.echoEnabled) then
 			self.sndEnginePower:setEffect("tunnel_echo")
 			self.echoEnabled = true
-			
-			-- change music volume
 			sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC_IN_TUNNEL)
 		end
 	else
 		if (self.echoEnabled) then
 			self.sndEnginePower:setEffect("tunnel_echo",false)
 			self.echoEnabled = false
-			
-			-- reset music volume
 			sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC)
 		end
 	end
@@ -713,8 +809,8 @@ function Car:update(dt)
 	end
 	
 	if (self.explosionTime == 0) then
-		self:updateSteerResult()
-		self:updateOutwardForce()
+		self:updateSteerResult(dt)
+		self:updateOutwardForce(dt)
 		self:updateSpark(dt)
 	else
 		delete = self:updateExplosion(dt)
@@ -805,8 +901,7 @@ function Car:draw()
 			screenY = screenY + bumpDy
 		end
 		
-		local maxSteerPerspectiveEffect = 10
-		local steerPerspectiveEffect = self.steer / MAX_STEER * maxSteerPerspectiveEffect
+		local steerPerspectiveEffect = self.steerFactor * MAX_STEER_PERSPECTIVE_EFFECT
 		local perspectiveEffect = (aspect.GAME_WIDTH/2-newScreenX)/(aspect.GAME_WIDTH/2) * 10 + steerPerspectiveEffect
 		local frontWheelDy = -imgFrontWheel[1]:getHeight() - 5 * imageScale
 		local accEffect = self.accEffect * 0.01
@@ -840,7 +935,7 @@ function Car:draw()
 		
 		-- draw air scoop
 		love.graphics.setColor(mainColor)
-		love.graphics.draw(imgAirScoop,screenX - airScoopWidth/2  - perspectiveEffect * 0.6,screenY - bodyHeight - airScoopHeight + accEffect)
+		love.graphics.draw(imgAirScoop,screenX - airScoopWidth/2  - perspectiveEffect * 0.6,screenY - bodyHeight - airScoopHeight + accEffect + math.abs(perspectiveEffect) * 0.02)
 		
 		-- draw rear wheels
 		love.graphics.setColor(1,1,1)

@@ -28,6 +28,7 @@ local schedule = require("modules.schedule")
 local segments = require("modules.segments")
 local sound = require("modules.sound")
 local timer = require("modules.timer")
+local tracks = require("modules.tracks")
 local utils = require("modules.utils")
 
 -- =========================================================
@@ -76,6 +77,8 @@ local imageGamepadModeR = nil
 local imageGamepadModeL = nil
 
 local selectedJoystick
+
+local selectedTrack = nil
 
 -- =========================================================
 -- functions
@@ -167,10 +170,10 @@ function switchToState(newState)
 		previousDisplayTime = nil
 		
 		horizon.reset()
-		opponents.reset()
 		schedule.reset()
 		segments.reset()
 		segments.addFirst()
+		opponents.reset()
 		timer.reset(progress,RACE_START_PAUSE)
 		TunnelEnd.reset()
 	
@@ -178,7 +181,7 @@ function switchToState(newState)
 		local dz = (perspective.maxZ - perspective.minZ) / 13
 		
 		-- player not on first segment
-		if ((CAR_COUNT * dz) > (segments.FIRST_SEGMENT_LENGTH * (perspective.maxZ - perspective.minZ))) then
+		if ((CAR_COUNT * dz) > (segments.getFirstSegmentLength() * (perspective.maxZ - perspective.minZ))) then
 			print("Warning: player not on first segment")
 		end
 		
@@ -363,6 +366,9 @@ end
 
 function love.keypressed(key)
 	if (state == STATE_TITLE) then
+		if (key == "t") then
+			tracks.selectNextTrack()
+		end
 		if (key == "w") then
 			fullScreen = not fullScreen
 			aspect.init(fullScreen)
@@ -433,7 +439,7 @@ function love.draw()
 			else
 				love.graphics.setColor(1,1,1)
 			end
-			love.graphics.print(string.sub(title,i,i),8 + i * 10,10)	
+			love.graphics.print(string.sub(title,i,i),8 + i * 10,8)	
 		end
 		love.graphics.pop()
 		
@@ -441,36 +447,39 @@ function love.draw()
 		love.graphics.print(VERSION,272,6)
 		
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("Written by Robbert Prins",75,60)
-		love.graphics.print("Music from PlayOnLoop.com",70,80)
+		love.graphics.print("Written by Robbert Prins",75,50)
+		love.graphics.print("Music from PlayOnLoop.com",70,70)
 		
 		love.graphics.setColor(0.470,0.902,1)
-		love.graphics.print("W = windowed / full screen",75,105)
+		love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",75,95)
+		love.graphics.print("W = windowed / full screen",75,110)
 		
 		-- more than one control method available
 		if (controls.getAvailableCount() > 1) then
 			love.graphics.setColor(0.470,0.902,1)
-			love.graphics.print("C = controls: "..controls.getSelected().label,80+controls.getSelected().labelDx,125)
+			--love.graphics.print("C = controls: "..controls.getSelected().label,80+controls.getSelected().labelDx,125)
+			love.graphics.print("C = controls: "..controls.getSelected().label,75,125)
 			if (controls.getSelected().mode ~= nil) then
 				--love.graphics.print(controls.getSelected().mode,90+controls.getSelected().labelDx+10,125)
 			end
 		-- one control method available (note: assuming there is never less than one)
 		else
 			love.graphics.setColor(1,1,1)
-			love.graphics.print("Controls: "..controls.getSelected().label,90+controls.getSelected().labelDx,125)
+			--love.graphics.print("Controls: "..controls.getSelected().label,90+controls.getSelected().labelDx,125)
+			love.graphics.print("Controls: "..controls.getSelected().label,75,125)
 		end
 
 		if (controls.getSelected().type == controls.GAMEPAD) then
 			love.graphics.setColor(1,1,1)
 			if (controls.getSelected().mode == controls.GAMEPAD_MODE_R) then
-				love.graphics.draw(imageGamepadModeR,240,125)
+				love.graphics.draw(imageGamepadModeR,225,125)
 			else
-				love.graphics.draw(imageGamepadModeL,240,125)
+				love.graphics.draw(imageGamepadModeL,225,125)
 			end
 		end
 
 		love.graphics.setColor(1,1,1)
-		love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,145)
+		love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,150)
 		
 		love.graphics.setColor(1,1,0)
 		love.graphics.print("Foppygames 2019",102,175)

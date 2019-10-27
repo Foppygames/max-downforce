@@ -47,7 +47,7 @@ function opponents.reset()
 end
 
 function opponents.resetYellowFlag()
-	yellowFlagDistance = (YELLOW_MIN_TRACK_LENGTHS + math.random() * (YELLOW_MAX_TRACK_LENGTHS - YELLOW_MIN_TRACK_LENGTHS)) * segments.totalLength
+	yellowFlagDistance = (YELLOW_MIN_TRACK_LENGTHS + math.random() * (YELLOW_MAX_TRACK_LENGTHS - YELLOW_MIN_TRACK_LENGTHS)) * segments.getTotalLength()
 	yellowFlagCount = 0
 	yellowFlagSide = -1 + math.random(0,1) * 2
 end

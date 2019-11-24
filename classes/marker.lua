@@ -1,4 +1,4 @@
--- Max Downforce - classes/light.lua
+-- Max Downforce - classes/marker.lua
 -- 2019 Foppygames
 
 -- classes
@@ -10,14 +10,14 @@ require "classes.entity"
 -- local variables
 local img = nil
 
--- light is based on entity
-Light = Entity:new()
+-- marker is based on entity
+Marker = Entity:new()
 
-function Light.init()
-	img = love.graphics.newImage("images/light.png")
+function Marker.init()
+	img = love.graphics.newImage("images/marker.png")
 end
 
-function Light:new(x,z)
+function Marker:new(x,z)
 	o = Entity:new(x,z)	
 	setmetatable(o, self)
 	self.__index = self
@@ -25,8 +25,8 @@ function Light:new(x,z)
 	o.image = img
 	o.width = o.image:getWidth()
 	o.height = o.image:getHeight()
-	o.smoothX = true
-	o.baseScale = 16
+	o.smoothX = false
+	o.baseScale = 4
 	o.solid = false
 	
 	return o

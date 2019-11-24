@@ -27,7 +27,7 @@ function TunnelEnd.reset()
 	count = 0
 end
 
-function TunnelEnd:new(z)
+function TunnelEnd:new(z,trackHasRavine)
 	o = Entity:new(0,z)	
 	setmetatable(o, self)
 	self.__index = self
@@ -35,13 +35,22 @@ function TunnelEnd:new(z)
 	count =	count + 1
 
 	o.solid = false
-	o.color = math.cos(math.rad(colorAngle)) / 50
-	o.lamp = (count % 5 == 0)
-	
-	if (math.random() > 0.92) then
-		colorAngle = colorAngle + 24
+	if (trackHasRavine) then
+		o.color = math.cos(math.rad(colorAngle)) / 30
 	else
-		colorAngle = colorAngle + 16
+		o.color = math.cos(math.rad(colorAngle)) / 50
+	end
+	o.lamp = (count % 5 == 0)
+	o.ravine = trackHasRavine
+	
+	if (trackHasRavine) then
+		colorAngle = colorAngle + 36
+	else
+		if (math.random() > 0.92) then
+			colorAngle = colorAngle + 24
+		else
+			colorAngle = colorAngle + 16
+		end
 	end
 	if (colorAngle > 360) then
 		colorAngle = 0
@@ -55,8 +64,8 @@ function TunnelEnd:draw()
 	local newScreenX = self:computeNewScreenX()
 	
 	local wallHeight = 200 * imageScale
-	local panelingHeight = 30 * imageScale
 	local wallWidth = 300 * imageScale
+	local panelingHeight = 30 * imageScale
 	
 	local y = self.screenY - wallHeight
 	local panelingY = self.screenY - panelingHeight
@@ -68,13 +77,21 @@ function TunnelEnd:draw()
 	
 	love.graphics.setColor(self.color,self.color,self.color*1.3)
 	if (self.z < (perspective.maxZ * 0.9)) then
-		love.graphics.rectangle("fill",leftX1,y,wallWidth,wallHeight)
+		if (not self.ravine) then
+			love.graphics.rectangle("fill",leftX1,y,wallWidth,wallHeight)
+		end
 		love.graphics.rectangle("fill",rightX1,y,wallWidth,wallHeight)
-		love.graphics.rectangle("fill",leftX1,y-roofHeight,wallWidth*2+(rightX1-leftX1),roofHeight)
-		
+		if (not self.ravine) then
+			love.graphics.rectangle("fill",leftX1,y-roofHeight,wallWidth*2+(rightX1-leftX1),roofHeight)
+		else
+			love.graphics.rectangle("fill",leftX1+wallWidth,y-roofHeight,wallWidth+(rightX1-leftX1),roofHeight)
+		end
+
 		-- paneling to hide color difference with black ground
 		love.graphics.setColor(0,0,0)
-		love.graphics.rectangle("fill",leftX1,panelingY,wallWidth,panelingHeight)
+		if (not self.ravine) then
+			love.graphics.rectangle("fill",leftX1,panelingY,wallWidth,panelingHeight)
+		end
 		love.graphics.rectangle("fill",rightX1,panelingY,wallWidth,panelingHeight)
 		
 		-- lamp
@@ -85,6 +102,8 @@ function TunnelEnd:draw()
 		end
 	else
 		-- filled opening to avoid seeing end when tunnel actually continues
-		love.graphics.rectangle("fill",leftX1,y-roofHeight,wallWidth*2+(rightX1-leftX1),wallHeight+roofHeight)
+		if (not self.ravine) then
+			love.graphics.rectangle("fill",leftX1,y-roofHeight,wallWidth*2+(rightX1-leftX1),wallHeight+roofHeight)
+		end
 	end
 end

@@ -7,19 +7,25 @@ local track1 = {}
 -- modules
 -- =========================================================
 
+local aspect = require("modules.aspect")
 local schedule = require("modules.schedule")
+local sound = require("modules.sound")
 
 -- =========================================================
 -- constants
 -- =========================================================
 
 local FIRST_SEGMENT_LENGTH = 0.55
+local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
 
 -- =========================================================
 -- variables
 -- =========================================================
 
-track1.name = "Trees"
+track1.name = "Forest"
+track1.hasRavine = false
+track1.song = sound.RACE_MUSIC_FOREST
+
 track1.totalLength = 0
 
 -- note: length is written as fraction of maxZ, to be converted in segments.init()
@@ -498,4 +504,9 @@ track1.segments = {
 	}
 }
 
+function track1.drawSky()
+	love.graphics.setColor(0,0.65,1)
+	love.graphics.rectangle("fill",0,0,aspect.GAME_WIDTH,SKY_HEIGHT)
+end
+		
 return track1

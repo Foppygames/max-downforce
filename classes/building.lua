@@ -37,6 +37,23 @@ function Building:new(x,z,high)
 	o.height = o.image:getHeight()
 	o.smoothX = true
 	o.baseScale = 12
+	o.mirrorX = 1
+	if ((not high) and (x > 0)) then
+		o.mirrorX = -1
+	end
 	
 	return o
+end
+
+function Building:draw()
+	local imageScaleX = self:computeImageScale()
+	local imageScaleY = imageScaleX
+	imageScaleX = imageScaleX * self.mirrorX
+	local newScreenX = self:computeNewScreenX()
+	love.graphics.push()
+	love.graphics.scale(imageScaleX,imageScaleY)
+	love.graphics.setColor(self.color,self.color,self.color)
+	love.graphics.draw(self.image,newScreenX/imageScaleX - self.width/2,self.screenY/imageScaleY - self.height)
+	love.graphics.pop()
+	self.storedScreenX = newScreenX
 end

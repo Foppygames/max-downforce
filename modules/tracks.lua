@@ -7,7 +7,6 @@ local tracks = {}
 -- modules
 -- =========================================================
 
---local entities = require("modules.entities")
 local perspective = require("modules.perspective")
 local schedule = require("modules.schedule")
 local track1 = require("modules.track1")
@@ -16,9 +15,6 @@ local track2 = require("modules.track2")
 -- =========================================================
 -- constants
 -- =========================================================
-
-local TRACK_TREES = 1
-local TRACK_MOUNTAINS = 2
 
 local SMOOTHING_SEGMENT_DDX_STEP = 0.04
 local SMOOTHING_SEGMENT_LENGTH = 0.05
@@ -99,6 +95,18 @@ end
 
 function tracks.getSelectedTrackName()
 	return selectedTrack.name
+end
+
+function tracks.getSelectedTrackSkyHeight()
+	return selectedTrack.skyHeight
+end
+
+function tracks.hasRavine()
+	return selectedTrack.hasRavine
+end
+
+function tracks.getSong()
+	return selectedTrack.song
 end
 
 function tracks.selectNextTrack()

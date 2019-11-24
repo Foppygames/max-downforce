@@ -13,6 +13,8 @@ require "classes.car"
 require "classes.flag"
 require "classes.grass"
 require "classes.light"
+require "classes.marker"
+require "classes.pillar"
 require "classes.sign"
 require "classes.spark"
 require "classes.stadium"
@@ -38,7 +40,7 @@ local utils = require("modules.utils")
 local list = {}
 
 local lap = false
-
+local ravine = false
 local images = {}
 local baseScale = {}
 local index = nil
@@ -56,13 +58,14 @@ function entities.getListLength()
 	return #list
 end
 
-function entities.reset()
+function entities.reset(trackHasRavine)
 	local i = 1
 	while i <= #list do
 		list[i]:clean()
 		i = i + 1
 	end
 	list = {}
+	ravine = trackHasRavine
 end
 
 function entities.checkLap()
@@ -97,7 +100,7 @@ function entities.addLowBuilding(x,z)
 end
 
 function entities.addCar(x,z,isPlayer,progress,pause)
-	local car = Car:new(x,z,isPlayer,progress,pause)
+	local car = Car:new(x,z,isPlayer,progress,pause,ravine)
 	
 	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,car)
@@ -123,8 +126,8 @@ function entities.addFlagger(x,z)
 	return flagger
 end
 
-function entities.addGrass(x,z)
-	local grass = Grass:new(x,z)
+function entities.addGrass(x,z,mountain)
+	local grass = Grass:new(x,z,mountain)
 	
 	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,grass)
@@ -139,6 +142,24 @@ function entities.addLight(x,z)
 	table.insert(list,light)
 	
 	return light
+end
+
+function entities.addMarker(x,z)
+	local marker = Marker:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,marker)
+	
+	return marker
+end
+
+function entities.addPillar(x,z)
+	local pillar = Pillar:new(x,z)
+	
+	-- insert at end since most items introduced at horizon (max z)
+	table.insert(list,pillar)
+	
+	return pillar
 end
 
 function entities.addSpark(x,z,speed,color)
@@ -168,8 +189,8 @@ function entities.addSign(x,z)
 	return sign
 end
 
-function entities.addTree(x,z,color)
-	local tree = Tree:new(x,z,color)
+function entities.addTree(x,z,color,mountain)
+	local tree = Tree:new(x,z,color,mountain)
 	
 	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,tree)
@@ -178,13 +199,13 @@ function entities.addTree(x,z,color)
 end
 
 function entities.addTunnelEnd(z)
-	local tunnelEnd = TunnelEnd:new(z)
+	local tunnelEnd = TunnelEnd:new(z,ravine)
 	table.insert(list,tunnelEnd)
 	return tunnelEnd
 end
 
 function entities.addTunnelStart(z)
-	local tunnelStart = TunnelStart:new(z)
+	local tunnelStart = TunnelStart:new(z,ravine)
 	table.insert(list,tunnelStart)
 	return tunnelStart
 end
@@ -202,38 +223,38 @@ local function checkCollision(car)
 		if (other ~= car) then
 			-- other entity is scenery
 			if (not other:isCar()) then
-				-- car is not in tunnel
-				if (not car.inTunnel) then
-					if (other.solid) then
-						-- collision on z
-						if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
-							local collision = false
-							local collisionDx = 0
-							-- other entity is start of tunnel
-							if (other:isTunnelStart()) then
-								-- collision on x
-								if (car:outsideTunnelBounds()) then
+				if (other.solid) then
+					-- collision on z
+					if ((car.z < other.z) and ((car.z + carLength) >= other.z)) then
+						local collision = false
+						local collisionDx = 0
+						-- other entity is start of tunnel
+						if (other:isTunnelStart()) then
+							-- collision on x
+							if (car:outsideTunnelBounds()) then
+								-- to the right of track or track has no ravine
+								if ((car.x > 0) or (not car.ravine)) then
 									collision = true
 								end
-							-- other entity is not start of tunnel
-							else
-								local dx = math.abs(other.x - car.x)
-								-- collision on x
-								if (dx < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then
-									collision = true
-									collisionDx = dx
-								end
 							end
-							if (collision) then
-								-- car is halted
-								local speed = car.speed
-								car.speed = 0
-								car.accEffect = 0
-								return {
-									speed = speed,
-									dx = collisionDx
-								}
+						-- other entity is not start of tunnel
+						else
+							local dx = math.abs(other.x - car.x)
+							-- collision on x
+							if (dx < (other:getCollisionWidth() * other.baseScale / 2 + carWidth / 2)) then
+								collision = true
+								collisionDx = dx
 							end
+						end
+						if (collision) then
+							-- car is halted
+							local speed = car.speed
+							car.speed = 0
+							car.accEffect = 0
+							return {
+								speed = speed,
+								dx = collisionDx
+							}
 						end
 					end
 				end
@@ -245,15 +266,18 @@ local function checkCollision(car)
 					if (car.speed > other.speed) then
 						local dx = math.abs(other.x - car.x)
 						-- collision on x
-						if (dx < (baseCarWidth * other.baseScale / 2 + carWidth / 2)) then 
-							-- car is blocked
-							local speed = car.speed - other.speed
-							car.speed = other.speed * 0.90
-							car.accEffect = 0
-							return {
-								speed = speed,
-								dx = dx/2
-							}
+						if (dx < (baseCarWidth * other.baseScale / 2 + carWidth / 2)) then
+							-- other car is not exploding
+							if (not other:exploding()) then
+								-- car is blocked
+								local speed = car.speed - other.speed
+								car.speed = other.speed * 0.90
+								car.accEffect = 0
+								return {
+									speed = speed,
+									dx = dx/2
+								}
+							end
 						end
 					end
 				end

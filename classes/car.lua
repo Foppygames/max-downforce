@@ -26,6 +26,7 @@ local MAX_DIST_BEFORE_CURB_OTHER_WHEEL = road.ROAD_WIDTH * 0.50
 local MAX_DIST_BEFORE_TUNNEL_WALL = road.ROAD_WIDTH * 0.40
 local MAX_DIST_BEFORE_GRASS = road.ROAD_WIDTH * 0.45
 local MAX_DIST_BEFORE_GRASS_OTHER_WHEEL = road.ROAD_WIDTH * 0.60
+local MAX_DIST_BEFORE_RAVINE = road.ROAD_WIDTH * 0.45 + road.RAVINE_ROADSIDE_WIDTH
 local HIT_TUNNEL_WALL_MAX_SPEED = TOP_SPEED * 0.85
 local OFF_ROAD_MAX_SPEED = TOP_SPEED * 0.75
 local OFF_ROAD_ACC_FACTOR = 0.5 
@@ -52,7 +53,7 @@ local imgBody = nil
 local imgFrontWheel = {}
 local imgRearWheel = {}
 local imgDiffuser = nil
-local imgWing = nil
+local imgWing = {}
 local imgAirScoop = nil
 local imgHelmet = nil
 local imgShadow = nil
@@ -63,8 +64,6 @@ local frontWheelWidth = 0
 local frontWheelHeight = 0
 local rearWheelWidth = 0
 local rearWheelHeight = 0
-local wingWidth = 0
-local wingHeight = 0
 local diffuserWidth = 0
 local diffuserHeight = 0
 local airScoopWidth = 0
@@ -105,7 +104,9 @@ function Car.init()
 		imgRearWheel[i] = love.graphics.newImage("images/car_rear_wheel_"..i..".png")
 	end
 	imgDiffuser = love.graphics.newImage("images/car_diffuser.png")
-	imgWing = love.graphics.newImage("images/car_wing.png")
+	for i = 1,5 do
+		imgWing[i] = love.graphics.newImage("images/car_wing_"..i..".png")
+	end
 	imgAirScoop = love.graphics.newImage("images/car_air_scoop.png")
 	imgHelmet = love.graphics.newImage("images/car_helmet.png")
 	imgShadow = love.graphics.newImage("images/shadow.png")
@@ -119,8 +120,6 @@ function Car.init()
 	frontWheelHeight = imgFrontWheel[1]:getHeight()
 	rearWheelWidth = imgRearWheel[1]:getWidth()
 	rearWheelHeight = imgRearWheel[1]:getHeight()
-	wingWidth = imgWing:getWidth()
-	wingHeight = imgWing:getHeight()
 	diffuserWidth = imgDiffuser:getWidth()
 	diffuserHeight = imgDiffuser:getHeight()
 	airScoopWidth = imgAirScoop:getWidth()
@@ -133,7 +132,7 @@ function Car.init()
 	frontWheelDy = -imgFrontWheel[1]:getHeight() - 4
 end
 
-function Car:new(lane,z,isPlayer,progress,pause)
+function Car:new(lane,z,isPlayer,progress,pause,ravine)
 	local x = Car.getXFromLane(lane,true)
 	
 	o = Entity:new(x,z)	
@@ -166,10 +165,15 @@ function Car:new(lane,z,isPlayer,progress,pause)
 	o.echoEnabled = false
 	o.aiBlockingCarSpeed = nil
 	o.pause = pause
+	o.ravine = ravine
 	o.inTunnel = false
+
+	o.imgWing = imgWing[math.random(5)]
+	o.wingWidth = o.imgWing:getWidth()
+	o.wingHeight = o.imgWing:getHeight()
 			
 	if (o.isPlayer) then
-		o.color = {1,0,0}
+		o.color = colors[math.random(#colors)]
 		o.topSpeed = TOP_SPEED
 		
 		o.sndEngineIdle = sound.getClone(sound.ENGINE_IDLE)
@@ -219,6 +223,10 @@ function Car:new(lane,z,isPlayer,progress,pause)
 	o.sparks = nil
 	o.steerFactor = 0
 	o.explosionTime = 0
+	o.falling = false
+	o.fallDx = 0
+	o.fallDy = 0
+	o.explodingAfterFall = false
 	
 	return o
 end
@@ -261,8 +269,8 @@ function Car:updateOffRoad(dt)
 	
 	-- left off tarmac
 	if (self.x < -MAX_DIST_BEFORE_CURB) then
-		-- not in tunnel
-		if (not self.inTunnel) then
+		-- not in tunnel, or on ravine track
+		if ((not self.inTunnel) or (self.ravine)) then
 			-- bump left
 			if (self.leftBumpDy == 0) then
 				self.leftBumpDy = -1
@@ -276,18 +284,17 @@ function Car:updateOffRoad(dt)
 					if (self.rightBumpDy == 0) then
 						self.rightBumpDy = -1
 					end
-					-- right on curb
-					if (self.x >= -MAX_DIST_BEFORE_GRASS_OTHER_WHEEL) then
+					-- right on curb and not in tunnel
+					if ((self.x >= -MAX_DIST_BEFORE_GRASS_OTHER_WHEEL) and (not self.inTunnel)) then
 						hitCurb = true
 					end
 				end
-			-- left on curb
-			else
+			-- left on curb and not in tunnel
+			elseif (not self.inTunnel) then
 				hitCurb = true
 			end
-		-- in tunnel
+		-- in tunnel and not on ravine track
 		else
-			-- hit wall
 			if (self.x < -MAX_DIST_BEFORE_TUNNEL_WALL) then
 				self.x = -MAX_DIST_BEFORE_TUNNEL_WALL + math.random() * 10
 				hitTunnelWallLeft = true
@@ -711,19 +718,46 @@ function Car:updateEngineSoundPlayer()
 	local gear = math.floor((self.speed/self.topSpeed) / (1.0/self.gears))
 	local gearSpeed = (self.speed - (gear*(self.topSpeed/self.gears))) / (self.topSpeed/self.gears)
 	self.sndEngineIdle:setPitch(1 + 2.5 * (self.speed/self.topSpeed))
-	self.sndEnginePower:setPitch(0.5 + gear * 0.045 + gearSpeed * 0.4)
+	local pitch = 0.5 + gear * 0.045 + gearSpeed * 0.4
+	if (self.falling) then
+		pitch = pitch * 1.4
+	end
+	self.sndEnginePower:setPitch(pitch)
 	
 	if (self.inTunnel) then
 		if (not self.echoEnabled) then
 			self.sndEnginePower:setEffect("tunnel_echo")
 			self.echoEnabled = true
-			sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC_IN_TUNNEL)
+			if (self.ravine) then
+				-- volume not already modified such as by countdown
+				-- note: taking floating point error into account in check for equality
+				if (math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC) < 0.01) then
+					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN,sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL)
+				end
+			else
+				-- volume not already modified such as by countdown
+				if (math.abs(sound.getVolume(sound.RACE_MUSIC_FOREST) - sound.VOLUME_MUSIC) < 0.01) then
+					sound.setVolume(sound.RACE_MUSIC_FOREST,sound.VOLUME_MUSIC_IN_TUNNEL)
+				end
+			end
 		end
 	else
 		if (self.echoEnabled) then
 			self.sndEnginePower:setEffect("tunnel_echo",false)
 			self.echoEnabled = false
-			sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC)
+			if (self.ravine) then
+				-- volume not already modified such as by countdown
+				if (math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL) < 0.01) then
+					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN,sound.VOLUME_MUSIC)
+				else
+					print(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN).." ~= "..sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL)
+				end
+			else
+				-- volume not already modified such as by countdown
+				if (math.abs(sound.getVolume(sound.RACE_MUSIC_FOREST) - sound.VOLUME_MUSIC_IN_TUNNEL) < 0.01) then
+					sound.setVolume(sound.RACE_MUSIC_FOREST,sound.VOLUME_MUSIC)
+				end
+			end
 		end
 	end
 end
@@ -751,7 +785,8 @@ function Car:updateEngineSound()
 	end
 end
 
-function Car:explode()
+function Car:explode(afterFall)
+	self.explodeAfterFall = afterFall
 	if (self.isPlayer) then
 		self.sndEngineIdle:setVolume(0)
 		self.sndEnginePower:setVolume(0)
@@ -759,6 +794,12 @@ function Car:explode()
 	sound.play(sound.EXPLOSION)
 	self.speed = 0
 	self.explosionTime = EXPLOSION_TIME + EXPLOSION_WAIT
+end
+
+function Car:fall()
+	self.falling = true
+	self.fallDy = 1
+	self.fallDx = -self.outwardForce + self.steerResult
 end
 
 function Car:updateExplosion(dt)
@@ -770,7 +811,6 @@ function Car:updateExplosion(dt)
 			self.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
 			self.steer = 0
 			self.x = 0
-			-- ...
 		else
 			delete = true
 		end
@@ -779,13 +819,39 @@ function Car:updateExplosion(dt)
 	return delete
 end
 
+function Car:updateFall(dt)
+	local explode = false
+	self.fallDy = self.fallDy + (self.fallDy * 8) * dt
+	local fallDistance = 70
+	if (self.isPlayer) then
+		fallDistance = 70
+	else
+		-- cars are not drawn behind road so cars falling in distance will show
+		-- through road; therefore for cpu cars the fall distance is limited
+		fallDistance = 10
+	end
+	if (self.fallDy >= fallDistance) then
+		self.falling = false
+		self.fallDy = 0
+		self.fallDx = 0
+		explode = true
+	end
+	return explode
+end
+
 function Car:update(dt)
 	local delete = false
+	local explodeAfterFall = false
 	local offRoad = self:updateOffRoad(dt)
 	local acc = self:getAcceleration()
 
 	if (offRoad) then
 		acc = acc * OFF_ROAD_ACC_FACTOR
+		if (self.ravine and (self.x < -MAX_DIST_BEFORE_RAVINE) and (self.explosionTime == 0)) then
+			if (not self.falling) then
+				self:fall()
+			end
+		end
 	end
 	
 	if (self.explosionTime == 0) then
@@ -796,7 +862,7 @@ function Car:update(dt)
 		else
 			-- 50% crash
 			if (self.collision.speed > (self.topSpeed * 0.5)) then
-				self:explode()
+				self:explode(false)
 			-- 20% crash
 			elseif (self.collision.speed > (self.topSpeed * 0.2)) then
 				sound.play(sound.COLLISION)
@@ -808,13 +874,23 @@ function Car:update(dt)
 	end
 	
 	if (self.explosionTime == 0) then
-		self:updateSteerResult(dt)
-		self:updateOutwardForce(dt)
-		self:updateSpark(dt)
-	else
+		if (not self.falling) then
+			self:updateSteerResult(dt)
+			self:updateOutwardForce(dt)
+			self:updateSpark(dt)
+		else
+			explodeAfterFall = self:updateFall(dt)
+		end
+	end
+
+	if (explodeAfterFall) then
+		self:explode(true)
+	end
+
+	if (self.explosionTime ~= 0) then
 		delete = self:updateExplosion(dt)
 	end
-	
+
 	self:updateEngineSound()	
 	
 	if (not self.isPlayer) then
@@ -825,11 +901,15 @@ function Car:update(dt)
 	self:updateWheelAnimation(dt)
 	
 	if (self.explosionTime == 0) then
-		-- apply outward force to x
-		self.x = self.x - self.outwardForce
+		if (not self.falling) then
+			-- apply outward force to x
+			self.x = self.x - self.outwardForce
 	
-		-- apply steer result to x
-		self.x = self.x + self.steerResult
+			-- apply steer result to x
+			self.x = self.x + self.steerResult
+		else
+			self.x = self.x + self.fallDx
+		end
 	end
 	
 	if (self.x < -(road.ROAD_WIDTH * 2)) then
@@ -889,10 +969,10 @@ function Car:draw()
 	love.graphics.scale(imageScale,imageScale)
 	love.graphics.setColor(1,1,1)
 	
-	local screenX = newScreenX/imageScale
-	local screenY = self.screenY/imageScale
+	local screenX = newScreenX / imageScale
+	local screenY = (self.screenY + self.fallDy) / imageScale
 	
-	if ((self.explosionTime == 0) or (self.explosionTime > EXPLOSION_WAIT + EXPLOSION_TIME/2)) then
+	if ((self.explosionTime == 0) or ((self.explosionTime > EXPLOSION_WAIT + EXPLOSION_TIME/2) and (not self.explodeAfterFall))) then
 		local bumpDy = 0
 		
 		if ((self.leftBumpDy ~= 0) or (self.rightBumpDy ~= 0)) then
@@ -906,8 +986,10 @@ function Car:draw()
 		local accEffect = self.accEffect * 0.01
 		
 		-- draw shadow
-		love.graphics.draw(imgShadow,screenX - shadowWidth/2, screenY - 6)
-		
+		if ((not self.falling)) then -- and (not self.inTunnel)) then
+			love.graphics.draw(imgShadow,screenX - shadowWidth/2, screenY - 6)
+		end
+
 		-- compute body rotation
 		local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
 		local bodyRotation = bodyDegreesChange * math.pi/180
@@ -920,7 +1002,7 @@ function Car:draw()
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelRightDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
 		local mainColor = self.color
-		if (self.inTunnel) then
+		if ((self.inTunnel) and (not self.ravine) and (not self.falling)) then
 			mainColor = self.colorInTunnel
 		end
 		
@@ -945,19 +1027,20 @@ function Car:draw()
 		local wingDegreesChange = bodyDegreesChange
 		local wingRotation = wingDegreesChange * math.pi/180
 		love.graphics.setColor(mainColor)
-		love.graphics.draw(imgWing,screenX - perspectiveEffect * 1.2,screenY - bodyHeight + 4 + accEffect * 2.5 + bumpDy, wingRotation, 1, 1, wingWidth/2, wingHeight)
+		love.graphics.draw(self.imgWing,screenX - perspectiveEffect * 1.2,screenY - bodyHeight + 4 + accEffect * 2.5 + bumpDy, wingRotation, 1, 1, self.wingWidth/2, self.wingHeight)
 		
 		-- draw diffuser
 		love.graphics.draw(imgDiffuser,screenX - diffuserWidth/2  - perspectiveEffect,screenY - diffuserHeight + accEffect*3)
 	end
 	
 	if (self.explosionTime > EXPLOSION_WAIT) then
-		local progress = 1 - ((self.explosionTime - EXPLOSION_WAIT) / EXPLOSION_TIME)
-		local total = #imgExplosion
-		local i = math.ceil(total * progress)
-		
-		love.graphics.setColor(1,1,1)
-		love.graphics.draw(imgExplosion[i], screenX - imgExplosion[i]:getWidth() / 2 * EXPLOSION_SCALE, screenY - imgExplosion[i]:getHeight() * EXPLOSION_SCALE, 0, EXPLOSION_SCALE, EXPLOSION_SCALE)
+		if (not self.explodeAfterFall) then
+			local progress = 1 - ((self.explosionTime - EXPLOSION_WAIT) / EXPLOSION_TIME)
+			local total = #imgExplosion
+			local i = math.ceil(total * progress)
+			love.graphics.setColor(1,1,1)
+			love.graphics.draw(imgExplosion[i], screenX - imgExplosion[i]:getWidth() / 2 * EXPLOSION_SCALE, screenY - imgExplosion[i]:getHeight() * EXPLOSION_SCALE, 0, EXPLOSION_SCALE, EXPLOSION_SCALE)
+		end
 	end
 	
 	love.graphics.pop()
@@ -980,7 +1063,10 @@ function Car:breakDown(lane)
 	self.topSpeed = self.topSpeed * 0.7
 	self.speed = self.topSpeed
 	self.targetSpeed = self.topSpeed
-	self.targetX = self.targetX + lane * road.ROAD_WIDTH / 3
+	-- only move more towards road side if not on ravine track
+	if (not self.ravine) then
+		self.targetX = self.targetX + lane * road.ROAD_WIDTH / 3
+	end
 end
 
 function Car:getSparks()
@@ -993,6 +1079,10 @@ end
 
 function Car:isCar()
 	return true
+end
+
+function Car:exploding()
+	return (self.explosionTime ~= 0)
 end
 
 function Car:outsideTunnelBounds()

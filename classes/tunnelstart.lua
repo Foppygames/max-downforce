@@ -21,12 +21,13 @@ function TunnelStart.init()
 	-- ...
 end
 
-function TunnelStart:new(z)
+function TunnelStart:new(z,trackHasRavine)
 	o = Entity:new(0,z)	
 	setmetatable(o, self)
 	self.__index = self
 	
 	o.solid = true
+	o.ravine = trackHasRavine
 	
 	return o
 end
@@ -41,9 +42,14 @@ function TunnelStart:draw()
 	local roofHeight = 110 * imageScale
 	
 	love.graphics.setColor(1,1,1)
-	love.graphics.rectangle("fill",0,y,leftWidth,height)
-	love.graphics.rectangle("fill",rightX,y,aspect.WINDOW_WIDTH-rightX,height)
-	love.graphics.rectangle("fill",0,y-roofHeight,aspect.WINDOW_WIDTH,roofHeight)
+	if (not self.ravine) then
+		love.graphics.rectangle("fill",0,y,leftWidth,height)
+		love.graphics.rectangle("fill",rightX,y,aspect.WINDOW_WIDTH-rightX,height)
+		love.graphics.rectangle("fill",0,y-roofHeight,aspect.WINDOW_WIDTH,roofHeight)
+	else
+		love.graphics.rectangle("fill",rightX,y,aspect.WINDOW_WIDTH-rightX,height)
+		love.graphics.rectangle("fill",leftWidth,y-roofHeight,aspect.WINDOW_WIDTH-leftWidth,roofHeight)
+	end
 end
 
 function TunnelStart:isTunnelStart()

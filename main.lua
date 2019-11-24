@@ -12,6 +12,8 @@ require "classes.flag"
 require "classes.flagger"
 require "classes.grass"
 require "classes.light"
+require "classes.marker"
+require "classes.pillar"
 require "classes.sign"
 require "classes.stadium"
 require "classes.spark"
@@ -35,7 +37,7 @@ local utils = require("modules.utils")
 -- constants
 -- =========================================================
 
-local VERSION = "1.0.0"
+local VERSION = "1.1.0"
 
 local STATE_TITLE = 0
 local STATE_RACE = 1
@@ -62,14 +64,17 @@ local progress = 0
 local finished = false
 local finishedCount = 0
 local tunnelWallDistance = 0
+local previousLastSegmentHadTunnel = false
 local crowdVolume = 0
 local beepTimer = 0
 local beepCounter = 0
 local titleShineTimer = 0
 local titleShineIndex = 0
 local previousDisplayTime = nil
+local previousRavineX = nil
+local ravineMinX = nil
+local ravineMinXY = nil
 
-local imageSky = nil
 local imageTrophyBronze = nil
 local imageTrophySilver = nil
 local imageTrophyGold = nil
@@ -111,7 +116,6 @@ function setupGame()
 		spread = 1
 	})
 	
-	imageSky = love.graphics.newImage("images/sky.png")
 	imageTrophyBronze = love.graphics.newImage("images/trophy_bronze.png")
 	imageTrophySilver = love.graphics.newImage("images/trophy_silver.png")
 	imageTrophyGold = love.graphics.newImage("images/trophy_gold.png")
@@ -125,6 +129,8 @@ function setupGame()
 	Flagger.init()
 	Grass.init()
 	Light.init()
+	Marker.init()
+	Pillar.init()
 	Sign.init()
 	Spark.init()
 	Stadium.init()
@@ -143,7 +149,7 @@ end
 
 function switchToState(newState)
 	if (state == STATE_RACE) then
-		sound.stop(sound.RACE_MUSIC)
+		sound.stop(tracks.getSong())
 		sound.stop(sound.CROWD)
 	end
 	
@@ -154,7 +160,7 @@ function switchToState(newState)
 	state = newState
 	
 	-- actions that apply to all states
-	entities.reset()
+	entities.reset(tracks.hasRavine())
 	love.graphics.setFont(love.graphics.newFont("Retroville_NC.ttf",10))
 	
 	-- actions that apply to specific states
@@ -240,9 +246,9 @@ function love.update(dt)
 					beepTimer = 0
 					
 					-- reset music volume after possible countdown
-					sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC)
+					sound.setVolume(tracks.getSong(),sound.VOLUME_MUSIC)
 					
-					sound.play(sound.RACE_MUSIC)
+					sound.play(tracks.getSong())
 				else
 					sound.play(sound.BEEP_1)
 					beepTimer = (RACE_START_PAUSE - TIME_BEFORE_BEEPS) / 2
@@ -272,17 +278,9 @@ function love.update(dt)
 		
 		updateCrowd(entitiesUpdateResult.stadiumNear,dt)
 		
-		--if (player == nil) then
-		--	print("game over")
-		--end
-		
 		if (entities.checkLap()) then
 			-- reset music volume after possible countdown
-			sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_MUSIC)
-			
-			-- note: in the case of multiple tunnels this should be reset for each tunnel
-			tunnelWallDistance = 0
-			TunnelEnd.reset()
+			sound.setVolume(tracks.getSong(),sound.VOLUME_MUSIC)
 			
 			Sign.resetIndex()
 
@@ -309,8 +307,6 @@ function love.update(dt)
 				if (lap > 1) then
 					timer.reset(progress,0)
 				end
-				
-				--print("PROGRESS: "..progress)
 			end
 		end
 		
@@ -325,7 +321,11 @@ function love.update(dt)
 				tunnelWallDistance = tunnelWallDistance - 3
 				entities.addTunnelEnd(perspective.maxZ - tunnelWallDistance)
 			end
+		elseif (previousLastSegmentHadTunnel) then
+			tunnelWallDistance = 0
+			TunnelEnd.reset()
 		end
+		previousLastSegmentHadTunnel = lastSegment.tunnel
 		
 		if (finishedCount > 0) then
 			finishedCount = finishedCount - dt
@@ -343,7 +343,7 @@ function love.update(dt)
 				local stepsTaken = steps - displayTime
 				local volume = sound.VOLUME_COUNTDOWN_MIN + stepsTaken * ((sound.VOLUME_COUNTDOWN_MAX - sound.VOLUME_COUNTDOWN_MIN) / steps)
 				sound.setVolume(sound.COUNTDOWN,volume)
-				sound.setVolume(sound.RACE_MUSIC,sound.VOLUME_COUNTDOWN_MAX - volume)
+				sound.setVolume(tracks.getSong(),sound.VOLUME_COUNTDOWN_MAX - volume)
 				sound.play(sound.COUNTDOWN)
 				previousDisplayTime = displayTime
 			end
@@ -457,15 +457,10 @@ function love.draw()
 		-- more than one control method available
 		if (controls.getAvailableCount() > 1) then
 			love.graphics.setColor(0.470,0.902,1)
-			--love.graphics.print("C = controls: "..controls.getSelected().label,80+controls.getSelected().labelDx,125)
 			love.graphics.print("C = controls: "..controls.getSelected().label,75,125)
-			if (controls.getSelected().mode ~= nil) then
-				--love.graphics.print(controls.getSelected().mode,90+controls.getSelected().labelDx+10,125)
-			end
 		-- one control method available (note: assuming there is never less than one)
 		else
 			love.graphics.setColor(1,1,1)
-			--love.graphics.print("Controls: "..controls.getSelected().label,90+controls.getSelected().labelDx,125)
 			love.graphics.print("Controls: "..controls.getSelected().label,75,125)
 		end
 
@@ -486,12 +481,22 @@ function love.draw()
 	end
 	
 	if (state == STATE_RACE) then
+		local ravine = tracks.hasRavine()
+
 		-- draw sky
-		love.graphics.setColor(1,1,1)
-		love.graphics.draw(imageSky,0,0)
-		
+		tracks.getSelectedTrack().drawSky()
+
+		-- draw horizon
 		horizon.draw()
-		
+
+		-- draw ravine
+		if (ravine) then
+			if (ravineMinX ~= nil) then
+				love.graphics.setColor(0.25,0.18,0.015)
+				love.graphics.rectangle("fill",ravineMinX,ravineMinXY,aspect.GAME_WIDTH-ravineMinX,aspect.GAME_HEIGHT-ravineMinXY)	
+			end
+		end
+
 		-- initial vertical position of drawing of road
 		local screenY = aspect.GAME_HEIGHT-0.5
 		
@@ -520,6 +525,9 @@ function love.draw()
 		local previousScreenY = screenY
 		local previousScale = perspective.scale[1]
 		
+		previousRavineX = nil
+		ravineMinX = nil
+
 		-- draw road
 		for i = 1, perspective.GROUND_HEIGHT do
 			local z = perspective.zMap[i]
@@ -529,9 +537,11 @@ function love.draw()
 			local curbColorVariant = 1
 			local grassColorVariant = 1
 			if (((z + textureOffset) % 8) > 4) then
-				roadColor = 0.30
-				curbColorVariant = 2
+				if (not (segment.tunnel and ravine)) then
+					roadColor = 0.30
+				end
 				grassColorVariant = 2
+				curbColorVariant = 2
 			end
 			
 			if (segmentIndex < lastSegmentIndex) then
@@ -542,53 +552,112 @@ function love.draw()
 			end
 			
 			if (segment.tunnel) then
-				roadColor = roadColor / 2.8
+				if (ravine) then
+					roadColor = roadColor / 1.4
+				else
+					roadColor = roadColor / 2.8
+				end
 			end
 
 			local roadWidth = road.ROAD_WIDTH * perspective.scale[i]
 			local curbWidth = road.CURB_WIDTH * perspective.scale[i]
 			local stripeWidth = road.STRIPE_WIDTH * perspective.scale[i]
+			local roadX = screenX - roadWidth / 2
+			local ravineX = roadX - road.RAVINE_ROADSIDE_WIDTH * perspective.scale[i]
 			
-			local x = screenX - roadWidth / 2
-			
+			if (ravine) then
+				if ((previousRavineX ~= nil) and (ravineX < previousRavineX)) then
+					if ((ravineMinX == nil) or (ravineX < ravineMinX)) then
+						ravineMinX = ravineX
+						ravineMinXY = screenY
+					end
+				end
+			end
+
+			previousRavineX = ravineX
+
 			-- update entities x,y,scale
 			entities.setupForDraw(z,screenX,screenY,perspective.scale[i],previousZ,previousScreenX,previousScreenY,previousScale,segment)
 			
 			-- draw grass
-			if (not segment.tunnel) then
-				if (grassColorVariant == 1) then
+			if (grassColorVariant == 1) then
+				if (ravine) then
+					love.graphics.setColor(0.5,0.36,0.03)
+				else
 					love.graphics.setColor(0.45,0.8,0.25)
+				end
+			else
+				if (ravine) then
+					love.graphics.setColor(0.45,0.31,0.01)
 				else
 					love.graphics.setColor(0.36,0.6,0.20)
 				end
-			else
-				love.graphics.setColor(0,0,0)
 			end
-			love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
+			if (ravine) then	
+				if (not segment.tunnel) then
+					love.graphics.line(ravineX,screenY,aspect.GAME_WIDTH,screenY)	
+				else
+					love.graphics.line(ravineX,screenY,roadX,screenY)
+					love.graphics.setColor(0,0,0)
+					love.graphics.line(roadX,screenY,aspect.GAME_WIDTH,screenY)
+				end
+			else
+				if (segment.tunnel) then
+					love.graphics.setColor(0,0,0)
+				end
+				love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
+			end
 			
 			-- draw tarmac
-			if (not segment.tunnel) then
-				love.graphics.setColor(roadColor*1.22,roadColor,roadColor)
+			if (ravine) then
+				if (not segment.tunnel) then
+					love.graphics.setColor(roadColor*1.4,roadColor,roadColor)
+				else
+					love.graphics.setColor(roadColor*1.2,roadColor,roadColor*1.3)
+				end
 			else
-				love.graphics.setColor(roadColor,roadColor,roadColor*1.3)
+				if (not segment.tunnel) then
+					love.graphics.setColor(roadColor*1.22,roadColor,roadColor)
+				else
+					love.graphics.setColor(roadColor,roadColor,roadColor*1.3)
+				end
 			end
-			love.graphics.line(x,screenY,x+roadWidth,screenY)
-			
+			love.graphics.line(roadX,screenY,roadX+roadWidth,screenY)
+
+			-- experiment: draw tunnel roof as upside down black road
+			-- Note: cancelled for now, would work together with reversed order drawing
+			-- so tunnel walls are drawn as part of drawing road instead of using entities
+			--[[
+			if (segment.tunnel) then
+				love.graphics.setColor(1,0,0)
+				local roofY = screenY - (200 * perspective.scale[i])
+				love.graphics.line(x,roofY,x+roadWidth,roofY)
+			end
+			]]--
+
 			-- draw curbs when not in tunnel
 			if (not segment.tunnel) then
 				if (curbColorVariant == 1) then
-					love.graphics.setColor(1,0.263,0)
+					if (ravine) then
+						love.graphics.setColor(0.1,0.263,0.8)
+					else
+						love.graphics.setColor(1,0.263,0)
+					end
 				elseif (curbColorVariant == 2) then
 					love.graphics.setColor(1,0.95,0.95)
 				end
-				love.graphics.line(x,screenY,x+curbWidth,screenY)
-				love.graphics.line(x+roadWidth-curbWidth,screenY,x+roadWidth,screenY)
+				love.graphics.line(roadX,screenY,roadX+curbWidth,screenY)
+				love.graphics.line(roadX+roadWidth-curbWidth,screenY,roadX+roadWidth,screenY)
 			end
 				
 			-- draw stripes
 			if (curbColorVariant ~= 1) then
 				if (segment.tunnel) then
-					love.graphics.setColor(0.8,0.8,0)
+					if (ravine) then
+						love.graphics.setColor(0.9,0.9,0)
+					else
+						love.graphics.setColor(0.8,0.8,0)
+					end
 				else
 					love.graphics.setColor(1,0.95,0.95)
 				end

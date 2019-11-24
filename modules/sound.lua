@@ -11,23 +11,26 @@ sound.ENGINE_IDLE = 1
 sound.ENGINE_POWER = 2
 sound.EXPLOSION = 3
 sound.COLLISION = 4
-sound.RACE_MUSIC = 5
-sound.CROWD = 6
-sound.TITLE_MUSIC = 7
-sound.BEEP_1 = 8
-sound.BEEP_2 = 9
-sound.LAP = 10
-sound.COUNTDOWN = 11
+sound.RACE_MUSIC_FOREST = 5
+sound.RACE_MUSIC_MOUNTAIN = 6
+sound.CROWD = 7
+sound.TITLE_MUSIC = 8
+sound.BEEP_1 = 9
+sound.BEEP_2 = 10
+sound.LAP = 11
+sound.COUNTDOWN = 12
 
 sound.VOLUME_EFFECTS = 0.3
 sound.VOLUME_EFFECTS_BEEPS = 0.9
-sound.VOLUME_MUSIC = 0 --1.0
-sound.VOLUME_MUSIC_IN_TUNNEL = 0 --0.5
+sound.VOLUME_MUSIC = 1.0
+sound.VOLUME_MUSIC_IN_TUNNEL = 0.5
+sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL = 0.7
 sound.VOLUME_COUNTDOWN_MIN = 0.3
 sound.VOLUME_COUNTDOWN_MAX = 1.0
 
 -- Note: treating music file differently - missing from repository for licensing reasons
-sound.RACE_MUSIC_PATH = "music/POL-galactic-chase-long.wav"
+sound.RACE_MUSIC_PATH_FOREST = "music/POL-galactic-chase-long.wav"
+sound.RACE_MUSIC_PATH_MOUNTAIN = "music/POL-combat-plan-long.wav"
 sound.TITLE_MUSIC_PATH = "music/POL-smash-bros-long.wav"
 
 -- =========================================================
@@ -56,19 +59,30 @@ function sound.init()
 	sound.sources[sound.COLLISION]:setVolume(sound.VOLUME_EFFECTS)
 	
 	-- Note: treating music files differently - missing from repository for licensing reasons
-	local info = love.filesystem.getInfo(sound.RACE_MUSIC_PATH)
+	local info = love.filesystem.getInfo(sound.RACE_MUSIC_PATH_FOREST)
 	
 	-- file exists
 	if (info ~= nil) then
-		sound.sources[sound.RACE_MUSIC] = love.audio.newSource(sound.RACE_MUSIC_PATH,"static")
-		sound.sources[sound.RACE_MUSIC]:setLooping(true)
-		sound.sources[sound.RACE_MUSIC]:setVolume(sound.VOLUME_MUSIC)
+		sound.sources[sound.RACE_MUSIC_FOREST] = love.audio.newSource(sound.RACE_MUSIC_PATH_FOREST,"static")
+		sound.sources[sound.RACE_MUSIC_FOREST]:setLooping(true)
+		sound.sources[sound.RACE_MUSIC_FOREST]:setVolume(sound.VOLUME_MUSIC)
 	-- file does not exist
 	else
-		sound.sources[sound.RACE_MUSIC] = nil
+		sound.sources[sound.RACE_MUSIC_FOREST] = nil
+	end
+
+	local info = love.filesystem.getInfo(sound.RACE_MUSIC_PATH_MOUNTAIN)
+
+	-- file exists
+	if (info ~= nil) then
+		sound.sources[sound.RACE_MUSIC_MOUNTAIN] = love.audio.newSource(sound.RACE_MUSIC_PATH_MOUNTAIN,"static")
+		sound.sources[sound.RACE_MUSIC_MOUNTAIN]:setLooping(true)
+		sound.sources[sound.RACE_MUSIC_MOUNTAIN]:setVolume(sound.VOLUME_MUSIC)
+	-- file does not exist
+	else
+		sound.sources[sound.RACE_MUSIC_MOUNTAIN] = nil
 	end
 	
-	-- Note: treating music files differently - missing from repository for licensing reasons
 	local info = love.filesystem.getInfo(sound.TITLE_MUSIC_PATH)
 	
 	-- file exists
@@ -114,13 +128,23 @@ function sound.stop(index)
 end
 
 function sound.isPlaying(index)
-	return sound.sources[index]:isPlaying()
+	if (sound.sources[index] ~= nil) then
+		return sound.sources[index]:isPlaying()
+	end
+	return false
 end
 
 function sound.setVolume(index,volume)
 	if (sound.sources[index] ~= nil) then
 		sound.sources[index]:setVolume(volume)
 	end
+end
+
+function sound.getVolume(index)
+	if (sound.sources[index] ~= nil) then
+		return sound.sources[index]:getVolume()
+	end
+	return 0
 end
 
 function sound.getClone(index)

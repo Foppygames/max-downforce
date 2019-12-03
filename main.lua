@@ -37,16 +37,15 @@ local utils = require("modules.utils")
 -- constants
 -- =========================================================
 
-local VERSION = "1.1.0"
-
 local STATE_TITLE = 0
 local STATE_RACE = 1
 local STATE_GAME_OVER = 2
 
+local VERSION = "1.1.0"
 local LAP_COUNT = 10
 local CAR_COUNT = 6
-local FINISHED_COUNT = 5
-local RACE_START_PAUSE = 2.5
+local TIME_AFTER_FINISHED = 5
+local TIME_BEFORE_START = 2.5
 local TIME_BEFORE_BEEPS = 0.7
 
 -- =========================================================
@@ -62,10 +61,9 @@ local playerSpeed = 0
 local lap = 0
 local progress = 0
 local finished = false
-local finishedCount = 0
+local afterFinishedTimer = 0
 local tunnelWallDistance = 0
 local previousLastSegmentHadTunnel = false
-local crowdVolume = 0
 local beepTimer = 0
 local beepCounter = 0
 local titleShineTimer = 0
@@ -74,16 +72,14 @@ local previousDisplayTime = nil
 local previousRavineX = nil
 local ravineMinX = nil
 local ravineMinXY = nil
+local selectedJoystick
+local selectedTrack = nil
 
 local imageTrophyBronze = nil
 local imageTrophySilver = nil
 local imageTrophyGold = nil
 local imageGamepadModeR = nil
 local imageGamepadModeL = nil
-
-local selectedJoystick
-
-local selectedTrack = nil
 
 -- =========================================================
 -- functions
@@ -96,25 +92,9 @@ end
 
 function setupGame()
 	love.window.setTitle("Max Downforce")
-
 	love.graphics.setDefaultFilter("nearest","nearest",1)
 	love.graphics.setLineStyle("rough")
-	
-	love.audio.setEffect("tunnel_echo",{
-		type = "echo",
-		volume = 1,
-		delay = 0.2,
-		feedback = 0.7,
-		spread = 1
-	})
-	
-	love.audio.setEffect("countdown_echo",{
-		type = "echo",
-		volume = 0.8,
-		delay = 0.2,
-		feedback = 0.5,
-		spread = 1
-	})
+	love.graphics.setFont(love.graphics.newFont("Retroville_NC.ttf",10))
 	
 	imageTrophyBronze = love.graphics.newImage("images/trophy_bronze.png")
 	imageTrophySilver = love.graphics.newImage("images/trophy_silver.png")
@@ -136,34 +116,29 @@ function setupGame()
 	Stadium.init()
 	Tree.init()
 	
-	selectedJoystick = controls.init()
-
+	aspect.init(fullScreen)
 	entities.init()
 	horizon.init()
 	perspective.initZMapAndScaling()
 	opponents.init()
 	segments.init()
 	sound.init()
-	aspect.init(fullScreen)
+
+	selectedJoystick = controls.init()
 end
 
 function switchToState(newState)
 	if (state == STATE_RACE) then
 		sound.stop(tracks.getSong())
 		sound.stop(sound.CROWD)
-	end
-	
-	if (state == STATE_TITLE) then
+	elseif (state == STATE_TITLE) then
 		sound.stop(sound.TITLE_MUSIC)
 	end
 
 	state = newState
 	
-	-- actions that apply to all states
 	entities.reset(tracks.hasRavine())
-	love.graphics.setFont(love.graphics.newFont("Retroville_NC.ttf",10))
 	
-	-- actions that apply to specific states
 	if (state == STATE_TITLE) then
 		math.randomseed(os.time())
 		sound.play(sound.TITLE_MUSIC)
@@ -172,7 +147,7 @@ function switchToState(newState)
 		lap = 0
 		progress = 0
 		finished = false
-		finishedCount = 0
+		afterFinishedTimer = 0
 		previousDisplayTime = nil
 		
 		horizon.reset()
@@ -180,7 +155,7 @@ function switchToState(newState)
 		segments.reset()
 		segments.addFirst()
 		opponents.reset()
-		timer.reset(progress,RACE_START_PAUSE)
+		timer.reset(progress,TIME_BEFORE_START)
 		TunnelEnd.reset()
 	
 		local startZ = perspective.zMap[30]
@@ -200,9 +175,9 @@ function switchToState(newState)
 				x = -1
 			end
 			if (i == 1) then
-				player = entities.addCar(x,z,true,1,RACE_START_PAUSE)
+				player = entities.addCar(x,z,true,1,TIME_BEFORE_START)
 			else
-				entities.addCar(x,z,false,0.1,RACE_START_PAUSE)
+				entities.addCar(x,z,false,0.1,TIME_BEFORE_START)
 			end
 		end
 		
@@ -210,28 +185,6 @@ function switchToState(newState)
 		beepCounter = 0
 	elseif (state == STATE_GAME_OVER) then
 		-- ...
-	end
-end
-
-function updateCrowd(stadiumNear,dt)
-	if (stadiumNear) then
-		crowdVolume = crowdVolume + 0.35 * dt
-		if (crowdVolume > sound.VOLUME_EFFECTS) then
-			crowdVolume = sound.VOLUME_EFFECTS
-		end
-		sound.setVolume(sound.CROWD,crowdVolume)
-		if (not sound.isPlaying(sound.CROWD)) then
-			sound.play(sound.CROWD)
-		end
-	else
-		if (sound.isPlaying(sound.CROWD)) then
-			crowdVolume = crowdVolume - 0.15 * dt
-			if (crowdVolume <= 0) then
-				crowdVolume = 0
-				sound.stop(sound.CROWD)
-			end
-			sound.setVolume(sound.CROWD,crowdVolume)
-		end
 	end
 end
 
@@ -251,7 +204,7 @@ function love.update(dt)
 					sound.play(tracks.getSong())
 				else
 					sound.play(sound.BEEP_1)
-					beepTimer = (RACE_START_PAUSE - TIME_BEFORE_BEEPS) / 2
+					beepTimer = (TIME_BEFORE_START - TIME_BEFORE_BEEPS) / 2
 				end
 			end
 		end
@@ -276,7 +229,7 @@ function love.update(dt)
 		
 		local entitiesUpdateResult = entities.update(playerSpeed,dt,segments.totalLength)
 		
-		updateCrowd(entitiesUpdateResult.stadiumNear,dt)
+		sound.updateCrowdVolume(entitiesUpdateResult.stadiumNear,dt)
 		
 		if (entities.checkLap()) then
 			-- reset music volume after possible countdown
@@ -298,7 +251,7 @@ function love.update(dt)
 					player:setIsPlayer(false)
 					
 					-- start count down after finish
-					finishedCount = FINISHED_COUNT
+					afterFinishedTimer = TIME_AFTER_FINISHED
 				end
 				finished = true
 			else
@@ -327,9 +280,9 @@ function love.update(dt)
 		end
 		previousLastSegmentHadTunnel = lastSegment.tunnel
 		
-		if (finishedCount > 0) then
-			finishedCount = finishedCount - dt
-			if (finishedCount <= 0) then
+		if (afterFinishedTimer > 0) then
+			afterFinishedTimer = afterFinishedTimer - dt
+			if (afterFinishedTimer <= 0) then
 				switchToState(STATE_GAME_OVER)
 			end
 		end

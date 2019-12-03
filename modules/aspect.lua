@@ -107,10 +107,6 @@ function aspect.init(fullScreen)
 	love.window.setMode(aspect.WINDOW_WIDTH,aspect.WINDOW_HEIGHT,{fullscreen=fullScreen,fullscreentype="desktop"})	
 end
 
---function aspect.toggleFullScreen()
---	love.window.setFullscreen( fullscreen, fstype )
---end
-
 function aspect.apply()
 	love.graphics.push()
 	love.graphics.translate(gameX,gameY)

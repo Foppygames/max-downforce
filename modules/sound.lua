@@ -39,11 +39,15 @@ sound.TITLE_MUSIC_PATH = "music/POL-smash-bros-long.wav"
 
 sound.sources = {}
 
+local crowdVolume = 0
+
 -- =========================================================
 -- public functions
 -- =========================================================
 
 function sound.init()
+	sound.initEffects()
+
 	sound.sources[sound.ENGINE_IDLE] = love.audio.newSource("sounds/engine_idle.wav","static")
 	sound.sources[sound.ENGINE_IDLE]:setLooping(true)
 	sound.sources[sound.ENGINE_IDLE]:setVolume(sound.VOLUME_EFFECTS)
@@ -112,6 +116,24 @@ function sound.init()
 	sound.sources[sound.COUNTDOWN]:setEffect("countdown_echo")
 end
 
+function sound.initEffects()
+	love.audio.setEffect("tunnel_echo",{
+		type = "echo",
+		volume = 1,
+		delay = 0.2,
+		feedback = 0.7,
+		spread = 1
+	})
+	
+	love.audio.setEffect("countdown_echo",{
+		type = "echo",
+		volume = 0.8,
+		delay = 0.2,
+		feedback = 0.5,
+		spread = 1
+	})
+end
+	
 function sound.play(index)
 	if (sound.sources[index] ~= nil) then
 		if (sound.sources[index]:isPlaying()) then
@@ -149,6 +171,28 @@ end
 
 function sound.getClone(index)
 	return sound.sources[index]:clone()
+end
+
+function sound.updateCrowdVolume(stadiumNear,dt)
+	if (stadiumNear) then
+		crowdVolume = crowdVolume + 0.35 * dt
+		if (crowdVolume > sound.VOLUME_EFFECTS) then
+			crowdVolume = sound.VOLUME_EFFECTS
+		end
+		sound.setVolume(sound.CROWD,crowdVolume)
+		if (not sound.isPlaying(sound.CROWD)) then
+			sound.play(sound.CROWD)
+		end
+	else
+		if (sound.isPlaying(sound.CROWD)) then
+			crowdVolume = crowdVolume - 0.15 * dt
+			if (crowdVolume <= 0) then
+				crowdVolume = 0
+				sound.stop(sound.CROWD)
+			end
+			sound.setVolume(sound.CROWD,crowdVolume)
+		end
+	end
 end
 
 return sound

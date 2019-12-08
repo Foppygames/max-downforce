@@ -42,40 +42,63 @@ local STATE_TITLE = 0
 local STATE_RACE = 1
 local STATE_GAME_OVER = 2
 
-local LAP_COUNT = 10
 local CAR_COUNT = 6
+local COLORS_CURBS_NO_RAVINE = {{1, 0.26, 0}, {1, 0.95, 0.95}}
+local COLORS_CURBS_RAVINE = {{0.1, 0.26, 0.8}, {1, 0.95, 0.95}}
+local COLORS_GRASS_NO_RAVINE = {{0.45, 0.8, 0.25}, {0.36, 0.6, 0.20}}
+local COLORS_GRASS_RAVINE = {{0.5, 0.36, 0.03}, {0.45, 0.31, 0.01}}
+local COLORS_STRIPES_RAVINE = {
+	tunnel = {0.9, 0.9, 0},
+	no_tunnel = {1, 0.95, 0.95}
+}
+local COLORS_STRIPES_NO_RAVINE = {
+	tunnel = {0.8, 0.8, 0},
+	no_tunnel = {1, 0.95, 0.95}
+}
+local COLORS_TARMAC_RAVINE = {
+	tunnel = {{0.24, 0.2, 0.26}, {0.24, 0.2, 0.26}},
+	no_tunnel = {{0.39, 0.28, 0.28}, {0.42, 0.30, 0.30}}
+}
+local COLORS_TARMAC_NO_RAVINE = {
+	tunnel = {{0.1, 0.1, 0.13}, {0.11, 0.11, 0.14}},
+	no_tunnel = {{0.34, 0.28, 0.28}, {0.37, 0.30, 0.30}}
+}
+local LAP_COUNT = 10
 local TIME_AFTER_FINISHED = 5
-local TIME_BEFORE_START = 2.5
 local TIME_BEFORE_BEEPS = 0.7
+local TIME_BEFORE_START = 2.5
 
 -- =========================================================
 -- variables
 -- =========================================================
 
-local state
-
-local fullScreen = false
-local titleShineTimer = 0
-local titleShineIndex = 0
-local textureOffset = 0
-local player = nil
-local lap = 0
-local progress = 0
-local finished = false
 local afterFinishedTimer = 0
-local tunnelWallDistance = 0
-local previousLastSegmentHadTunnel = false
-local beepTimer = 0
 local beepCounter = 0
+local beepTimer = 0
+local curbColors = nil
+local finished = false
+local fullScreen = false
+local grassColors = nil
+local lap = 0
+local player = nil
+local previousLastSegmentHadTunnel = false
 local previousDisplayTime = nil
-local trackHasRavine
 local previousRavineX = nil
+local progress = 0
 local ravineMinX = nil
 local ravineMinXY = nil
 local selectedJoystick
 local selectedTrack = nil
-local title
-local version
+local state
+local stripeColors = nil
+local tarmacColors = nil
+local textureOffset = 0
+local title = ""
+local titleShineIndex = 0
+local titleShineTimer = 0
+local trackHasRavine
+local tunnelWallDistance = 0
+local version = ""
 
 local imageTrophyBronze = nil
 local imageTrophySilver = nil
@@ -231,22 +254,10 @@ local function drawInfoTime()
 	love.graphics.pop()
 end
 
-local function drawGrass(grassColorVariant,trackHasRavine,segment,ravineX,screenY,roadX)
-	if (grassColorVariant == 1) then
-		if (trackHasRavine) then
-			love.graphics.setColor(0.5,0.36,0.03)
-		else
-			love.graphics.setColor(0.45,0.8,0.25)
-		end
-	else
-		if (trackHasRavine) then
-			love.graphics.setColor(0.45,0.31,0.01)
-		else
-			love.graphics.setColor(0.36,0.6,0.20)
-		end
-	end
+local function drawGrass(trackHasRavine,tunnel,colorIndex,ravineX,screenY,roadX)
+	love.graphics.setColor(grassColors[colorIndex])
 	if (trackHasRavine) then	
-		if (not segment.tunnel) then
+		if (not tunnel) then
 			love.graphics.line(ravineX,screenY,aspect.GAME_WIDTH,screenY)	
 		else
 			love.graphics.line(ravineX,screenY,roadX,screenY)
@@ -254,26 +265,18 @@ local function drawGrass(grassColorVariant,trackHasRavine,segment,ravineX,screen
 			love.graphics.line(roadX,screenY,aspect.GAME_WIDTH,screenY)
 		end
 	else
-		if (segment.tunnel) then
+		if (tunnel) then
 			love.graphics.setColor(0,0,0)
 		end
 		love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 	end
 end
 
-local function drawTarmac(trackHasRavine,segment,roadColor,roadX,screenY,roadWidth)
-	if (trackHasRavine) then
-		if (not segment.tunnel) then
-			love.graphics.setColor(roadColor*1.4,roadColor,roadColor)
-		else
-			love.graphics.setColor(roadColor*1.2,roadColor,roadColor*1.3)
-		end
+local function drawTarmac(trackHasRavine,tunnel,colorIndex,roadX,screenY,roadWidth)
+	if (tunnel) then
+		love.graphics.setColor(tarmacColors.tunnel[colorIndex])
 	else
-		if (not segment.tunnel) then
-			love.graphics.setColor(roadColor*1.22,roadColor,roadColor)
-		else
-			love.graphics.setColor(roadColor,roadColor,roadColor*1.3)
-		end
+		love.graphics.setColor(tarmacColors.no_tunnel[colorIndex])
 	end
 	love.graphics.line(roadX,screenY,roadX+roadWidth,screenY)
 end
@@ -289,34 +292,50 @@ local function drawTunnelRoof(segment,screenY,x,roadWidth)
 	end
 end
 
-local function drawCurbs(segment,curbColorVariant,trackHasRavine,roadX,screenY,curbWidth,roadWidth)
-	if (not segment.tunnel) then
-		if (curbColorVariant == 1) then
-			if (trackHasRavine) then
-				love.graphics.setColor(0.1,0.263,0.8)
-			else
-				love.graphics.setColor(1,0.263,0)
-			end
-		elseif (curbColorVariant == 2) then
-			love.graphics.setColor(1,0.95,0.95)
-		end
-		love.graphics.line(roadX,screenY,roadX+curbWidth,screenY)
-		love.graphics.line(roadX+roadWidth-curbWidth,screenY,roadX+roadWidth,screenY)
+local function drawCurbs(trackHasRavine,colorIndex,roadX,screenY,curbWidth,roadWidth)
+	love.graphics.setColor(curbColors[colorIndex])
+	love.graphics.line(roadX,screenY,roadX+curbWidth,screenY)
+	love.graphics.line(roadX+roadWidth-curbWidth,screenY,roadX+roadWidth,screenY)
+end
+
+local function drawStripes(tunnel,trackHasRavine,screenX,stripeWidth,screenY)
+	if (tunnel) then
+		love.graphics.setColor(stripeColors.tunnel)
+	else
+		love.graphics.setColor(stripeColors.no_tunnel)
+	end
+	love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
+end
+
+local function setCurbColors()
+	if (trackHasRavine) then
+		curbColors = COLORS_CURBS_RAVINE
+	else
+		curbColors = COLORS_CURBS_NO_RAVINE
 	end
 end
 
-local function drawStripes(curbColorVariant,segment,trackHasRavine,screenX,stripeWidth,screenY)
-	if (curbColorVariant ~= 1) then
-		if (segment.tunnel) then
-			if (trackHasRavine) then
-				love.graphics.setColor(0.9,0.9,0)
-			else
-				love.graphics.setColor(0.8,0.8,0)
-			end
-		else
-			love.graphics.setColor(1,0.95,0.95)
-		end
-		love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
+local function setGrassColors()
+	if (trackHasRavine) then
+		grassColors = COLORS_GRASS_RAVINE
+	else
+		grassColors = COLORS_GRASS_NO_RAVINE
+	end
+end
+
+local function setStripeColors()
+	if (trackHasRavine) then
+		stripeColors = COLORS_STRIPES_RAVINE
+	else
+		stripeColors = COLORS_STRIPES_NO_RAVINE
+	end
+end
+
+local function setTarmacColors()
+	if (trackHasRavine) then
+		tarmacColors = COLORS_TARMAC_RAVINE
+	else
+		tarmacColors = COLORS_TARMAC_NO_RAVINE
 	end
 end
 
@@ -381,7 +400,11 @@ local function switchToState(newState)
 		timer.reset(progress,TIME_BEFORE_START)
 		TunnelEnd.reset()
 	
-		setupStartingGrid()		
+		setupStartingGrid()
+		setCurbColors()
+		setGrassColors()
+		setStripeColors()
+		setTarmacColors()
 	end
 end
 
@@ -664,18 +687,12 @@ function states.draw()
 		for i = 1, perspective.GROUND_HEIGHT do
 			local z = perspective.zMap[i]
 			
-			-- set base colors
-			local roadColor = 0.28
-			local curbColorVariant = 1
-			local grassColorVariant = 1
-
+			-- set default color index
+			local colorIndex = 1
+			
 			-- toggle colors for horizontal striping effect
 			if (((z + textureOffset) % 8) > 4) then
-				if (not (segment.tunnel and trackHasRavine)) then
-					roadColor = 0.30
-				end
-				grassColorVariant = 2
-				curbColorVariant = 2
+				colorIndex = 2
 			end
 			
 			-- consider switching to next segment
@@ -686,15 +703,6 @@ function states.draw()
 				end
 			end
 			
-			-- modify road color in tunnel
-			if (segment.tunnel) then
-				if (trackHasRavine) then
-					roadColor = roadColor / 1.4
-				else
-					roadColor = roadColor / 2.8
-				end
-			end
-
 			local roadWidth = road.ROAD_WIDTH * perspective.scale[i]
 			local curbWidth = road.CURB_WIDTH * perspective.scale[i]
 			local stripeWidth = road.STRIPE_WIDTH * perspective.scale[i]
@@ -717,10 +725,14 @@ function states.draw()
 			entities.setupForDraw(z,screenX,screenY,perspective.scale[i],previousZ,previousScreenX,previousScreenY,previousScale,segment)
 			
 			-- draw grass and road elements
-			drawGrass(grassColorVariant,trackHasRavine,segment,ravineX,screenY,roadX)
-			drawTarmac(trackHasRavine,segment,roadColor,roadX,screenY,roadWidth)
-			drawCurbs(segment,curbColorVariant,trackHasRavine,roadX,screenY,curbWidth,roadWidth)
-			drawStripes(curbColorVariant,segment,trackHasRavine,screenX,stripeWidth,screenY)
+			drawGrass(trackHasRavine,segment.tunnel,colorIndex,ravineX,screenY,roadX)
+			drawTarmac(trackHasRavine,segment.tunnel,colorIndex,roadX,screenY,roadWidth)
+			if (colorIndex ~= 1) then
+				drawStripes(segment.tunnel,trackHasRavine,screenX,stripeWidth,screenY)
+			end
+			if (not segment.tunnel) then
+				drawCurbs(trackHasRavine,colorIndex,roadX,screenY,curbWidth,roadWidth)
+			end
 			
 			-- draw tunnel roof as upside down road, see function for details
 			--states.drawTunnelRoof(segment,screenY,x,roadWidth)

@@ -28,25 +28,18 @@ local road = require("modules.road")
 local utils = require("modules.utils")
 
 -- =========================================================
--- constants
--- =========================================================
-
--- ...
-
--- =========================================================
 -- variables
 -- =========================================================
 
-local list = {}
-
-local lap = false
-local ravine = false
-local images = {}
 local baseScale = {}
+local images = {}
 local index = nil
+local lap = false
+local list = {}
+local ravine = false
 	
 -- =========================================================
--- functions
+-- public functions
 -- =========================================================
 
 function entities.init()
@@ -54,18 +47,14 @@ function entities.init()
 	index = nil
 end
 
-function entities.getListLength()
-	return #list
-end
-
 function entities.reset(trackHasRavine)
+	ravine = trackHasRavine
 	local i = 1
 	while i <= #list do
 		list[i]:clean()
 		i = i + 1
 	end
 	list = {}
-	ravine = trackHasRavine
 end
 
 function entities.checkLap()
@@ -74,127 +63,87 @@ end
 
 function entities.addBanner(x,z,forcedImageIndex)
 	local banner = Banner:new(x,z,forcedImageIndex)
-	
-	-- insert at end since most items introduced at horizon (max z)
+	-- Note: entities inserted at end of list since they are typically introduced at horizon,
+	-- so this means less work has to be done when sorting the list on entity z values later
 	table.insert(list,banner)
-	
 	return banner
 end
 
 function entities.addHighBuilding(x,z)
 	local building = Building:new(x,z,true)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,building)
-	
 	return building
 end
 
 function entities.addLowBuilding(x,z)
 	local building = Building:new(x,z,false)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,building)
-	
 	return building
 end
 
 function entities.addCar(x,z,isPlayer,progress,pause)
 	local car = Car:new(x,z,isPlayer,progress,pause,ravine)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,car)
-	
 	return car
 end
 
 function entities.addFlag(x,z)
 	local flag = Flag:new(x,z)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,flag)
-	
 	return flag
 end
 
 function entities.addFlagger(x,z)
 	local flagger = Flagger:new(x,z)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,flagger)
-	
 	return flagger
 end
 
 function entities.addGrass(x,z,mountain)
 	local grass = Grass:new(x,z,mountain)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,grass)
-	
 	return grass
 end
 
 function entities.addLight(x,z)
 	local light = Light:new(x,z)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,light)
-	
 	return light
 end
 
 function entities.addMarker(x,z)
 	local marker = Marker:new(x,z)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,marker)
-	
 	return marker
 end
 
 function entities.addPillar(x,z)
 	local pillar = Pillar:new(x,z)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,pillar)
-	
 	return pillar
 end
 
 function entities.addSpark(x,z,speed,color)
 	local spark = Spark:new(x,z,speed,color)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,spark)
-	
 	return spark
 end
 
 function entities.addStadium(x,z)
 	local stadium = Stadium:new(x,z)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,stadium)
-	
 	return stadium
 end
 
 function entities.addSign(x,z)
 	local sign = Sign:new(x,z)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,sign)
-	
 	return sign
 end
 
 function entities.addTree(x,z,color,mountain)
 	local tree = Tree:new(x,z,color,mountain)
-	
-	-- insert at end since most items introduced at horizon (max z)
 	table.insert(list,tree)
-	
 	return tree
 end
 
@@ -214,7 +163,7 @@ end
 -- Note: this function modifies car speed in case of collision
 local function checkCollision(car)
 	local baseCarWidth = Car.getBaseTotalCarWidth()
-	local carLength = perspective.maxZ / 50
+	local carLength = perspective.carLength
 	local carWidth = baseCarWidth * car.baseScale
 	
 	local i = 1
@@ -292,9 +241,9 @@ end
 -- checks if a car is ahead
 local function lookAhead(car,x)
 	local baseCarWidth = Car.getBaseTotalCarWidth()
-	local carLength = perspective.maxZ / 50
-	local carWidth = Car.getBaseTotalCarWidth() * car.baseScale
-	local checkDistance = carLength * (1 + 5 * (car.speed / car.topSpeed)) --8
+	local carLength = perspective.carLength
+	local carWidth = baseCarWidth * car.baseScale
+	local checkDistance = carLength * (1 + 8 * (car.speed / car.topSpeed))
 	
 	if (x == nil) then
 		x = car.x

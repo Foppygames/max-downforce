@@ -74,6 +74,7 @@ local shadowWidth = 0
 local frontWheelLeftDx = 0	
 local frontWheelRightDx = 0	
 local frontWheelDy = 0
+local baseTotalCarWidth = 0
 
 -- car is based on entity
 Car = Entity:new()
@@ -130,6 +131,7 @@ function Car.init()
 	frontWheelLeftDx = -imgBody:getWidth()/2 + 2 - imgFrontWheel[1]:getWidth()
 	frontWheelRightDx = imgBody:getWidth()/2 - 2
 	frontWheelDy = -imgFrontWheel[1]:getHeight() - 4
+	baseTotalCarWidth =  (bodyWidth + frontWheelWidth * 2) * WIDTH_MODIFIER
 end
 
 function Car:new(lane,z,isPlayer,progress,pause,ravine)
@@ -411,7 +413,7 @@ function Car:getAcceleration()
 end
 
 function Car.getBaseTotalCarWidth()
-	return (bodyWidth + frontWheelWidth * 2) * WIDTH_MODIFIER
+	return baseTotalCarWidth
 end
 
 function Car:updateSteerPlayerKeyboard(dt)

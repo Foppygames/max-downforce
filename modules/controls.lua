@@ -1,5 +1,5 @@
 -- Max Downforce - modules/controls.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 -- Load the Gamepad Mapping for add support for more gamepads
 love.joystick.loadGamepadMappings("gamecontrollerdb.txt")

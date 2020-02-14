@@ -41,7 +41,7 @@ local STATE_TITLE = 0
 local STATE_RACE = 1
 local STATE_GAME_OVER = 2
 
-local VERSION = "1.1.0"
+local VERSION = "1.1.1"
 local LAP_COUNT = 10
 local CAR_COUNT = 6
 local TIME_AFTER_FINISHED = 5

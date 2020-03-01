@@ -47,7 +47,7 @@ function perspective.initZMapAndScaling()
 	perspective.maxZ = perspective.zMap[perspective.GROUND_HEIGHT]
 
 	-- compute car length as a fraction of distance towards horizon
-	perspective.carLength = perspective.maxZ / 160
+	perspective.carLength = perspective.maxZ / 80
 end
 
 return perspective

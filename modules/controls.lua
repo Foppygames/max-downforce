@@ -22,7 +22,7 @@ controls.GAMEPAD_LABEL_DX = 8
 controls.GAMEPAD_START_TEXT = "Press A to start"
 controls.GAMEPAD_START_TEXT_DX = 14
 
-controls.GAMEPAD_X_DEADZONE = 0.02
+controls.GAMEPAD_X_DEADZONE = 0.04
 
 controls.GAMEPAD_MODE_R = 1
 controls.GAMEPAD_MODE_L = 2

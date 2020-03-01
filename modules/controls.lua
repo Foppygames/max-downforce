@@ -1,6 +1,8 @@
 -- Max Downforce - modules/controls.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
+love.joystick.loadGamepadMappings("gamecontrollerdb.txt")
+	
 local controls = {}
 
 -- =========================================================

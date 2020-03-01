@@ -1,5 +1,5 @@
 -- Max Downforce - modules/perspective.lua
--- 2017-2019 Foppygames
+-- 2017-2020 Foppygames
 
 local perspective = {}
 
@@ -47,7 +47,7 @@ function perspective.initZMapAndScaling()
 	perspective.maxZ = perspective.zMap[perspective.GROUND_HEIGHT]
 
 	-- compute car length as a fraction of distance towards horizon
-	perspective.carLength = perspective.maxZ / 80
+	perspective.carLength = perspective.maxZ / 160
 end
 
 return perspective

@@ -1,5 +1,5 @@
 -- Max Downforce - modules/entities.lua
--- 2017-2019 Foppygames
+-- 2017-2020 Foppygames
 
 local entities = {}
 
@@ -243,7 +243,7 @@ local function lookAhead(car,x)
 	local baseCarWidth = Car.getBaseTotalCarWidth()
 	local carLength = perspective.carLength
 	local carWidth = baseCarWidth * car.baseScale
-	local checkDistance = carLength * (1 + 8 * (car.speed / car.topSpeed))
+	local checkDistance = carLength * (1 + 16 * (car.speed / car.topSpeed))
 	
 	if (x == nil) then
 		x = car.x

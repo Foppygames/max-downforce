@@ -1,5 +1,5 @@
 -- Max Downforce - main.lua
--- 2017-2019 Foppygames
+-- 2017-2020 Foppygames
 
 -- =========================================================
 -- includes
@@ -11,7 +11,7 @@ local states = require("modules.states")
 -- constants
 -- =========================================================
 
-local VERSION = "1.1.0"
+local VERSION = "1.1.1"
 local TITLE = "Max Downforce"
 
 -- =========================================================

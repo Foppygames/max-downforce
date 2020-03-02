@@ -1,5 +1,5 @@
 -- Max Downforce - modules/states.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 local states = {}
 
@@ -179,45 +179,46 @@ local function drawTitleScreen()
 		else
 			love.graphics.setColor(1,1,1)
 		end
-		love.graphics.print(string.sub(titleAllCaps,i,i),8 + i * 10,8)	
+		love.graphics.print(string.sub(titleAllCaps,i,i),8 + i * 10,6)
 	end
 	love.graphics.pop()
 	
 	love.graphics.setColor(0.1,0.1,0.3)
-	love.graphics.print(version,272,6)
+	love.graphics.print(version,260,4)
 	
 	love.graphics.setColor(1,1,1)
-	love.graphics.print("Written by Robbert Prins",75,50)
-	love.graphics.print("Music from PlayOnLoop.com",70,70)
+	love.graphics.print("Written by Robbert Prins",75,45)
+	love.graphics.print("Music from PlayOnLoop.com",70,65)
 	
 	love.graphics.setColor(0.470,0.902,1)
-	love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",75,95)
-	love.graphics.print("W = windowed / full screen",75,110)
-	
+	love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",75,90)
+	love.graphics.print("W = windowed / full screen",75,105)
+	love.graphics.print("M = music: "..sound.getMusicEnabledLabel(),75,120)
+
 	-- more than one control method available
 	if (controls.getAvailableCount() > 1) then
 		love.graphics.setColor(0.470,0.902,1)
-		love.graphics.print("C = controls: "..controls.getSelected().label,75,125)
+		love.graphics.print("C = controls: "..controls.getSelected().label,75,135)
 	-- one control method available (note: assuming there is never less than one)
 	else
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("Controls: "..controls.getSelected().label,75,125)
+		love.graphics.print("Controls: "..controls.getSelected().label,75,135)
 	end
 
 	if (controls.getSelected().type == controls.GAMEPAD) then
 		love.graphics.setColor(1,1,1)
 		if (controls.getSelected().mode == controls.GAMEPAD_MODE_R) then
-			love.graphics.draw(imageGamepadModeR,225,125)
+			love.graphics.draw(imageGamepadModeR,225,135)
 		else
-			love.graphics.draw(imageGamepadModeL,225,125)
+			love.graphics.draw(imageGamepadModeL,225,135)
 		end
 	end
 
 	love.graphics.setColor(1,1,1)
-	love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,150)
+	love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,160)
 	
 	love.graphics.setColor(1,1,0)
-	love.graphics.print("Foppygames 2019",102,175)
+	love.graphics.print("Foppygames 2019",102,178)
 end
 
 local function drawInfoCurrentLap()
@@ -371,10 +372,14 @@ end
 local function switchToState(newState)
 	-- clean up current state
 	if (state == STATE_RACE) then
-		sound.stop(tracks.getSong())
+		if (sound.musicIsEnabled()) then
+			sound.stop(tracks.getSong())
+		end
 		sound.stop(sound.CROWD)
 	elseif (state == STATE_TITLE) then
-		sound.stop(sound.TITLE_MUSIC)
+		if (sound.musicIsEnabled()) then
+			sound.stop(sound.TITLE_MUSIC)
+		end
 	end
 	entities.reset(tracks.hasRavine())
 
@@ -382,7 +387,9 @@ local function switchToState(newState)
 	state = newState
 	if (state == STATE_TITLE) then
 		math.randomseed(os.time())
-		sound.play(sound.TITLE_MUSIC)
+		if (sound.musicIsEnabled()) then
+			sound.play(sound.TITLE_MUSIC)
+		end
 		titleShineIndex = 0
 	elseif (state == STATE_RACE) then
 		lap = 0
@@ -467,7 +474,9 @@ function states.update(dt)
 					-- reset music volume after possible countdown
 					sound.setVolume(tracks.getSong(),sound.VOLUME_MUSIC)
 					
-					sound.play(tracks.getSong())
+					if (sound.musicIsEnabled()) then
+						sound.play(tracks.getSong())
+					end
 				else
 					sound.play(sound.BEEP_1)
 					beepTimer = (TIME_BEFORE_START - TIME_BEFORE_BEEPS) / 2
@@ -582,6 +591,9 @@ end
 
 function states.updateKeyPressed(key)
 	if (state == STATE_TITLE) then
+		if (key == "m") then
+			sound.toggleMusicEnabled()
+		end
 		if (key == "t") then
 			tracks.selectNextTrack()
 		end

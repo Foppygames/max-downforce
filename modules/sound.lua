@@ -1,5 +1,5 @@
 -- Max Downforce - modules/sound.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 local sound = {}
 
@@ -40,6 +40,7 @@ sound.TITLE_MUSIC_PATH = "music/POL-smash-bros-long.wav"
 sound.sources = {}
 
 local crowdVolume = 0
+local musicEnabled = true
 
 -- =========================================================
 -- public functions
@@ -134,6 +135,17 @@ function sound.initEffects()
 	})
 end
 	
+function sound.musicIsEnabled()
+	return musicEnabled
+end
+
+function sound.getMusicEnabledLabel()
+	if (musicEnabled) then
+		return "on"
+	end
+	return "off"
+end
+
 function sound.play(index)
 	if (sound.sources[index] ~= nil) then
 		if (sound.sources[index]:isPlaying()) then
@@ -159,6 +171,16 @@ end
 function sound.setVolume(index,volume)
 	if (sound.sources[index] ~= nil) then
 		sound.sources[index]:setVolume(volume)
+	end
+end
+
+-- Note: only used while on title screen
+function sound.toggleMusicEnabled()
+	musicEnabled = not musicEnabled
+	if (sound.isPlaying(sound.TITLE_MUSIC)) then
+		sound.stop(sound.TITLE_MUSIC)
+	else
+		sound.play(sound.TITLE_MUSIC)
 	end
 end
 

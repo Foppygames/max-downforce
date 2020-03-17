@@ -53,7 +53,7 @@ local TIME_BEFORE_BEEPS = 0.7
 -- =========================================================
 
 local state
-local fullScreen = false
+local fullScreen = true
 local textureOffset = 0
 local player = nil
 local playerX = 0
@@ -401,7 +401,7 @@ function love.draw()
 		
 		love.graphics.setColor(1,1,1)
 		love.graphics.print("Written by Robbert Prins",75,50)
-		love.graphics.print("Music from PlayOnLoop.com",70,70)
+		love.graphics.print("Music by Kevin MacLeod CC-BY 4.0",45,70)
 		
 		love.graphics.setColor(0.470,0.902,1)
 		love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",75,95)

@@ -29,9 +29,9 @@ sound.VOLUME_COUNTDOWN_MIN = 0.3
 sound.VOLUME_COUNTDOWN_MAX = 1.0
 
 -- Note: treating music file differently - missing from repository for licensing reasons
-sound.RACE_MUSIC_PATH_FOREST = "music/POL-galactic-chase-long.wav"
-sound.RACE_MUSIC_PATH_MOUNTAIN = "music/POL-combat-plan-long.wav"
-sound.TITLE_MUSIC_PATH = "music/POL-smash-bros-long.wav"
+sound.RACE_MUSIC_PATH_FOREST = "music/5029-raving-energy-by-kevin-macleod.mp3"
+sound.RACE_MUSIC_PATH_MOUNTAIN = "music/5018-your-call-by-kevin-macleod.mp3"
+sound.TITLE_MUSIC_PATH = "music/4616-werq-by-kevin-macleod.mp3"
 
 -- =========================================================
 -- variables

@@ -188,7 +188,7 @@ local function drawTitleScreen()
 	
 	love.graphics.setColor(1,1,1)
 	love.graphics.print("Written by Robbert Prins",75,45)
-	love.graphics.print("Music from PlayOnLoop.com",70,65)
+	love.graphics.print(sound.MUSIC_CREDITS,sound.MUSIC_CREDITS_X,65)
 	
 	love.graphics.setColor(0.470,0.902,1)
 	love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",75,90)

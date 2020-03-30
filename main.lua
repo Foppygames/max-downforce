@@ -11,7 +11,7 @@ local states = require("modules.states")
 -- constants
 -- =========================================================
 
-local VERSION = "1.1.1"
+local VERSION = "1.1.2"
 local TITLE = "Max Downforce"
 
 -- =========================================================

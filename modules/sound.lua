@@ -1,5 +1,5 @@
 -- Max Downforce - modules/sound.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 local sound = {}
 
@@ -28,10 +28,24 @@ sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL = 0.7
 sound.VOLUME_COUNTDOWN_MIN = 0.3
 sound.VOLUME_COUNTDOWN_MAX = 1.0
 
--- Note: treating music file differently - missing from repository for licensing reasons
-sound.RACE_MUSIC_PATH_FOREST = "music/5029-raving-energy-by-kevin-macleod.mp3"
-sound.RACE_MUSIC_PATH_MOUNTAIN = "music/5018-your-call-by-kevin-macleod.mp3"
-sound.TITLE_MUSIC_PATH = "music/4616-werq-by-kevin-macleod.mp3"
+-- Note: used to pick music to be used in build
+sound.USE_OFFICIAL_MUSIC = false
+
+-- use official music by PlayOnLoop.com (missing from repository for licensing reasons)
+if (sound.USE_OFFICIAL_MUSIC) then
+	sound.RACE_MUSIC_PATH_FOREST = "music/POL-galactic-chase-long.wav"
+	sound.RACE_MUSIC_PATH_MOUNTAIN = "music/POL-combat-plan-long.wav"
+	sound.TITLE_MUSIC_PATH = "music/POL-smash-bros-long.wav"
+	sound.MUSIC_CREDITS = "Music from PlayOnLoop.com"
+	sound.MUSIC_CREDITS_X = 70
+-- use 
+else
+	sound.RACE_MUSIC_PATH_FOREST = "music/5029-raving-energy-by-kevin-macleod.mp3"
+	sound.RACE_MUSIC_PATH_MOUNTAIN = "music/5018-your-call-by-kevin-macleod.mp3"
+	sound.TITLE_MUSIC_PATH = "music/4616-werq-by-kevin-macleod.mp3"
+	sound.MUSIC_CREDITS = "Music by Kevin MacLeod (incompetech.com)"
+	sound.MUSIC_CREDITS_X = 20
+end
 
 -- =========================================================
 -- variables
@@ -40,6 +54,7 @@ sound.TITLE_MUSIC_PATH = "music/4616-werq-by-kevin-macleod.mp3"
 sound.sources = {}
 
 local crowdVolume = 0
+local musicEnabled = true
 
 -- =========================================================
 -- public functions
@@ -48,72 +63,43 @@ local crowdVolume = 0
 function sound.init()
 	sound.initEffects()
 
-	sound.sources[sound.ENGINE_IDLE] = love.audio.newSource("sounds/engine_idle.wav","static")
-	sound.sources[sound.ENGINE_IDLE]:setLooping(true)
-	sound.sources[sound.ENGINE_IDLE]:setVolume(sound.VOLUME_EFFECTS)
-	
-	sound.sources[sound.ENGINE_POWER] = love.audio.newSource("sounds/power3.ogg","static")
-	sound.sources[sound.ENGINE_POWER]:setLooping(true)
-	sound.sources[sound.ENGINE_POWER]:setVolume(sound.VOLUME_EFFECTS)
-	
-	sound.sources[sound.EXPLOSION] = love.audio.newSource("sounds/explosion.wav","static")
-	sound.sources[sound.EXPLOSION]:setVolume(sound.VOLUME_EFFECTS)
-	
-	sound.sources[sound.COLLISION] = love.audio.newSource("sounds/collision.wav","static")
-	sound.sources[sound.COLLISION]:setVolume(sound.VOLUME_EFFECTS)
-	
-	-- Note: treating music files differently - missing from repository for licensing reasons
-	local info = love.filesystem.getInfo(sound.RACE_MUSIC_PATH_FOREST)
-	
-	-- file exists
-	if (info ~= nil) then
-		sound.sources[sound.RACE_MUSIC_FOREST] = love.audio.newSource(sound.RACE_MUSIC_PATH_FOREST,"static")
-		sound.sources[sound.RACE_MUSIC_FOREST]:setLooping(true)
-		sound.sources[sound.RACE_MUSIC_FOREST]:setVolume(sound.VOLUME_MUSIC)
-	-- file does not exist
-	else
-		sound.sources[sound.RACE_MUSIC_FOREST] = nil
-	end
+	sound.initMusic(sound.RACE_MUSIC_PATH_FOREST,sound.RACE_MUSIC_FOREST)
+	sound.initMusic(sound.RACE_MUSIC_PATH_MOUNTAIN,sound.RACE_MUSIC_MOUNTAIN)
+	sound.initMusic(sound.TITLE_MUSIC_PATH,sound.TITLE_MUSIC)
 
-	local info = love.filesystem.getInfo(sound.RACE_MUSIC_PATH_MOUNTAIN)
+	sound.initSound("sounds/engine_idle.wav",sound.ENGINE_IDLE,true,sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/power3.ogg",sound.ENGINE_POWER,true,sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/explosion.wav",sound.EXPLOSION,nil,sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/collision.wav",sound.COLLISION,nil,sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/crowd.wav",sound.CROWD,true,sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/beep1.wav",sound.BEEP_1,nil,sound.VOLUME_EFFECTS_BEEPS)
+	sound.initSound("sounds/beep2.wav",sound.BEEP_2,nil,sound.VOLUME_EFFECTS_BEEPS)
+	sound.initSound("sounds/lap.wav",sound.LAP,nil,sound.VOLUME_EFFECTS_BEEPS)
+	sound.initSound("sounds/countdown.wav",sound.COUNTDOWN,nil,nil)
+end
 
+function sound.initSound(path,id,loop,volume)
+	sound.sources[id] = love.audio.newSource(path,"static")
+	if (loop) then
+		sound.sources[id]:setLooping(loop)
+	end
+	if (volume) then
+		sound.sources[id]:setVolume(volume)
+	end
+end
+
+function sound.initMusic(path,id)
+	local info = love.filesystem.getInfo(path)
+	
 	-- file exists
 	if (info ~= nil) then
-		sound.sources[sound.RACE_MUSIC_MOUNTAIN] = love.audio.newSource(sound.RACE_MUSIC_PATH_MOUNTAIN,"static")
-		sound.sources[sound.RACE_MUSIC_MOUNTAIN]:setLooping(true)
-		sound.sources[sound.RACE_MUSIC_MOUNTAIN]:setVolume(sound.VOLUME_MUSIC)
+		sound.sources[id] = love.audio.newSource(path,"static")
+		sound.sources[id]:setLooping(true)
+		sound.sources[id]:setVolume(sound.VOLUME_MUSIC)
 	-- file does not exist
 	else
-		sound.sources[sound.RACE_MUSIC_MOUNTAIN] = nil
+		sound.sources[id] = nil
 	end
-	
-	local info = love.filesystem.getInfo(sound.TITLE_MUSIC_PATH)
-	
-	-- file exists
-	if (info ~= nil) then
-		sound.sources[sound.TITLE_MUSIC] = love.audio.newSource(sound.TITLE_MUSIC_PATH,"static")
-		sound.sources[sound.TITLE_MUSIC]:setLooping(true)
-		sound.sources[sound.TITLE_MUSIC]:setVolume(sound.VOLUME_MUSIC)
-	-- file does not exist
-	else
-		sound.sources[sound.TITLE_MUSIC] = nil
-	end
-	
-	sound.sources[sound.CROWD] = love.audio.newSource("sounds/crowd.wav","static")
-	sound.sources[sound.CROWD]:setLooping(true)
-	sound.sources[sound.CROWD]:setVolume(sound.VOLUME_EFFECTS)
-	
-	sound.sources[sound.BEEP_1] = love.audio.newSource("sounds/beep1.wav","static")
-	sound.sources[sound.BEEP_1]:setVolume(sound.VOLUME_EFFECTS_BEEPS)
-	
-	sound.sources[sound.BEEP_2] = love.audio.newSource("sounds/beep2.wav","static")
-	sound.sources[sound.BEEP_2]:setVolume(sound.VOLUME_EFFECTS_BEEPS)
-	
-	sound.sources[sound.LAP] = love.audio.newSource("sounds/lap.wav","static")
-	sound.sources[sound.LAP]:setVolume(sound.VOLUME_EFFECTS_BEEPS)
-	
-	sound.sources[sound.COUNTDOWN] = love.audio.newSource("sounds/countdown.wav","static")
-	sound.sources[sound.COUNTDOWN]:setEffect("countdown_echo")
 end
 
 function sound.initEffects()
@@ -134,6 +120,17 @@ function sound.initEffects()
 	})
 end
 	
+function sound.musicIsEnabled()
+	return musicEnabled
+end
+
+function sound.getMusicEnabledLabel()
+	if (musicEnabled) then
+		return "on"
+	end
+	return "off"
+end
+
 function sound.play(index)
 	if (sound.sources[index] ~= nil) then
 		if (sound.sources[index]:isPlaying()) then
@@ -159,6 +156,16 @@ end
 function sound.setVolume(index,volume)
 	if (sound.sources[index] ~= nil) then
 		sound.sources[index]:setVolume(volume)
+	end
+end
+
+-- Note: only used while on title screen
+function sound.toggleMusicEnabled()
+	musicEnabled = not musicEnabled
+	if (sound.isPlaying(sound.TITLE_MUSIC)) then
+		sound.stop(sound.TITLE_MUSIC)
+	else
+		sound.play(sound.TITLE_MUSIC)
 	end
 end
 

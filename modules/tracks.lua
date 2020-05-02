@@ -1,5 +1,5 @@
 -- Max Downforce - modules/tracks.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 local tracks = {}
 
@@ -11,6 +11,7 @@ local perspective = require("modules.perspective")
 local schedule = require("modules.schedule")
 local track1 = require("modules.track1")
 local track2 = require("modules.track2")
+local track3 = require("modules.track3")
 
 -- =========================================================
 -- constants
@@ -85,6 +86,7 @@ end
 function tracks.init()
 	initTrackModule(track1)
 	initTrackModule(track2)
+	initTrackModule(track3)
 
 	selectedTrack = track1
 end
@@ -112,6 +114,8 @@ end
 function tracks.selectNextTrack()
 	if (selectedTrack == track1) then
 		selectedTrack = track2
+	elseif (selectedTrack == track2) then
+		selectedTrack = track3
 	else
 		selectedTrack = track1
 	end

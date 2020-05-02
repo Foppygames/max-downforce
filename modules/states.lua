@@ -218,7 +218,7 @@ local function drawTitleScreen()
 	love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,160)
 	
 	love.graphics.setColor(1,1,0)
-	love.graphics.print("Foppygames 2019",102,178)
+	love.graphics.print("Foppygames 2019-2020",102-20,178)
 end
 
 local function drawInfoCurrentLap()

@@ -30,7 +30,7 @@ sound.VOLUME_COUNTDOWN_MIN = 0.3
 sound.VOLUME_COUNTDOWN_MAX = 1.0
 
 -- Note: used to pick music to be used in build
-sound.USE_OFFICIAL_MUSIC = false
+sound.USE_OFFICIAL_MUSIC = true --false
 
 -- use official music by PlayOnLoop.com (excluded from repository)
 if (sound.USE_OFFICIAL_MUSIC) then
@@ -42,7 +42,7 @@ if (sound.USE_OFFICIAL_MUSIC) then
 	sound.MUSIC_CREDITS_X = 70
 -- use music by Kevin MacLeod licensed under Creative Commons (included in repository)
 else
-	-- Note: track 3 and title screen play the same music
+	-- Note: city track and title screen play the same music
 	sound.RACE_MUSIC_PATH_FOREST = "music/5029-raving-energy-by-kevin-macleod.mp3"
 	sound.RACE_MUSIC_PATH_MOUNTAIN = "music/5018-your-call-by-kevin-macleod.mp3"
 	sound.RACE_MUSIC_PATH_CITY = "music/4616-werq-by-kevin-macleod.mp3"

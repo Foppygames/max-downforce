@@ -81,6 +81,8 @@ local function initTrackModule(trackModule)
 			trackModule.segments[i].scheduleItems[j].dz = trackModule.segments[i].scheduleItems[j].dz * (perspective.maxZ - perspective.minZ)
 		end
 	end
+
+	print("total track length: "..trackModule.totalLength)
 end
 
 function tracks.init()
@@ -95,6 +97,10 @@ function tracks.getSelectedTrack()
 	return selectedTrack
 end
 
+function tracks.getSelectedTrackHorizonType()
+	return 1 --selectedTrack.horizonType
+end
+
 function tracks.getSelectedTrackName()
 	return selectedTrack.name
 end
@@ -105,6 +111,18 @@ end
 
 function tracks.hasRavine()
 	return selectedTrack.hasRavine
+end
+
+function tracks.isInMountains()
+	return selectedTrack.isInMountains
+end
+
+function tracks.isInForest()
+	return selectedTrack.isInForest
+end
+
+function tracks.isInCity()
+	return selectedTrack.isInCity
 end
 
 function tracks.getSong()

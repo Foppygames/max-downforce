@@ -47,6 +47,7 @@ local COLORS_CURBS_NO_RAVINE = {{1, 0.26, 0}, {1, 0.95, 0.95}}
 local COLORS_CURBS_RAVINE = {{0.1, 0.26, 0.8}, {1, 0.95, 0.95}}
 local COLORS_GRASS_NO_RAVINE = {{0.45, 0.8, 0.25}, {0.36, 0.6, 0.20}}
 local COLORS_GRASS_RAVINE = {{0.5, 0.36, 0.03}, {0.45, 0.31, 0.01}}
+local COLORS_GRASS_CITY = {{0.03, 0.0, 0.0}, {0.06, 0.05, 0.05}}
 local COLORS_STRIPES_RAVINE = {
 	tunnel = {0.9, 0.9, 0},
 	no_tunnel = {1, 0.95, 0.95}
@@ -63,6 +64,10 @@ local COLORS_TARMAC_NO_RAVINE = {
 	tunnel = {{0.1, 0.1, 0.13}, {0.11, 0.11, 0.14}},
 	no_tunnel = {{0.34, 0.28, 0.28}, {0.37, 0.30, 0.30}}
 }
+local COLORS_TARMAC_CITY = {
+	tunnel = {{0.39, 0.28, 0.28}, {0.42, 0.30, 0.30}},
+	no_tunnel = {{0.22, 0.14, 0.18}, {0.24, 0.16, 0.20}}
+}
 local LAP_COUNT = 10
 local TIME_AFTER_FINISHED = 5
 local TIME_BEFORE_BEEPS = 0.7
@@ -77,7 +82,7 @@ local beepCounter = 0
 local beepTimer = 0
 local curbColors = nil
 local finished = false
-local fullScreen = true
+local fullScreen = false --true
 local grassColors = nil
 local lap = 0
 local player = nil
@@ -97,6 +102,9 @@ local title = ""
 local titleShineIndex = 0
 local titleShineTimer = 0
 local trackHasRavine
+local trackIsInMountains
+local trackIsInForest
+local trackIsInCity
 local tunnelWallDistance = 0
 local version = ""
 
@@ -218,7 +226,7 @@ local function drawTitleScreen()
 	love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,160)
 	
 	love.graphics.setColor(1,1,0)
-	love.graphics.print("Foppygames 2019-2020",102-20,178)
+	love.graphics.print("Foppygames 2019-2020",82,178)
 end
 
 local function drawInfoCurrentLap()
@@ -317,10 +325,12 @@ local function setCurbColors()
 end
 
 local function setGrassColors()
-	if (trackHasRavine) then
+	if (trackIsInMountains) then
 		grassColors = COLORS_GRASS_RAVINE
-	else
+	elseif (trackIsInForest) then
 		grassColors = COLORS_GRASS_NO_RAVINE
+	else
+		grassColors = COLORS_GRASS_CITY
 	end
 end
 
@@ -333,10 +343,12 @@ local function setStripeColors()
 end
 
 local function setTarmacColors()
-	if (trackHasRavine) then
+	if (trackIsInMountains) then
 		tarmacColors = COLORS_TARMAC_RAVINE
-	else
+	elseif (trackIsInForest) then
 		tarmacColors = COLORS_TARMAC_NO_RAVINE
+	else
+		tarmacColors = COLORS_TARMAC_CITY
 	end
 end
 
@@ -398,6 +410,9 @@ local function switchToState(newState)
 		afterFinishedTimer = 0
 		previousDisplayTime = nil
 		trackHasRavine = tracks.hasRavine()
+		trackIsInMountains = tracks.isInMountains()
+		trackIsInForest = tracks.isInForest()
+		trackIsInCity = tracks.isInCity()
 
 		horizon.reset()
 		schedule.reset()

@@ -18,7 +18,7 @@ local tracks = require("modules.tracks")
 
 local IMAGE_INDEXES_FOREST_TRACK = {1, 2, 3}
 local IMAGE_INDEXES_MOUNTAIN_TRACK = {1, 5, 2, 5}
-local IMAGE_INDEXES_CITY_TRACK = {4, 6, 3}
+local IMAGE_INDEXES_CITY_TRACK = {4, 6, 7}
 
 local COLOR_FOREST_TRACK = {1,1,1}
 local COLOR_MOUNTAIN_TRACK = {0.2,0.3,0.6}
@@ -49,7 +49,8 @@ function horizon.init()
 		love.graphics.newImage("images/horizon_trees.png"),
 		love.graphics.newImage("images/horizon_clouds_2.png"),
 		love.graphics.newImage("images/horizon_hills_2.png"),
-		love.graphics.newImage("images/horizon_skyscrapers.png")
+		love.graphics.newImage("images/horizon_skyscrapers.png"),
+		love.graphics.newImage("images/horizon_buildings.png")
 	}
 end
 

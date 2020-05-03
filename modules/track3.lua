@@ -32,8 +32,11 @@ track3.song = sound.RACE_MUSIC_CITY
 
 track3.totalLength = 0
 
--- note: length is written as fraction of maxZ, to be converted in segments.init()
--- note: dz is written as fraction of maxZ, to be converted in segments.init()
+-- Note: length is written as fraction of maxZ, to be converted in segments.init()
+-- Note: dz is written as fraction of maxZ, to be converted in segments.init()
+-- Note: light property only makes sense on this track as it is in dark by default
+-- and tunnels are light; light segments are rendered as if they are tunnel segments
+-- (but with curbs), so on the other tracks this would actually make them dark
 track3.segments = {
 	-- starting grid straight leading up to start/finish
 	{
@@ -47,14 +50,16 @@ track3.segments = {
 				count = 1
 			}
 		},
-		tunnel = false
+		tunnel = false,
+		light = true
 	},
 	-- long straight after start/finish
 	{
 		ddx = 0,
 		length = 3.0,
 		scheduleItems = {},
-		tunnel = false
+		tunnel = false,
+		light = true
 	},
 	-- long curve right
 	{
@@ -89,7 +94,8 @@ track3.segments = {
 		ddx = 0.4,
 		length = 3,
 		scheduleItems = {},
-		tunnel = false
+		tunnel = false,
+		light = true
 	},
 	-- long straight towards tunnel
 	{

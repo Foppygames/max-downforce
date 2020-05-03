@@ -134,7 +134,7 @@ function Car.init()
 	baseTotalCarWidth =  (bodyWidth + frontWheelWidth * 2) * WIDTH_MODIFIER
 end
 
-function Car:new(lane,z,isPlayer,progress,pause,ravine)
+function Car:new(lane,z,isPlayer,progress,pause,ravine,city)
 	local x = Car.getXFromLane(lane,true)
 	
 	o = Entity:new(x,z)	
@@ -168,7 +168,9 @@ function Car:new(lane,z,isPlayer,progress,pause,ravine)
 	o.aiBlockingCarSpeed = nil
 	o.pause = pause
 	o.ravine = ravine
+	o.city = city
 	o.inTunnel = false
+	o.inLight = false
 
 	o.imgWing = imgWing[math.random(5)]
 	o.wingWidth = o.imgWing:getWidth()
@@ -962,6 +964,7 @@ function Car:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previous
 	self.segmentDdx = segment.ddx
 	self.targetSpeed = self.topSpeed
 	self.inTunnel = segment.tunnel
+	self.inLight = segment.light
 end
 
 function Car:draw()
@@ -988,7 +991,7 @@ function Car:draw()
 		local accEffect = self.accEffect * 0.01
 		
 		-- draw shadow
-		if ((not self.falling)) then -- and (not self.inTunnel)) then
+		if ((not self.falling)) then
 			love.graphics.draw(imgShadow,screenX - shadowWidth/2, screenY - 6)
 		end
 
@@ -1003,9 +1006,23 @@ function Car:draw()
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelRightDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
-		local mainColor = self.color
-		if ((self.inTunnel) and (not self.ravine) and (not self.falling)) then
-			mainColor = self.colorInTunnel
+		local mainColor
+		-- car is in city at night
+		if (self.city) then
+			-- car is in lighted tunnel or in light
+			if ((self.inTunnel) or (self.inLight)) then
+				-- use bright color
+				mainColor = self.color
+			else
+				-- use dark color
+				mainColor = self.colorInTunnel
+			end
+		-- car is in forest or on mountain by daylight
+		else
+			mainColor = self.color
+			if ((self.inTunnel) and (not self.ravine) and (not self.falling)) then
+				mainColor = self.colorInTunnel
+			end
 		end
 		
 		-- draw body

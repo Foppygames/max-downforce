@@ -42,6 +42,7 @@ local function initTrackModule(trackModule)
 		if ((trackModule.segments[i].ddx ~= 0) and (nextDdx == 0)) then
 			local ddx = trackModule.segments[i].ddx
 			local tunnel = trackModule.segments[i].tunnel
+			local light = trackModule.segments[i].light
 			local j = 1
 			if (ddx > 0) then
 				ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
@@ -50,7 +51,8 @@ local function initTrackModule(trackModule)
 						ddx = ddx,
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
-						tunnel = tunnel
+						tunnel = tunnel,
+						light = light
 					})
 					ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1
@@ -62,7 +64,8 @@ local function initTrackModule(trackModule)
 						ddx = ddx,
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
-						tunnel = tunnel
+						tunnel = tunnel,
+						light = light
 					})
 					ddx = ddx + SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1
@@ -95,10 +98,6 @@ end
 
 function tracks.getSelectedTrack()
 	return selectedTrack
-end
-
-function tracks.getSelectedTrackHorizonType()
-	return 1 --selectedTrack.horizonType
 end
 
 function tracks.getSelectedTrackName()

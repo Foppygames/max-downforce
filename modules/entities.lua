@@ -37,7 +37,8 @@ local index = nil
 local lap = false
 local list = {}
 local ravine = false
-	
+local city = false
+
 -- =========================================================
 -- public functions
 -- =========================================================
@@ -47,8 +48,9 @@ function entities.init()
 	index = nil
 end
 
-function entities.reset(trackHasRavine)
+function entities.reset(trackHasRavine,trackIsInCity)
 	ravine = trackHasRavine
+	city = trackIsInCity
 	local i = 1
 	while i <= #list do
 		list[i]:clean()
@@ -82,7 +84,7 @@ function entities.addLowBuilding(x,z)
 end
 
 function entities.addCar(x,z,isPlayer,progress,pause)
-	local car = Car:new(x,z,isPlayer,progress,pause,ravine)
+	local car = Car:new(x,z,isPlayer,progress,pause,ravine,city)
 	table.insert(list,car)
 	return car
 end

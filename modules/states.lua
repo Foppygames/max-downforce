@@ -45,6 +45,10 @@ local STATE_GAME_OVER = 2
 local CAR_COUNT = 6
 local COLORS_CURBS_NO_RAVINE = {{1, 0.26, 0}, {1, 0.95, 0.95}}
 local COLORS_CURBS_RAVINE = {{0.1, 0.26, 0.8}, {1, 0.95, 0.95}}
+local COLORS_CURBS_CITY = {
+	light = {{1, 0.26, 0}, {1, 0.95, 0.95}},
+	no_light = {{0.8, 0.1, 0}, {0.8, 0.6, 0.6}}
+}
 local COLORS_GRASS_NO_RAVINE = {{0.45, 0.8, 0.25}, {0.36, 0.6, 0.20}}
 local COLORS_GRASS_RAVINE = {{0.5, 0.36, 0.03}, {0.45, 0.31, 0.01}}
 local COLORS_GRASS_CITY = {{0.03, 0.0, 0.0}, {0.06, 0.05, 0.05}}
@@ -55,6 +59,10 @@ local COLORS_STRIPES_RAVINE = {
 local COLORS_STRIPES_NO_RAVINE = {
 	tunnel = {0.8, 0.8, 0},
 	no_tunnel = {1, 0.95, 0.95}
+}
+local COLORS_STRIPES_CITY = {
+	tunnel = {1, 0.95, 0.95},
+	no_tunnel = {0.8, 0.6, 0.6}
 }
 local COLORS_TARMAC_RAVINE = {
 	tunnel = {{0.24, 0.2, 0.26}, {0.24, 0.2, 0.26}},
@@ -301,8 +309,16 @@ local function drawTunnelRoof(segment,screenY,x,roadWidth)
 	end
 end
 
-local function drawCurbs(trackHasRavine,colorIndex,roadX,screenY,curbWidth,roadWidth)
-	love.graphics.setColor(curbColors[colorIndex])
+local function drawCurbs(light,colorIndex,roadX,screenY,curbWidth,roadWidth)
+	if (trackIsInCity) then
+		if (light) then
+			love.graphics.setColor(curbColors.light[colorIndex])
+		else
+			love.graphics.setColor(curbColors.no_light[colorIndex])
+		end
+	else
+		love.graphics.setColor(curbColors[colorIndex])
+	end
 	love.graphics.line(roadX,screenY,roadX+curbWidth,screenY)
 	love.graphics.line(roadX+roadWidth-curbWidth,screenY,roadX+roadWidth,screenY)
 end
@@ -317,10 +333,12 @@ local function drawStripes(tunnel,trackHasRavine,screenX,stripeWidth,screenY)
 end
 
 local function setCurbColors()
-	if (trackHasRavine) then
+	if (trackIsInMountains) then
 		curbColors = COLORS_CURBS_RAVINE
-	else
+	elseif (trackIsInForest) then
 		curbColors = COLORS_CURBS_NO_RAVINE
+	else
+		curbColors = COLORS_CURBS_CITY
 	end
 end
 
@@ -335,10 +353,12 @@ local function setGrassColors()
 end
 
 local function setStripeColors()
-	if (trackHasRavine) then
+	if (trackIsInMountains) then
 		stripeColors = COLORS_STRIPES_RAVINE
-	else
+	elseif (trackIsInForest) then
 		stripeColors = COLORS_STRIPES_NO_RAVINE
+	else
+		stripeColors = COLORS_STRIPES_CITY
 	end
 end
 
@@ -393,7 +413,7 @@ local function switchToState(newState)
 			sound.stop(sound.TITLE_MUSIC)
 		end
 	end
-	entities.reset(tracks.hasRavine())
+	entities.reset(tracks.hasRavine(),tracks.isInCity())
 
 	-- init new state
 	state = newState
@@ -753,12 +773,12 @@ function states.draw()
 			
 			-- draw grass and road elements
 			drawGrass(trackHasRavine,segment.tunnel,colorIndex,ravineX,screenY,roadX)
-			drawTarmac(trackHasRavine,segment.tunnel,colorIndex,roadX,screenY,roadWidth)
+			drawTarmac(trackHasRavine,segment.tunnel or segment.light,colorIndex,roadX,screenY,roadWidth)
 			if (colorIndex ~= 1) then
-				drawStripes(segment.tunnel,trackHasRavine,screenX,stripeWidth,screenY)
+				drawStripes(segment.tunnel or segment.light,trackHasRavine,screenX,stripeWidth,screenY)
 			end
 			if (not segment.tunnel) then
-				drawCurbs(trackHasRavine,colorIndex,roadX,screenY,curbWidth,roadWidth)
+				drawCurbs(segment.light,colorIndex,roadX,screenY,curbWidth,roadWidth)
 			end
 			
 			-- draw tunnel roof as upside down road, see function for details

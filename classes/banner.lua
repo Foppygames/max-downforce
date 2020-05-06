@@ -1,5 +1,5 @@
 -- Max Downforce - classes/banner.lua
--- 2018 Foppygames
+-- 2018-2020 Foppygames
 
 -- classes
 require "classes.entity"
@@ -18,7 +18,8 @@ Banner = Entity:new()
 function Banner.init()
 	img = {
 		love.graphics.newImage("images/banner_start.png"),
-		love.graphics.newImage("images/banner_forest_bridge.png")
+		love.graphics.newImage("images/banner_forest_bridge.png"),
+		love.graphics.newImage("images/banner_city_lights.png")
 	}
 end
 
@@ -70,8 +71,14 @@ function Banner:draw()
 	love.graphics.setColor(color)
 	love.graphics.rectangle("fill",x1-poleWidth,y1,poleWidth,poleHeight)
 	love.graphics.rectangle("fill",x1+self.width,y1,poleWidth,poleHeight)
-	love.graphics.setColor(0,0,0,0.3)
-	love.graphics.rectangle("fill",x1,self.screenY/imageScale-2,self.width,2)
+
+	-- banner is not city lights
+	if (self.imageIndex ~= 3) then
+		-- draw shadow
+		love.graphics.setColor(0,0,0,0.3)
+		love.graphics.rectangle("fill",x1,self.screenY/imageScale-2,self.width,2)
+	end
+
 	love.graphics.pop()
 	self.storedScreenX = newScreenX
 end

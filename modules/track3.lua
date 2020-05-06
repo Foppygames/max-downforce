@@ -38,7 +38,7 @@ track3.totalLength = 0
 -- and tunnels are light; light segments are rendered as if they are tunnel segments
 -- (but with curbs), so on the other tracks this would actually make them dark
 track3.segments = {
-	-- starting grid straight leading up to start/finish
+	-- starting grid straight leading up to start/finish, lights
 	{
 		ddx = 0,
 		length = FIRST_SEGMENT_LENGTH,
@@ -53,18 +53,62 @@ track3.segments = {
 		tunnel = false,
 		light = true
 	},
-	-- long straight after start/finish
+	-- long straight after start/finish, lights
 	{
 		ddx = 0,
 		length = 3.0,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
+				startZ = 0.5,
+				dz = 0.5,
+				count = 6
+			}
+		},
 		tunnel = false,
 		light = true
 	},
-	-- long curve right
+	-- long curve left, part 1, lights
 	{
-		ddx = 0.7,
-		length = 4,
+		ddx = -0.7,
+		length = 1,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
+				startZ = 0.5,
+				dz = 0.5,
+				count = 2
+			}
+		},
+		tunnel = false,
+		light = true
+	},
+	-- long curve left, part 2
+	{
+		ddx = -0.7,
+		length = 1.5,
+		scheduleItems = {},
+		tunnel = false
+	},
+	-- long curve left, part 3, with lights
+	{
+		ddx = -0.7,
+		length = 1.5,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
+				startZ = 0,
+				dz = 0.5,
+				count = 4
+			}
+		},
+		tunnel = false,
+		light = true
+	},
+	-- long curve left, part 4
+	{
+		ddx = -0.7,
+		length = 1.5,
 		scheduleItems = {},
 		tunnel = false
 	},
@@ -75,7 +119,21 @@ track3.segments = {
 		scheduleItems = {},
 		tunnel = false
 	},
-	-- long curve left
+	-- medium curve right
+	{
+		ddx = 0.5,
+		length = 3,
+		scheduleItems = {},
+		tunnel = false
+	},
+	-- very short straight
+	{
+		ddx = 0,
+		length = 0.5,
+		scheduleItems = {},
+		tunnel = false
+	},
+	-- medium curve left
 	{
 		ddx = -0.5,
 		length = 3,
@@ -89,32 +147,46 @@ track3.segments = {
 		scheduleItems = {},
 		tunnel = false
 	},
-	-- long curve right
+	-- long curve right, part 1, towards tunnel
 	{
-		ddx = 0.4,
+		ddx = 0.3,
 		length = 3,
 		scheduleItems = {},
+		tunnel = false
+	},
+	-- long curve right, part 2, towards tunnel, lights
+	{
+		ddx = 0.3,
+		length = 1,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
+				startZ = 0,
+				dz = 0.5,
+				count = 2
+			}
+		},
 		tunnel = false,
 		light = true
 	},
-	-- long straight towards tunnel
+	-- long curve right, part 3, tunnel
 	{
-		ddx = 0,
-		length = 2.5,
+		ddx = 0.3,
+		length = 3,
 		scheduleItems = {},
-		tunnel = false
+		tunnel = true
 	},
 	-- medium straight, tunnel
 	{
 		ddx = 0,
-		length = 2,
+		length = 3,
 		scheduleItems = {},
 		tunnel = true
 	},
-	-- long curve left, tunnel
+	-- hard left, tunnel
 	{
-		ddx = -0.6,
-		length = 4,
+		ddx = -0.8,
+		length = 2,
 		scheduleItems = {},
 		tunnel = true
 	},
@@ -128,107 +200,9 @@ track3.segments = {
 	-- long curve right, tunnel
 	{
 		ddx = 0.6,
-		length = 5,
+		length = 4,
 		scheduleItems = {},
 		tunnel = true
-	},
-	-- short straight, tunnel
-	{
-		ddx = 0,
-		length = 1,
-		scheduleItems = {},
-		tunnel = true
-	},
-	-- medium straight
-	{
-		ddx = 0,
-		length = 2,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- short curve right
-	{
-		ddx = 0.7,
-		length = 1.5,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- very short straight
-	{
-		ddx = 0,
-		length = 0.5,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- short curve left
-	{
-		ddx = -0.6,
-		length = 1.5,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- very short straight
-	{
-		ddx = 0,
-		length = 0.5,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- long hard curve right
-	{
-		ddx = 0.85,
-		length = 3.6,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- short straight
-	{
-		ddx = 0,
-		length = 1,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- short straight, tunnel
-	{
-		ddx = 0,
-		length = 1,
-		scheduleItems = {},
-		tunnel = true
-	},
-	-- very short straight
-	{
-		ddx = 0,
-		length = 0.2,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- short left
-	{
-		ddx = -0.7,
-		length = 1,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- short straight, tunnel
-	{
-		ddx = 0,
-		length = 1,
-		scheduleItems = {},
-		tunnel = true
-	},
-	-- very short straight
-	{
-		ddx = 0,
-		length = 0.2,
-		scheduleItems = {},
-		tunnel = false
-	},
-	-- long medium curve right
-	{
-		ddx = 0.6,
-		length = 3.6,
-		scheduleItems = {},
-		tunnel = false
 	},
 	-- straight before start/finish
 	{

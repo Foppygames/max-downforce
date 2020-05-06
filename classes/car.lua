@@ -1050,6 +1050,8 @@ function Car:draw()
 		
 		-- draw diffuser
 		love.graphics.draw(imgDiffuser,screenX - diffuserWidth/2  - perspectiveEffect,screenY - diffuserHeight + accEffect*3)
+	
+		-- draw rear light
 	end
 	
 	if (self.explosionTime > EXPLOSION_WAIT) then

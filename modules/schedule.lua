@@ -16,6 +16,7 @@ local perspective = require("modules.perspective")
 
 schedule.ITEM_BANNER_START = "banner_start"
 schedule.ITEM_BANNER_FOREST_BRIDGE = "banner_forest_bridge"
+schedule.ITEM_BANNER_CITY_LIGHTS = "banner_city_lights"
 schedule.ITEM_LOW_BUILDING_L = "low_building_l"
 schedule.ITEM_LOW_BUILDING_R = "low_building_r"
 schedule.ITEM_HIGH_BUILDING_R = "high_building_r"
@@ -130,6 +131,8 @@ function processItem(itemType,z)
 		entities.addBanner(0,z,2)
 	elseif (itemType == schedule.ITEM_BANNER_START) then
 		entities.addBanner(0,z,1)
+	elseif (itemType == schedule.ITEM_BANNER_CITY_LIGHTS) then
+		entities.addBanner(0,z,3)
 	end
 end
 

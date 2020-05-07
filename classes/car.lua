@@ -1,5 +1,5 @@
 -- Max Downforce - classes/car.lua
--- 2018-2019 Foppygames
+-- 2018-2020 Foppygames
 
 -- modules
 local aspect = require("modules.aspect")
@@ -207,6 +207,11 @@ function Car:new(lane,z,isPlayer,progress,pause,ravine,city)
 	o.colorInTunnel = {}
 	for i = 1,3 do
 		o.colorInTunnel[i] = o.color[i] / 2
+	end
+	
+	o.colorInDark = {}
+	for i = 1,3 do
+		o.colorInDark[i] = o.color[i] / 4
 	end
 	
 	o.topSpeedForAcceleration = (3 * TOP_SPEED + o.topSpeed) / 4
@@ -1015,7 +1020,7 @@ function Car:draw()
 				mainColor = self.color
 			else
 				-- use dark color
-				mainColor = self.colorInTunnel
+				mainColor = self.colorInDark
 			end
 		-- car is in forest or on mountain by daylight
 		else
@@ -1052,6 +1057,13 @@ function Car:draw()
 		love.graphics.draw(imgDiffuser,screenX - diffuserWidth/2  - perspectiveEffect,screenY - diffuserHeight + accEffect*3)
 	
 		-- draw rear light
+		if (self.city) then
+			local lightSize = 4
+			love.graphics.setColor(0,0,0)
+			love.graphics.rectangle("fill",screenX - (lightSize+4)/2 - perspectiveEffect * 1.2,screenY - bodyHeight,lightSize+4,lightSize+4)
+			love.graphics.setColor(1,0,0)
+			love.graphics.rectangle("fill",screenX - lightSize/2 - perspectiveEffect * 1.2,screenY - bodyHeight + 2,lightSize,lightSize)
+		end
 	end
 	
 	if (self.explosionTime > EXPLOSION_WAIT) then

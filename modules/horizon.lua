@@ -13,7 +13,7 @@ local segments = require("modules.segments")
 local tracks = require("modules.tracks")
 
 -- =========================================================
--- public constants
+-- constants
 -- =========================================================
 
 local IMAGE_INDEXES_RAVINE_TRACK = {1, 5, 2, 5}
@@ -22,7 +22,7 @@ local COLOR_RAVINE_TRACK = {0.2,0.3,0.6}
 local COLOR_NON_RAVINE_TRACK = {1,1,1}
 
 -- =========================================================
--- private variables
+-- variables
 -- =========================================================
 
 local image = {}

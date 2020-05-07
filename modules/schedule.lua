@@ -44,7 +44,7 @@ schedule.ITEM_STADIUM_L = "stadium_l"
 schedule.ITEM_STADIUM_R = "stadium_r"
 
 -- =========================================================
--- private variables
+-- variables
 -- =========================================================
 
 local items = {}

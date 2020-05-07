@@ -22,7 +22,7 @@ local YELLOW_MIN_TRACK_LENGTHS = 0.6
 local YELLOW_MAX_TRACK_LENGTHS = 2.6
 
 -- =========================================================
--- private variables
+-- variables
 -- =========================================================
 
 local minOpponentZ

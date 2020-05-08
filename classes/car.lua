@@ -236,7 +236,8 @@ function Car:new(lane,z,isPlayer,progress,pause,ravine,city)
 	o.fallDx = 0
 	o.fallDy = 0
 	o.explodingAfterFall = false
-	
+	o.braking = false
+
 	return o
 end
 
@@ -522,6 +523,7 @@ function Car:updateSteer(dt)
 end
 
 function Car:updateSpeedPlayerKeyboard(acc,dt)
+	self.braking = love.keyboard.isDown("down")
 	if (self.pause > 0) then
 		self.pause = self.pause - dt
 	else
@@ -534,9 +536,10 @@ function Car:updateSpeedPlayerKeyboard(acc,dt)
 			end
 		else
 			if (self.speed > 0) then
-				if love.keyboard.isDown("down") then
+				if self.braking then
 					self.speed = self.speed - BRAKE * dt
 					self.accEffect = -BRAKE
+					self.braking = true
 				else
 					self.speed = self.speed - IDLE_BRAKE * dt
 					self.accEffect = self.accEffect * 0.9
@@ -607,11 +610,17 @@ function Car:updateSpeedPlayerGamepad(acc,dt)
 end
 
 function Car:updateSpeedCPU(acc,dt)
+	self.braking = false
 	if (self.pause > 0) then
 		self.pause = self.pause - dt
 	else
 		if (self.aiBlockingCarSpeed ~= nil) then
 			if (self.speed > self.aiBlockingCarSpeed) then
+				-- difference is considerable
+				if ((self.speed - self.aiBlockingCarSpeed) > (self.speed * 0.1)) then
+					-- Note: this is to avoid brake light flickering while behind a car
+					self.braking = true
+				end
 				self.speed = self.speed - BRAKE * dt
 			end
 			self.aiBlockingCarSpeed = nil
@@ -1057,13 +1066,31 @@ function Car:draw()
 		love.graphics.draw(imgDiffuser,screenX - diffuserWidth/2  - perspectiveEffect,screenY - diffuserHeight + accEffect*3)
 	
 		-- draw rear light
-		if (self.city) then
-			local lightSize = 4
-			love.graphics.setColor(0,0,0)
-			love.graphics.rectangle("fill",screenX - (lightSize+4)/2 - perspectiveEffect * 1.2,screenY - bodyHeight,lightSize+4,lightSize+4)
+		local lightSize = 4
+		love.graphics.setColor(0,0,0)
+		love.graphics.rectangle("fill",screenX - (lightSize+4)/2 - perspectiveEffect * 1.4,screenY - bodyHeight + accEffect * 2.8 + bumpDy,lightSize+4,lightSize+4)
+		if (not self.braking) then
+			if (not self.inTunnel) then
+				if (self.city) then
+					if (not self.inLight) then
+						love.graphics.setColor(0.8,0,0)
+					else
+						love.graphics.setColor(0.4,0,0)
+					end
+				else
+					love.graphics.setColor(0.4,0,0)
+				end
+			else
+				if (self.city) then
+					love.graphics.setColor(0.4,0,0)
+				else
+					love.graphics.setColor(0.6,0,0)
+				end
+			end
+		else
 			love.graphics.setColor(1,0,0)
-			love.graphics.rectangle("fill",screenX - lightSize/2 - perspectiveEffect * 1.2,screenY - bodyHeight + 2,lightSize,lightSize)
 		end
+		love.graphics.rectangle("fill",screenX - lightSize/2 - perspectiveEffect * 1.6,screenY - bodyHeight + 2 + accEffect * 3.6 + bumpDy,lightSize,lightSize)
 	end
 	
 	if (self.explosionTime > EXPLOSION_WAIT) then

@@ -43,6 +43,7 @@ local function initTrackModule(trackModule)
 			local ddx = trackModule.segments[i].ddx
 			local tunnel = trackModule.segments[i].tunnel
 			local light = trackModule.segments[i].light
+			local crossroads = trackModule.segments[i].crossroads
 			local j = 1
 			if (ddx > 0) then
 				ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
@@ -52,7 +53,8 @@ local function initTrackModule(trackModule)
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
 						tunnel = tunnel,
-						light = light
+						light = light,
+						crossroads = crossroads
 					})
 					ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1
@@ -65,7 +67,8 @@ local function initTrackModule(trackModule)
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
 						tunnel = tunnel,
-						light = light
+						light = light,
+						crossroads = crossroads
 					})
 					ddx = ddx + SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1

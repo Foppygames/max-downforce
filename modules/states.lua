@@ -271,8 +271,16 @@ local function drawInfoTime()
 	love.graphics.pop()
 end
 
-local function drawGrass(trackHasRavine,tunnel,colorIndex,ravineX,screenY,roadX)
-	love.graphics.setColor(grassColors[colorIndex])
+local function drawGrass(trackHasRavine,tunnel,crossroads,light,colorIndex,ravineX,screenY,roadX)
+	if (crossroads) then
+		if (tunnel or light) then
+			love.graphics.setColor(tarmacColors.tunnel[colorIndex])
+		else
+			love.graphics.setColor(tarmacColors.no_tunnel[colorIndex])
+		end
+	else
+		love.graphics.setColor(grassColors[colorIndex])
+	end
 	if (trackHasRavine) then	
 		if (not tunnel) then
 			love.graphics.line(ravineX,screenY,aspect.GAME_WIDTH,screenY)	
@@ -772,12 +780,12 @@ function states.draw()
 			entities.setupForDraw(z,screenX,screenY,perspective.scale[i],previousZ,previousScreenX,previousScreenY,previousScale,segment)
 			
 			-- draw grass and road elements
-			drawGrass(trackHasRavine,segment.tunnel,colorIndex,ravineX,screenY,roadX)
+			drawGrass(trackHasRavine,segment.tunnel,segment.crossroads,segment.light,colorIndex,ravineX,screenY,roadX)
 			drawTarmac(trackHasRavine,segment.tunnel or segment.light,colorIndex,roadX,screenY,roadWidth)
 			if (colorIndex ~= 1) then
 				drawStripes(segment.tunnel or segment.light,trackHasRavine,screenX,stripeWidth,screenY)
 			end
-			if (not segment.tunnel) then
+			if (not (segment.tunnel or segment.crossroads)) then
 				drawCurbs(segment.light,colorIndex,roadX,screenY,curbWidth,roadWidth)
 			end
 			

@@ -77,6 +77,18 @@ track3.segments = {
 		length = 1.5,
 		scheduleItems = {
 			{
+				itemType = schedule.ITEM_LOW_BUILDING_L,
+				startZ = 0.5,
+				dz = 0.2,
+				count = 3
+			},
+			{
+				itemType = schedule.ITEM_HIGH_BUILDING_R,
+				startZ = 0.50,
+				dz = 0,
+				count = 1
+			},
+			{
 				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
 				startZ = 0.5,
 				dz = 0.5,
@@ -206,14 +218,40 @@ track3.segments = {
 	{
 		ddx = -0.7,
 		length = 1.5,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_TREES_L_R,
+				startZ = 0.3,
+				dz = 0.2,
+				count = 10
+			}
+		},
 		tunnel = false
 	},
 	-- short straight
 	{
 		ddx = 0,
 		length = 1,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_CITY_BUILDING_L_R,
+				startZ = 0,
+				dz = 0.2,
+				count = 6
+			},
+			{
+				itemType = schedule.ITEM_TREES_L,
+				startZ = 0.3,
+				dz = 0.2,
+				count = 2
+			},
+			{
+				itemType = schedule.ITEM_TREES_R,
+				startZ = 0.7,
+				dz = 0.2,
+				count = 3
+			}
+		},
 		tunnel = false
 	},
 	-- medium curve right, part 1

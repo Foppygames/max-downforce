@@ -71,14 +71,20 @@ function entities.addBanner(x,z,forcedImageIndex)
 	return banner
 end
 
+function entities.addCityBuilding(x,z)
+	local building = Building:new(x,z,false,true)
+	table.insert(list,building)
+	return building
+end
+
 function entities.addHighBuilding(x,z)
-	local building = Building:new(x,z,true)
+	local building = Building:new(x,z,true,false)
 	table.insert(list,building)
 	return building
 end
 
 function entities.addLowBuilding(x,z)
-	local building = Building:new(x,z,false)
+	local building = Building:new(x,z,false,false)
 	table.insert(list,building)
 	return building
 end

@@ -73,3 +73,10 @@ end
 function Tree:getCollisionWidth()
 	return self.width / 2
 end
+
+function Tree:setSegment(segment)
+	self.segment = segment
+	if (segment.isInCity and (not segment.light)) then
+		self.color = 0.25
+	end
+end

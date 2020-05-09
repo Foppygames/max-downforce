@@ -70,6 +70,10 @@ local function addFromIndex(index,z)
 	segment.length = segment.length - (perspective.maxZ - z)
 	segment.ddxFraction = segment.ddx
 	segment.ddx = segment.ddx*segments.MAX_SEGMENT_DDX
+
+	-- store track properties in segment, to be inspected by entities in segment
+	segment.isInCity = track.isInCity
+
 	table.insert(active,segment)
 end
 

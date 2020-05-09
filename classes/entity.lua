@@ -1,5 +1,5 @@
 -- Max Downforce - classes/entity.lua
--- 2018-2019 Foppygames
+-- 2018-2020 Foppygames
 
 -- modules
 local perspective = require("modules.perspective")
@@ -25,6 +25,7 @@ function Entity:new(x,z)
 	o.width = 0
 	o.height = 0
 	o.color = 1
+	o.segment = nil
 	
 	return o
 end
@@ -56,6 +57,9 @@ function Entity:scroll(playerSpeed,dt)
 end
 
 function Entity:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previousScreenY,previousScale,segment)
+	if (self.segment == nil) then
+		self:setSegment(segment)
+	end
 	local fractionTowardsZ = (self.z - previousZ) / (z - previousZ)
 	local fractionRemaining = 1 - fractionTowardsZ
 	self.roadX = fractionTowardsZ * roadX + fractionRemaining * previousRoadX
@@ -106,6 +110,10 @@ end
 
 function Entity:getCollisionWidth()
 	return self.width
+end
+
+function Entity:setSegment(segment)
+	self.segment = segment
 end
 
 -- cleans up object prior to deletion

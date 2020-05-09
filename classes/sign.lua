@@ -36,7 +36,6 @@ function Sign:new(x,z)
 	o.height = o.image:getHeight()
 	o.smoothX = true
 	o.baseScale = 12
-	o.color = color
 	
 	imgIndex = imgIndex + 1
 	if (imgIndex > #img) then
@@ -44,4 +43,11 @@ function Sign:new(x,z)
 	end
 	
 	return o
+end
+
+function Sign:setSegment(segment)
+	self.segment = segment
+	if (segment.isInCity and (not segment.light)) then
+		self.color = 0.35
+	end
 end

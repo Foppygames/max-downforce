@@ -81,6 +81,20 @@ track3.segments = {
 				startZ = 0.5,
 				dz = 0.5,
 				count = 3
+			},
+			{
+				itemType = schedule.ITEM_SIGN_L,
+				-- Note: sign image sequence is reset when player completes lap; signs thefore should
+				-- be placed out of view from finish line, or they would be created before the reset
+				startZ = 1.1,
+				dz = 0.4,
+				count = 4
+			},
+			{
+				itemType = schedule.ITEM_SIGN_R,
+				startZ = 1.1,
+				dz = 0.4,
+				count = 4
 			}
 		},
 		tunnel = false,
@@ -110,7 +124,7 @@ track3.segments = {
 		tunnel = false,
 		light = true
 	},
-	-- crossing
+	-- crossing, lights
 	{
 		ddx = 0,
 		length = 0.15,
@@ -132,6 +146,18 @@ track3.segments = {
 		ddx = -0.7,
 		length = 1,
 		scheduleItems = {
+			{
+				itemType = schedule.ITEM_SIGN_L,
+				startZ = 0.3,
+				dz = 0.4,
+				count = 6
+			},
+			{
+				itemType = schedule.ITEM_SIGN_R,
+				startZ = 0.4,
+				dz = 0.4,
+				count = 6
+			},
 			{
 				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
 				startZ = 0.5,

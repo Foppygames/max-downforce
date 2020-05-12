@@ -99,13 +99,13 @@ track3.segments = {
 				-- Note: sign image sequence is reset when player completes lap; signs thefore should
 				-- be placed out of view from finish line, or they would be created before the reset
 				startZ = 1.1,
-				dz = 0.4,
+				dz = 0.35,
 				count = 4
 			},
 			{
 				itemType = schedule.ITEM_SIGN_R,
 				startZ = 1.1,
-				dz = 0.4,
+				dz = 0.35,
 				count = 4
 			}
 		},
@@ -237,27 +237,42 @@ track3.segments = {
 				itemType = schedule.ITEM_CITY_BUILDING_L_R,
 				startZ = 0,
 				dz = 0.2,
-				count = 6
+				count = 13
 			},
 			{
-				itemType = schedule.ITEM_TREES_L,
+				itemType = schedule.ITEM_TREES_L_CITY,
 				startZ = 0.3,
 				dz = 0.2,
-				count = 2
+				count = 11
 			},
 			{
-				itemType = schedule.ITEM_TREES_R,
+				itemType = schedule.ITEM_TREES_R_CITY,
 				startZ = 0.7,
 				dz = 0.2,
-				count = 3
+				count = 10
 			}
 		},
 		tunnel = false
 	},
-	-- medium curve right, part 1
+	-- medium curve right, part 1,lights
 	{
 		ddx = 0.65,
 		length = 1.6,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_BANNER_CITY_LANTERNS,
+				startZ = 0,
+				dz = 0.2,
+				count = 9
+			}
+		},
+		tunnel = false,
+		light = true
+	},
+	-- medium curve right, part 2
+	{
+		ddx = 0.65,
+		length = 0.2,
 		scheduleItems = {},
 		tunnel = false
 	},
@@ -270,11 +285,18 @@ track3.segments = {
 		light = false,
 		crossroads = true
 	},
-	-- medium curve right, part 2
+	-- medium curve right, part 3
 	{
 		ddx = 0.65,
 		length = 1.6,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_CITY_BUILDING_L_R,
+				startZ = 0.1,
+				dz = 0.2,
+				count = 10
+			}
+		},
 		tunnel = false
 	},
 	-- very short straight
@@ -288,7 +310,14 @@ track3.segments = {
 	{
 		ddx = -0.5,
 		length = 3,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_CITY_BUILDING_L_R,
+				startZ = 0.1,
+				dz = 0.2,
+				count = 10
+			}
+		},
 		tunnel = false
 	},
 	-- very short straight
@@ -302,7 +331,14 @@ track3.segments = {
 	{
 		ddx = 0.3,
 		length = 4,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_CITY_BUILDING_L_R,
+				startZ = 0.1,
+				dz = 0.2,
+				count = 10
+			}
+		},
 		tunnel = false
 	},
 	-- long curve right, part 2, tunnel

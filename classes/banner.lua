@@ -19,7 +19,8 @@ function Banner.init()
 	img = {
 		love.graphics.newImage("images/banner_start.png"),
 		love.graphics.newImage("images/banner_forest_bridge.png"),
-		love.graphics.newImage("images/banner_city_lights.png")
+		love.graphics.newImage("images/banner_city_lights.png"),
+		love.graphics.newImage("images/banner_city_lanterns.png")
 	}
 end
 
@@ -58,6 +59,11 @@ function Banner:new(x,z,forcedImageIndex)
 		o.poleColor = {0.65,0.65,0.65}
 		o.poleWidth = o.poleWidth * 2
 		o.poleHeight = o.poleHeight * 1.4
+	-- banner is city lanterns
+	elseif (forcedImageIndex == 4) then
+		o.poleColor = {0,0,0}
+		o.poleWidth = o.poleWidth * 3
+		o.poleHeight = o.poleHeight * 1.6
 	end
 	
 	return o
@@ -77,8 +83,8 @@ function Banner:draw()
 	love.graphics.rectangle("fill",x1-self.poleWidth,y1,self.poleWidth,self.poleHeight)
 	love.graphics.rectangle("fill",x1+self.width,y1,self.poleWidth,self.poleHeight)
 
-	-- banner is not city lights
-	if (self.imageIndex ~= 3) then
+	-- banner is not city lights or lanterns
+	if (self.imageIndex < 3) then
 		-- draw shadow
 		love.graphics.setColor(0,0,0,0.3)
 		love.graphics.rectangle("fill",x1,self.screenY/imageScale-2,self.width,2)

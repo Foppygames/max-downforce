@@ -752,6 +752,11 @@ function Car:updateEngineSoundPlayer()
 				if (math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC) < 0.01) then
 					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN,sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL)
 				end
+			elseif (self.city) then
+				-- volume not already modified such as by countdown
+				if (math.abs(sound.getVolume(sound.RACE_MUSIC_CITY) - sound.VOLUME_MUSIC) < 0.01) then
+					sound.setVolume(sound.RACE_MUSIC_CITY,sound.VOLUME_MUSIC_IN_TUNNEL)
+				end
 			else
 				-- volume not already modified such as by countdown
 				if (math.abs(sound.getVolume(sound.RACE_MUSIC_FOREST) - sound.VOLUME_MUSIC) < 0.01) then
@@ -767,8 +772,11 @@ function Car:updateEngineSoundPlayer()
 				-- volume not already modified such as by countdown
 				if (math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL) < 0.01) then
 					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN,sound.VOLUME_MUSIC)
-				else
-					print(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN).." ~= "..sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL)
+				end
+			elseif (self.city) then
+				-- volume not already modified such as by countdown
+				if (math.abs(sound.getVolume(sound.RACE_MUSIC_CITY) - sound.VOLUME_MUSIC_IN_TUNNEL) < 0.01) then
+					sound.setVolume(sound.RACE_MUSIC_CITY,sound.VOLUME_MUSIC)
 				end
 			else
 				-- volume not already modified such as by countdown

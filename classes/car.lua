@@ -555,23 +555,30 @@ function Car:updateSpeedPlayerKeyboard(acc,dt)
 end
 
 function Car:updateSpeedPlayerGamepad(acc,dt)
+	self.braking = false
+	local throttle = 0
+	local triggerLeft = 0
+	local triggerRight = 0
+	if (controls.joystick ~= nil) then
+		throttle = -controls.joystick:getGamepadAxis(controls.joystickThrottleAxis)
+		if (throttle == 0) then
+			triggerLeft = controls.joystick:getGamepadAxis("triggerleft")
+			triggerRight = controls.joystick:getGamepadAxis("triggerright")
+			if (triggerLeft > 0) then
+				throttle = -triggerLeft
+			elseif (triggerRight > 0) then
+				throttle = triggerRight
+			end
+		end
+		self.braking = (throttle < 0)
+	end
+
 	if (self.pause > 0) then
 		self.pause = self.pause - dt
 	else
 		if (controls.joystick ~= nil) then
-			local throttle = -controls.joystick:getGamepadAxis(controls.joystickThrottleAxis)
 			local relSpeed = self.speed / self.topSpeed
 			
-			if (throttle == 0) then
-				local triggerLeft = controls.joystick:getGamepadAxis("triggerleft")
-				local triggerRight = controls.joystick:getGamepadAxis("triggerright")
-				if (triggerLeft > 0) then
-					throttle = -triggerLeft
-				elseif (triggerRight > 0) then
-					throttle = triggerRight
-				end
-			end
-
 			-- player wants to go faster
 			if (throttle > relSpeed) then
 				local howMuchFaster = (throttle-relSpeed) / (1-relSpeed)
@@ -586,7 +593,7 @@ function Car:updateSpeedPlayerGamepad(acc,dt)
 			else
 				if (self.speed > 0) then
 					-- applying the brakes
-					if (throttle < 0) then
+					if (self.braking) then
 						self.speed = self.speed - BRAKE * dt
 						self.accEffect = -BRAKE
 					-- reducing throttle

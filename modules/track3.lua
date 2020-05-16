@@ -112,16 +112,31 @@ track3.segments = {
 		tunnel = false,
 		light = true
 	},
+	-- crosswalk
+	{
+		ddx = 0,
+		length = 0.07,
+		scheduleItems = {},
+		light = true,
+		crosswalk = true
+	},
 	-- crossing
 	{
 		ddx = 0,
-		length = 0.15,
+		length = 0.18,
 		scheduleItems = {},
 		tunnel = false,
 		light = true,
 		crossroads = true
 	},
-	-- long straight after start/finish, part 2, lights
+	-- crosswalk
+	{
+		ddx = 0,
+		length = 0.07,
+		scheduleItems = {},
+		light = true,
+		crosswalk = true
+	},
 	{
 		ddx = 0,
 		length = 1.5,
@@ -136,14 +151,30 @@ track3.segments = {
 		tunnel = false,
 		light = true
 	},
+	-- crosswalk
+	{
+		ddx = 0,
+		length = 0.07,
+		scheduleItems = {},
+		light = true,
+		crosswalk = true
+	},
 	-- crossing, lights
 	{
 		ddx = 0,
-		length = 0.15,
+		length = 0.18,
 		scheduleItems = {},
 		tunnel = false,
 		light = true,
 		crossroads = true
+	},
+	-- crosswalk
+	{
+		ddx = 0,
+		length = 0.07,
+		scheduleItems = {},
+		light = true,
+		crosswalk = true
 	},
 	-- short straight, lights
 	{
@@ -273,31 +304,67 @@ track3.segments = {
 	{
 		ddx = 0.65,
 		length = 0.2,
+		scheduleItems = {}
+	},
+	-- crosswalk
+	{
+		ddx = 0.65,
+		length = 0.07,
 		scheduleItems = {},
-		tunnel = false
+		crosswalk = true
 	},
 	-- crossing
 	{
 		ddx = 0.65,
-		length = 0.15,
+		length = 0.18,
 		scheduleItems = {},
-		tunnel = false,
-		light = false,
 		crossroads = true
+	},
+	-- crosswalk
+	{
+		ddx = 0.65,
+		length = 0.07,
+		scheduleItems = {},
+		crosswalk = true
 	},
 	-- medium curve right, part 3
 	{
-		ddx = 0.65,
+		ddx = 0.75,
+		length = 0.3,
+		scheduleItems = {}
+	},
+	-- medium curve right, part 4, lights
+	{
+		ddx = 0.75,
 		length = 1.6,
 		scheduleItems = {
+			{
+				itemType = schedule.ITEM_TREES_L_R,
+				startZ = 0,
+				dz = 0,
+				count = 1
+			},
 			{
 				itemType = schedule.ITEM_CITY_BUILDING_L_R,
 				startZ = 0.1,
 				dz = 0.2,
 				count = 10
+			},
+			{
+				itemType = schedule.ITEM_BANNER_CITY_LANTERNS,
+				startZ = 0,
+				dz = 0.2,
+				count = 9
+			},
+			{
+				itemType = schedule.ITEM_TREES_L_R,
+				startZ = 2.1,
+				dz = 0.2,
+				count = 5
 			}
 		},
-		tunnel = false
+		tunnel = false,
+		light = true
 	},
 	-- very short straight
 	{
@@ -308,8 +375,8 @@ track3.segments = {
 	},
 	-- medium curve left
 	{
-		ddx = -0.5,
-		length = 3,
+		ddx = -0.8,
+		length = 2.5,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_CITY_BUILDING_L_R,
@@ -330,7 +397,7 @@ track3.segments = {
 	-- long curve right, part 1, towards tunnel
 	{
 		ddx = 0.3,
-		length = 4,
+		length = 2,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_CITY_BUILDING_L_R,
@@ -341,7 +408,42 @@ track3.segments = {
 		},
 		tunnel = false
 	},
-	-- long curve right, part 2, tunnel
+	-- crosswalk
+	{
+		ddx = 0.3,
+		length = 0.07,
+		scheduleItems = {},
+		crosswalk = true
+	},
+	-- crossing
+	{
+		ddx = 0.3,
+		length = 0.18,
+		scheduleItems = {},
+		crossroads = true
+	},
+	-- crosswalk
+	{
+		ddx = 0.3,
+		length = 0.07,
+		scheduleItems = {},
+		crosswalk = true
+	},
+	-- long curve right, part 2, towards tunnel
+	{
+		ddx = 0.3,
+		length = 2,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_CITY_BUILDING_L_R,
+				startZ = 0.1,
+				dz = 0.2,
+				count = 10
+			}
+		},
+		tunnel = false
+	},
+	-- long curve right, part 3, tunnel
 	{
 		ddx = 0.3,
 		length = 3,

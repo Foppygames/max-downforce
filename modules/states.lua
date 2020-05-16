@@ -90,7 +90,7 @@ local beepCounter = 0
 local beepTimer = 0
 local curbColors = nil
 local finished = false
-local fullScreen = false --true
+local fullScreen = true
 local grassColors = nil
 local lap = 0
 local player = nil
@@ -317,6 +317,18 @@ local function drawTunnelRoof(segment,screenY,x,roadWidth)
 	end
 end
 
+local function drawCrosswalk(tunnel,screenX,stripeWidth,screenY,crosswalk)
+	if (tunnel) then
+		love.graphics.setColor(stripeColors.tunnel)
+	else
+		love.graphics.setColor(stripeColors.no_tunnel)
+	end
+	for i = -4, 4 do
+		local startX = screenX+i*2*stripeWidth-stripeWidth/2
+		love.graphics.line(startX,screenY,startX+stripeWidth,screenY)
+	end
+end
+
 local function drawCurbs(light,colorIndex,roadX,screenY,curbWidth,roadWidth)
 	if (trackIsInCity) then
 		if (light) then
@@ -331,13 +343,21 @@ local function drawCurbs(light,colorIndex,roadX,screenY,curbWidth,roadWidth)
 	love.graphics.line(roadX+roadWidth-curbWidth,screenY,roadX+roadWidth,screenY)
 end
 
-local function drawStripes(tunnel,trackHasRavine,screenX,stripeWidth,screenY)
+local function drawStripes(tunnel,screenX,stripeWidth,screenY,crosswalk)
 	if (tunnel) then
 		love.graphics.setColor(stripeColors.tunnel)
 	else
 		love.graphics.setColor(stripeColors.no_tunnel)
 	end
-	love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
+	if (crosswalk) then
+		local width = stripeWidth * 2
+		for i = -4, 4 do
+			local startX = screenX+i*2*width-width/2
+			love.graphics.line(startX,screenY,startX+width,screenY)
+		end
+	else
+		love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
+	end
 end
 
 local function setCurbColors()
@@ -782,8 +802,10 @@ function states.draw()
 			-- draw grass and road elements
 			drawGrass(trackHasRavine,segment.tunnel,segment.crossroads,segment.light,colorIndex,ravineX,screenY,roadX)
 			drawTarmac(trackHasRavine,segment.tunnel or segment.light,colorIndex,roadX,screenY,roadWidth)
-			if (colorIndex ~= 1) then
-				drawStripes(segment.tunnel or segment.light,trackHasRavine,screenX,stripeWidth,screenY)
+			if (segment.crosswalk) then
+				drawCrosswalk(segment.tunnel or segment.light,screenX,stripeWidth*2,screenY)
+			elseif (colorIndex ~= 1) then
+				drawStripes(segment.tunnel or segment.light,screenX,stripeWidth,screenY)
 			end
 			if (not (segment.tunnel or segment.crossroads)) then
 				drawCurbs(segment.light,colorIndex,roadX,screenY,curbWidth,roadWidth)

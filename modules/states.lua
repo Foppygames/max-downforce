@@ -271,7 +271,7 @@ local function drawInfoTime()
 	love.graphics.pop()
 end
 
-local function drawGrass(trackHasRavine,tunnel,crossroads,light,colorIndex,ravineX,screenY,roadX)
+local function drawGrass(trackHasRavine,trackIsInCity,tunnel,crossroads,light,colorIndex,ravineX,screenY,roadX)
 	if (crossroads) then
 		if (tunnel or light) then
 			love.graphics.setColor(tarmacColors.tunnel[colorIndex])
@@ -286,12 +286,16 @@ local function drawGrass(trackHasRavine,tunnel,crossroads,light,colorIndex,ravin
 			love.graphics.line(ravineX,screenY,aspect.GAME_WIDTH,screenY)	
 		else
 			love.graphics.line(ravineX,screenY,roadX,screenY)
-			love.graphics.setColor(0,0,0)
+			love.graphics.setColor(0.45,0.32,0.027)
 			love.graphics.line(roadX,screenY,aspect.GAME_WIDTH,screenY)
 		end
 	else
 		if (tunnel) then
-			love.graphics.setColor(0,0,0)
+			if trackIsInCity then
+				love.graphics.setColor(1,1,0.4)
+			else
+				love.graphics.setColor(0,0,0)
+			end
 		end
 		love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 	end
@@ -800,7 +804,7 @@ function states.draw()
 			entities.setupForDraw(z,screenX,screenY,perspective.scale[i],previousZ,previousScreenX,previousScreenY,previousScale,segment)
 			
 			-- draw grass and road elements
-			drawGrass(trackHasRavine,segment.tunnel,segment.crossroads,segment.light,colorIndex,ravineX,screenY,roadX)
+			drawGrass(trackHasRavine,trackIsInCity,segment.tunnel,segment.crossroads,segment.light,colorIndex,ravineX,screenY,roadX)
 			drawTarmac(trackHasRavine,segment.tunnel or segment.light,colorIndex,roadX,screenY,roadWidth)
 			if (segment.crosswalk) then
 				drawCrosswalk(segment.tunnel or segment.light,screenX,stripeWidth*2,screenY)

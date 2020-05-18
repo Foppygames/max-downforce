@@ -156,13 +156,13 @@ function entities.addTree(x,z,color,mountain)
 end
 
 function entities.addTunnelEnd(z)
-	local tunnelEnd = TunnelEnd:new(z,ravine)
+	local tunnelEnd = TunnelEnd:new(z,ravine,city)
 	table.insert(list,tunnelEnd)
 	return tunnelEnd
 end
 
 function entities.addTunnelStart(z)
-	local tunnelStart = TunnelStart:new(z,ravine)
+	local tunnelStart = TunnelStart:new(z,ravine,city)
 	table.insert(list,tunnelStart)
 	return tunnelStart
 end

@@ -1,5 +1,5 @@
 -- Max Downforce - classes/tunnelend.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 -- classes
 require "classes.entity"
@@ -27,7 +27,7 @@ function TunnelEnd.reset()
 	count = 0
 end
 
-function TunnelEnd:new(z,trackHasRavine)
+function TunnelEnd:new(z,trackHasRavine,trackIsInCity)
 	o = Entity:new(0,z)	
 	setmetatable(o, self)
 	self.__index = self
@@ -35,24 +35,31 @@ function TunnelEnd:new(z,trackHasRavine)
 	count =	count + 1
 
 	o.solid = false
-	if (trackHasRavine) then
-		o.color = math.cos(math.rad(colorAngle)) / 30
-	else
-		o.color = math.cos(math.rad(colorAngle)) / 50
-	end
 	o.lamp = (count % 5 == 0)
 	o.ravine = trackHasRavine
 	
-	if (trackHasRavine) then
+	local color
+	if trackHasRavine then
+		color = 1.0 - math.cos(math.rad(colorAngle)) * 0.1
+		o.wallColor = {color*0.45, color*0.32, color*0.027}
+		o.roofColor = {color*0.41, color*0.27, color*0.009}
+	elseif trackIsInCity then
+		color = 1.0 - math.cos(math.rad(colorAngle)) * 0.1
+		o.wallColor = {color,color,color*0.4}
+		o.roofColor = {color*0.95,color*0.95,color*0.38}
+	else
+		color = math.cos(math.rad(colorAngle)) / 50
+		o.wallColor = {color,color,color*1.3}
+		o.roofColor = o.wallColor
+	end
+	o.endColor = {o.wallColor[1]/3,o.wallColor[2]/3,o.wallColor[3]/3}
+	
+	if trackHasRavine then
 		colorAngle = colorAngle + 36
 	else
-		if (math.random() > 0.92) then
-			colorAngle = colorAngle + 24
-		else
-			colorAngle = colorAngle + 16
-		end
+		colorAngle = colorAngle + 16
 	end
-	if (colorAngle > 360) then
+	if colorAngle > 360 then
 		colorAngle = 0
 	end
 	
@@ -65,44 +72,35 @@ function TunnelEnd:draw()
 	
 	local wallHeight = 200 * imageScale
 	local wallWidth = 300 * imageScale
-	local panelingHeight = 30 * imageScale
+	local roofHeight = 120 * imageScale
 	
 	local y = self.screenY - wallHeight
-	local panelingY = self.screenY - panelingHeight
-	
 	local leftX1 = newScreenX - road.ROAD_WIDTH / 2 * imageScale - wallWidth
 	local rightX1 = newScreenX + road.ROAD_WIDTH / 2 * imageScale
 	
-	local roofHeight = 120 * imageScale
-	
-	love.graphics.setColor(self.color,self.color,self.color*1.3)
-	if (self.z < (perspective.maxZ * 0.9)) then
-		if (not self.ravine) then
+	if self.z < (perspective.maxZ * 0.9) then
+		love.graphics.setColor(self.wallColor)
+		if not self.ravine then
 			love.graphics.rectangle("fill",leftX1,y,wallWidth,wallHeight)
 		end
 		love.graphics.rectangle("fill",rightX1,y,wallWidth,wallHeight)
-		if (not self.ravine) then
+		
+		love.graphics.setColor(self.roofColor)
+		if not self.ravine then
 			love.graphics.rectangle("fill",leftX1,y-roofHeight,wallWidth*2+(rightX1-leftX1),roofHeight)
 		else
 			love.graphics.rectangle("fill",leftX1+wallWidth,y-roofHeight,wallWidth+(rightX1-leftX1),roofHeight)
 		end
 
-		-- paneling to hide color difference with black ground
-		love.graphics.setColor(0,0,0)
-		if (not self.ravine) then
-			love.graphics.rectangle("fill",leftX1,panelingY,wallWidth,panelingHeight)
-		end
-		love.graphics.rectangle("fill",rightX1,panelingY,wallWidth,panelingHeight)
-		
-		-- lamp
-		if (self.lamp) then
+		if self.lamp then
 			local lampWidth = 60 * imageScale
 			love.graphics.setColor(1,1,1)
 			love.graphics.rectangle("fill",newScreenX-lampWidth/2,y,lampWidth,lampWidth/6)
 		end
 	else
-		-- filled opening to avoid seeing end when tunnel actually continues
-		if (not self.ravine) then
+		-- draw filled rectangle to avoid seeing horizon when tunnel actually continues
+		if not self.ravine then
+			love.graphics.setColor(self.endColor)
 			love.graphics.rectangle("fill",leftX1,y-roofHeight,wallWidth*2+(rightX1-leftX1),wallHeight+roofHeight)
 		end
 	end

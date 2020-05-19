@@ -1068,8 +1068,8 @@ function Car:draw()
 		
 		-- draw rear wheels
 		love.graphics.setColor(1,1,1)
-		love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect,screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
-		love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX + bodyWidth/2 - perspectiveEffect,screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
+		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect, screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
+		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX + bodyWidth/2 - perspectiveEffect, screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
 		-- draw rear wing
 		local wingDegreesChange = bodyDegreesChange

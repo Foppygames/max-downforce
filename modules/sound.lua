@@ -59,7 +59,7 @@ sound.paths = {}
 sound.sources = {}
 
 local crowdVolume = 0
-local musicEnabled = true
+local musicEnabled = false --true
 
 -- =========================================================
 -- private functions

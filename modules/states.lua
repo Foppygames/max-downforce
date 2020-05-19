@@ -292,7 +292,7 @@ local function drawGrass(trackHasRavine,trackIsInCity,tunnel,crossroads,light,co
 	else
 		if (tunnel) then
 			if trackIsInCity then
-				love.graphics.setColor(1,1,0.4)
+				love.graphics.setColor(1,1,0.6)
 			else
 				love.graphics.setColor(0,0,0)
 			end

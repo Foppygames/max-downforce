@@ -33,6 +33,7 @@ schedule.ITEM_LIGHT_L = "light_l"
 schedule.ITEM_LIGHT_L_R = "light_l_r"
 schedule.ITEM_LIGHT_R = "light_r"
 schedule.ITEM_MARKER_L = "marker_l"
+schedule.ITEM_MARKER_L_R = "marker_l_r"
 schedule.ITEM_PILLAR_L = "pillar_l"
 schedule.ITEM_SIGN_L = "sign_l"
 schedule.ITEM_SIGN_R = "sign_r"
@@ -101,6 +102,9 @@ function processItem(itemType,z)
 		entities.addLight(450,z)
 	elseif (itemType == schedule.ITEM_MARKER_L) then
 		entities.addMarker(-310,z)
+	elseif (itemType == schedule.ITEM_MARKER_L_R) then
+		entities.addMarker(-310,z)
+		entities.addMarker(310,z)
 	elseif (itemType == schedule.ITEM_PILLAR_L) then
 		entities.addPillar(-260,z)
 	elseif (itemType == schedule.ITEM_SIGN_L) then

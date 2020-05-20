@@ -471,19 +471,151 @@ track3.segments = {
 		scheduleItems = {},
 		tunnel = true
 	},
-	-- long curve right, tunnel
+	-- curve right, tunnel
 	{
 		ddx = 0.6,
-		length = 4,
+		length = 2,
 		scheduleItems = {},
 		tunnel = true
+	},
+	-- curve right, no tunnel
+	{
+		ddx = 0.6,
+		length = 0.4,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 0.2,
+				dz = 0.2,
+				count = 5
+			},
+			{
+				itemType = schedule.ITEM_SIGN_L,
+				startZ = 0.25,
+				dz = 0.3,
+				count = 3
+			},
+			{
+				itemType = schedule.ITEM_SIGN_R,
+				startZ = 0.25,
+				dz = 0.3,
+				count = 3
+			}
+		},
+		tunnel = false
+	},
+	-- short straight, tunnel
+	{
+		ddx = 0,
+		length = 0.3,
+		scheduleItems = {},
+		tunnel = true
+	},
+	-- curve left, tunnel
+	{
+		ddx = -0.4,
+		length = 1.5,
+		scheduleItems = {},
+		tunnel = true
+	},
+	-- short straight
+	{
+		ddx = 0,
+		length = 1.5,
+		scheduleItems = {},
+		tunnel = false
+	},
+	-- quick right
+	{
+		ddx = 0.7,
+		length = 1.8,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_MARKER_L_R,
+				startZ = 0,
+				dz = 0.3,
+				count = 18
+			}
+		},
+		tunnel = false,
+		light = false
+	},
+	-- very short straight
+	{
+		ddx = 0,
+		length = 0.2,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_TREES_L_R,
+				startZ = 0,
+				dz = 0,
+				count = 1
+			}
+		},
+		tunnel = false,
+		light = false
+	},
+	-- quick left
+	{
+		ddx = -0.7,
+		length = 1.8,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_TREES_R_CITY,
+				startZ = 0.25,
+				dz = 0,
+				count = 1
+			}
+		},
+		tunnel = false,
+		light = false
+	},
+	-- very short straight
+	{
+		ddx = 0,
+		length = 0.2,
+		scheduleItems = {},
+		tunnel = false,
+		light = false
+	},
+	-- long right
+	{
+		ddx = 0.5,
+		length = 2.5,
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
+				startZ = 0,
+				dz = 0.5,
+				count = 17
+			}
+		},
+		tunnel = false,
+		light = true
+	},
+	-- very short straight
+	{
+		ddx = 0,
+		length = 0.1,
+		scheduleItems = {},
+		tunnel = false,
+		light = true
+	},
+	-- long left
+	{
+		ddx = -0.2,
+		length = 3.5,
+		scheduleItems = {},
+		tunnel = false,
+		light = true
 	},
 	-- straight before start/finish
 	{
 		ddx = 0.0,
-		length = 1.4,
+		length = 1.5,
 		scheduleItems = {},
-		tunnel = false
+		tunnel = false,
+		light = true
 	}
 }
 

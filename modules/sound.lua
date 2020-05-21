@@ -39,7 +39,7 @@ if (sound.USE_OFFICIAL_MUSIC) then
 	sound.RACE_MUSIC_PATH_CITY = "music/POL-future-shock-long.wav"
 	sound.TITLE_MUSIC_PATH = "music/POL-smash-bros-long.wav"
 	sound.MUSIC_CREDITS = "Music from PlayOnLoop.com"
-	sound.MUSIC_CREDITS_X = 70
+	sound.MUSIC_CREDITS_X = 88
 -- use music by Kevin MacLeod licensed under Creative Commons (included in repository)
 else
 	-- Note: city track and title screen play the same music
@@ -48,7 +48,7 @@ else
 	sound.RACE_MUSIC_PATH_CITY = "music/4616-werq-by-kevin-macleod.mp3"
 	sound.TITLE_MUSIC_PATH = "music/4616-werq-by-kevin-macleod.mp3"
 	sound.MUSIC_CREDITS = "Music by Kevin MacLeod (incompetech.com)"
-	sound.MUSIC_CREDITS_X = 20
+	sound.MUSIC_CREDITS_X = 38
 end
 
 -- =========================================================

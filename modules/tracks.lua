@@ -91,7 +91,7 @@ local function initTrackModule(trackModule)
 		end
 	end
 
-	print("total track length: "..trackModule.totalLength)
+	--print("total track length: "..trackModule.totalLength)
 end
 
 function tracks.init()

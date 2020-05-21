@@ -131,37 +131,37 @@ local function drawGameOverScreen()
 	if (not finished) then
 		love.graphics.push()
 		love.graphics.scale(2,2)
-		love.graphics.print("GAME OVER",45,20)
+		love.graphics.print("GAME OVER",54,20)
 		love.graphics.pop()
 		
 		-- still in first lap
 		if (lap < 2) then
-			love.graphics.print("Don't give up!",120,70)
+			love.graphics.print("Don't give up!",138,70)
 		-- beyond first lap
 		else
 			love.graphics.setColor(1,1,0)
 			-- in second lap
 			if (lap == 2) then
-				love.graphics.print("You completed 1 full lap",85,70)
+				love.graphics.print("You completed 1 full lap",103,70)
 				love.graphics.setColor(1,1,1)
-				love.graphics.print("Well done!",131,95)
+				love.graphics.print("Well done!",149,95)
 			-- beyond second lap
 			else
-				love.graphics.print("You completed "..(lap-1).." full laps",80,70)
+				love.graphics.print("You completed "..(lap-1).." full laps",98,70)
 				-- completed more than one lap
 				if (lap > 2) then
 					love.graphics.setColor(1,1,1)
 					-- completed nine laps
 					if (lap == 10) then
-						love.graphics.print("You win the silver cup!",89,95)
+						love.graphics.print("You win the silver cup!",107,95)
 						love.graphics.draw(imageTrophySilver,aspect.GAME_WIDTH/2-imageTrophySilver:getWidth()/2,120)
 					-- completed eight laps
 					elseif (lap == 9) then
-						love.graphics.print("You win the bronze cup!",85,95)
+						love.graphics.print("You win the bronze cup!",103,95)
 						love.graphics.draw(imageTrophyBronze,aspect.GAME_WIDTH/2-imageTrophyBronze:getWidth()/2,120)
 					-- completed between two and seven laps
 					else
-						love.graphics.print("Well done!",131,95)
+						love.graphics.print("Well done!",149,95)
 					end
 				end
 			end
@@ -169,16 +169,16 @@ local function drawGameOverScreen()
 	else
 		love.graphics.push()
 		love.graphics.scale(2,2)
-		love.graphics.print("CONGRATULATIONS!",15,20)
+		love.graphics.print("CONGRATULATIONS!",24,20)
 		love.graphics.pop()
 		love.graphics.setColor(1,1,0)
-		love.graphics.print("You finished the race",92,70)
+		love.graphics.print("You finished the race",110,70)
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("You win the gold cup!",95,95)
+		love.graphics.print("You win the gold cup!",113,95)
 		love.graphics.draw(imageTrophyGold,aspect.GAME_WIDTH/2-imageTrophyGold:getWidth()/2,120)
 		love.graphics.setColor(0.471,0.902,1)
-		love.graphics.print("You may consider yourself a member of",30,150)
-		love.graphics.print("an elite group of grand prix racers",40,170)
+		love.graphics.print("You may consider yourself a member of",48,150)
+		love.graphics.print("an elite group of grand prix racers",58,170)
 	end
 end
 
@@ -195,46 +195,46 @@ local function drawTitleScreen()
 		else
 			love.graphics.setColor(1,1,1)
 		end
-		love.graphics.print(string.sub(titleAllCaps,i,i),8 + i * 10,6)
+		love.graphics.print(string.sub(titleAllCaps,i,i),17 + i * 10,6)
 	end
 	love.graphics.pop()
 	
 	love.graphics.setColor(0.1,0.1,0.3)
-	love.graphics.print(version,260,4)
+	love.graphics.print(version,278,4)
 	
 	love.graphics.setColor(1,1,1)
-	love.graphics.print("Written by Robbert Prins",75,45)
+	love.graphics.print("Written by Robbert Prins",93,45)
 	love.graphics.print(sound.MUSIC_CREDITS,sound.MUSIC_CREDITS_X,65)
 	
 	love.graphics.setColor(0.470,0.902,1)
-	love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",75,90)
-	love.graphics.print("W = windowed / full screen",75,105)
-	love.graphics.print("M = music: "..sound.getMusicEnabledLabel(),75,120)
+	love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",93,90)
+	love.graphics.print("W = windowed / full screen",93,105)
+	love.graphics.print("M = music: "..sound.getMusicEnabledLabel(),93,120)
 
 	-- more than one control method available
 	if (controls.getAvailableCount() > 1) then
 		love.graphics.setColor(0.470,0.902,1)
-		love.graphics.print("C = controls: "..controls.getSelected().label,75,135)
+		love.graphics.print("C = controls: "..controls.getSelected().label,93,135)
 	-- one control method available (note: assuming there is never less than one)
 	else
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("Controls: "..controls.getSelected().label,75,135)
+		love.graphics.print("Controls: "..controls.getSelected().label,93,135)
 	end
 
 	if (controls.getSelected().type == controls.GAMEPAD) then
 		love.graphics.setColor(1,1,1)
 		if (controls.getSelected().mode == controls.GAMEPAD_MODE_R) then
-			love.graphics.draw(imageGamepadModeR,225,135)
+			love.graphics.draw(imageGamepadModeR,243,135)
 		else
-			love.graphics.draw(imageGamepadModeL,225,135)
+			love.graphics.draw(imageGamepadModeL,243,135)
 		end
 	end
 
 	love.graphics.setColor(1,1,1)
-	love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,160)
+	love.graphics.print(controls.getSelected().startText,108+controls.getSelected().startTextDx,160)
 	
 	love.graphics.setColor(1,1,0)
-	love.graphics.print("Foppygames 2019-2020",82,178)
+	love.graphics.print("Foppygames 2019-2020",100,178)
 end
 
 local function drawInfoCurrentLap()

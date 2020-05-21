@@ -15,7 +15,7 @@ local utils = require("modules.utils")
 
 aspect.WINDOW_WIDTH = 1065
 aspect.WINDOW_HEIGHT = 600
-aspect.GAME_WIDTH = 355
+aspect.GAME_WIDTH = 356
 aspect.GAME_HEIGHT = 200
 
 local BAR_COLOR = {0,0,0}

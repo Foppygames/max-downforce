@@ -24,6 +24,7 @@ local REMAINING_HEIGHT = aspect.GAME_HEIGHT - SKY_HEIGHT
 -- =========================================================
 
 track3.name = "City"
+track3.number = 3
 track3.hasRavine = false
 track3.isInMountains = false
 track3.isInForest = false
@@ -139,7 +140,7 @@ track3.segments = {
 	},
 	{
 		ddx = 0,
-		length = 1.5,
+		length = 1,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
@@ -148,6 +149,20 @@ track3.segments = {
 				count = 4
 			}
 		},
+		tunnel = false,
+		light = true
+	},
+	{
+		ddx = 0,
+		length = 0.2,
+		scheduleItems = {},
+		tunnel = true,
+		light = true
+	},
+	{
+		ddx = 0,
+		length = 0.3,
+		scheduleItems = {},
 		tunnel = false,
 		light = true
 	},
@@ -354,7 +369,7 @@ track3.segments = {
 				itemType = schedule.ITEM_BANNER_CITY_LANTERNS,
 				startZ = 0,
 				dz = 0.2,
-				count = 9
+				count = 13
 			},
 			{
 				itemType = schedule.ITEM_TREES_L_R,
@@ -379,6 +394,12 @@ track3.segments = {
 		length = 2.5,
 		scheduleItems = {
 			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 0,
+				dz = 0.3,
+				count = 12
+			},
+			{
 				itemType = schedule.ITEM_CITY_BUILDING_L_R,
 				startZ = 0.1,
 				dz = 0.2,
@@ -391,7 +412,26 @@ track3.segments = {
 	{
 		ddx = 0,
 		length = 0.5,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_SIGN_L,
+				startZ = 0,
+				dz = 0,
+				count = 1
+			},
+			{
+				itemType = schedule.ITEM_SIGN_R,
+				startZ = 0,
+				dz = 0,
+				count = 1
+			},
+			{
+				itemType = schedule.ITEM_TREES_L_R,
+				startZ = 0.2,
+				dz = 0.2,
+				count = 2
+			}
+		},
 		tunnel = false
 	},
 	-- long curve right, part 1, towards tunnel
@@ -400,34 +440,63 @@ track3.segments = {
 		length = 2,
 		scheduleItems = {
 			{
+				itemType = schedule.ITEM_BANNER_CITY_LANTERNS,
+				startZ = 0,
+				dz = 0.2,
+				count = 11
+			},
+			{
 				itemType = schedule.ITEM_CITY_BUILDING_L_R,
 				startZ = 0.1,
 				dz = 0.2,
 				count = 10
+			},
+			{
+				itemType = schedule.ITEM_TREES_R_CITY,
+				startZ = 0.95,
+				dz = 0.2,
+				count = 2
+			},
+			{
+				itemType = schedule.ITEM_TREES_L_CITY,
+				startZ = 1.25,
+				dz = 0.2,
+				count = 2
 			}
 		},
-		tunnel = false
+		tunnel = false,
+		light = true
 	},
 	-- crosswalk
 	{
 		ddx = 0.3,
 		length = 0.07,
 		scheduleItems = {},
-		crosswalk = true
+		crosswalk = true,
+		light = true
 	},
 	-- crossing
 	{
 		ddx = 0.3,
 		length = 0.18,
 		scheduleItems = {},
-		crossroads = true
+		crossroads = true,
+		light = true
 	},
 	-- crosswalk
 	{
 		ddx = 0.3,
 		length = 0.07,
-		scheduleItems = {},
-		crosswalk = true
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_BANNER_CITY_LANTERNS,
+				startZ = 0.01,
+				dz = 0,
+				count = 1
+			}
+		},
+		crosswalk = true,
+		light = true
 	},
 	-- long curve right, part 2, towards tunnel
 	{
@@ -439,6 +508,18 @@ track3.segments = {
 				startZ = 0.1,
 				dz = 0.2,
 				count = 10
+			},
+			{
+				itemType = schedule.ITEM_TREES_L_CITY,
+				startZ = 0.95,
+				dz = 0.2,
+				count = 2
+			},
+			{
+				itemType = schedule.ITEM_TREES_R_CITY,
+				startZ = 1.25,
+				dz = 0.2,
+				count = 2
 			}
 		},
 		tunnel = false
@@ -522,7 +603,14 @@ track3.segments = {
 	{
 		ddx = 0,
 		length = 1.5,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 0.1,
+				dz = 0.2,
+				count = 5
+			}
+		},
 		tunnel = false
 	},
 	-- quick right
@@ -535,6 +623,12 @@ track3.segments = {
 				startZ = 0,
 				dz = 0.3,
 				count = 18
+			},
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 0.4,
+				dz = 0.3,
+				count = 3
 			}
 		},
 		tunnel = false,
@@ -565,6 +659,12 @@ track3.segments = {
 				startZ = 0.25,
 				dz = 0,
 				count = 1
+			},
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 0.4,
+				dz = 0.3,
+				count = 3
 			}
 		},
 		tunnel = false,
@@ -588,6 +688,24 @@ track3.segments = {
 				startZ = 0,
 				dz = 0.5,
 				count = 17
+			},
+			{
+				itemType = schedule.ITEM_SIGN_L,
+				startZ = 1.0,
+				dz = 0.4,
+				count = 3
+			},
+			{
+				itemType = schedule.ITEM_SIGN_R,
+				startZ = 2.0,
+				dz = 0.4,
+				count = 3
+			},
+			{
+				itemType = schedule.ITEM_GRASS_L_R,
+				startZ = 3,
+				dz = 0.4,
+				count = 8
 			}
 		},
 		tunnel = false,
@@ -601,10 +719,26 @@ track3.segments = {
 		tunnel = false,
 		light = true
 	},
-	-- long left
+	-- long left, part 1
 	{
 		ddx = -0.2,
-		length = 3.5,
+		length = 3.2,
+		scheduleItems = {},
+		tunnel = false,
+		light = true
+	},
+	-- long left, part 2, tunnel
+	{
+		ddx = -0.2,
+		length = 0.2,
+		scheduleItems = {},
+		tunnel = true,
+		light = true
+	},
+	-- long left, part 3
+	{
+		ddx = -0.2,
+		length = 0.1,
 		scheduleItems = {},
 		tunnel = false,
 		light = true
@@ -613,7 +747,20 @@ track3.segments = {
 	{
 		ddx = 0.0,
 		length = 1.5,
-		scheduleItems = {},
+		scheduleItems = {
+			{
+				itemType = schedule.ITEM_FLAG_L,
+				startZ = 0.1,
+				dz = 0.3,
+				count = 4
+			},
+			{
+				itemType = schedule.ITEM_FLAG_R,
+				startZ = 0.1,
+				dz = 0.3,
+				count = 4
+			}
+		},
 		tunnel = false,
 		light = true
 	}

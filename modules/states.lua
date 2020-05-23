@@ -207,7 +207,7 @@ local function drawTitleScreen()
 	love.graphics.print(sound.MUSIC_CREDITS,sound.MUSIC_CREDITS_X,65)
 	
 	love.graphics.setColor(0.470,0.902,1)
-	love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",93,90)
+	love.graphics.print("T = track "..tracks.getSelectedTrackNumber().."/"..tracks.getTrackCount()..": "..tracks.getSelectedTrackName(),93,90)
 	love.graphics.print("W = windowed / full screen",93,105)
 	love.graphics.print("M = music: "..sound.getMusicEnabledLabel(),93,120)
 

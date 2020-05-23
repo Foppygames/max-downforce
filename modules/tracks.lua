@@ -91,7 +91,7 @@ local function initTrackModule(trackModule)
 		end
 	end
 
-	--print("total track length: "..trackModule.totalLength)
+	--print("total track length: "..trackModule.totalLength.." ("..trackModule.name..")")
 end
 
 function tracks.init()
@@ -110,8 +110,16 @@ function tracks.getSelectedTrackName()
 	return selectedTrack.name
 end
 
+function tracks.getSelectedTrackNumber()
+	return selectedTrack.number
+end
+
 function tracks.getSelectedTrackSkyHeight()
 	return selectedTrack.skyHeight
+end
+
+function tracks.getTrackCount()
+	return 3
 end
 
 function tracks.hasRavine()

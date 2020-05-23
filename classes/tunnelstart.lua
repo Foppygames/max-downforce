@@ -47,7 +47,7 @@ function TunnelStart:draw()
 	local rightX = newScreenX + road.ROAD_WIDTH / 2 * imageScale
 	local roofHeight = 110 * imageScale
 	
-	-- Note: slightly increase height to avoid seeing thin line of grass under tunnel start
+	-- Note: slightly increase height (after setting y) to avoid seeing thin line of grass under tunnel start
 	height = height + 0.5
 
 	love.graphics.setColor(self.color)

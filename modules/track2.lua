@@ -24,6 +24,7 @@ local REMAINING_HEIGHT = aspect.GAME_HEIGHT - SKY_HEIGHT
 -- =========================================================
 
 track2.name = "Mountain"
+track2.number = 2
 track2.hasRavine = true
 track2.isInMountains = true
 track2.isInForest = false

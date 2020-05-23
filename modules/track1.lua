@@ -23,6 +23,7 @@ local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
 -- =========================================================
 
 track1.name = "Forest"
+track1.number = 1
 track1.hasRavine = false
 track1.isInMountains = false
 track1.isInForest = true

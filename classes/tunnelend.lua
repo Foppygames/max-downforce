@@ -27,7 +27,7 @@ function TunnelEnd.reset()
 	count = 0
 end
 
-function TunnelEnd:new(z,trackHasRavine,trackIsInCity)
+function TunnelEnd:new(z,trackHasRavine,trackIsInCity,last)
 	o = Entity:new(0,z)	
 	setmetatable(o, self)
 	self.__index = self
@@ -37,6 +37,7 @@ function TunnelEnd:new(z,trackHasRavine,trackIsInCity)
 	o.solid = false
 	o.lamp = (count % 5 == 0)
 	o.ravine = trackHasRavine
+	o.last = last
 	
 	local color
 	if trackHasRavine then
@@ -78,6 +79,11 @@ function TunnelEnd:draw()
 	local leftX1 = newScreenX - road.ROAD_WIDTH / 2 * imageScale - wallWidth
 	local rightX1 = newScreenX + road.ROAD_WIDTH / 2 * imageScale
 	
+	-- Note: slightly increase height (after setting y) to avoid seeing thin line of grass under last tunnel wall
+	if self.last then
+		wallHeight = wallHeight + 0.5
+	end
+
 	if self.z < (perspective.maxZ * 0.9) then
 		love.graphics.setColor(self.wallColor)
 		if not self.ravine then

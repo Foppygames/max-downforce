@@ -59,7 +59,7 @@ local function addFromIndex(index,z)
 				-- segment has no tunnel
 				else
 					if (tunnelStarted) then
-						entities.addTunnelEnd(z)
+						entities.addTunnelEnd(z,true)
 						tunnelStarted = false
 					end
 				end

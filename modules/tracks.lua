@@ -1,5 +1,5 @@
 -- Max Downforce - modules/tracks.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 local tracks = {}
 
@@ -11,6 +11,7 @@ local perspective = require("modules.perspective")
 local schedule = require("modules.schedule")
 local track1 = require("modules.track1")
 local track2 = require("modules.track2")
+local track3 = require("modules.track3")
 
 -- =========================================================
 -- constants
@@ -41,6 +42,9 @@ local function initTrackModule(trackModule)
 		if ((trackModule.segments[i].ddx ~= 0) and (nextDdx == 0)) then
 			local ddx = trackModule.segments[i].ddx
 			local tunnel = trackModule.segments[i].tunnel
+			local light = trackModule.segments[i].light
+			local crossroads = trackModule.segments[i].crossroads
+			local crosswalk = trackModule.segments[i].crosswalk
 			local j = 1
 			if (ddx > 0) then
 				ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
@@ -49,7 +53,10 @@ local function initTrackModule(trackModule)
 						ddx = ddx,
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
-						tunnel = tunnel
+						tunnel = tunnel,
+						light = light,
+						crossroads = crossroads,
+						crosswalk = crosswalk
 					})
 					ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1
@@ -61,7 +68,10 @@ local function initTrackModule(trackModule)
 						ddx = ddx,
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
-						tunnel = tunnel
+						tunnel = tunnel,
+						light = light,
+						crossroads = crossroads,
+						crosswalk = crosswalk
 					})
 					ddx = ddx + SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1
@@ -80,11 +90,14 @@ local function initTrackModule(trackModule)
 			trackModule.segments[i].scheduleItems[j].dz = trackModule.segments[i].scheduleItems[j].dz * (perspective.maxZ - perspective.minZ)
 		end
 	end
+
+	--print("total track length: "..trackModule.totalLength.." ("..trackModule.name..")")
 end
 
 function tracks.init()
 	initTrackModule(track1)
 	initTrackModule(track2)
+	initTrackModule(track3)
 
 	selectedTrack = track1
 end
@@ -97,12 +110,32 @@ function tracks.getSelectedTrackName()
 	return selectedTrack.name
 end
 
+function tracks.getSelectedTrackNumber()
+	return selectedTrack.number
+end
+
 function tracks.getSelectedTrackSkyHeight()
 	return selectedTrack.skyHeight
 end
 
+function tracks.getTrackCount()
+	return 3
+end
+
 function tracks.hasRavine()
 	return selectedTrack.hasRavine
+end
+
+function tracks.isInMountains()
+	return selectedTrack.isInMountains
+end
+
+function tracks.isInForest()
+	return selectedTrack.isInForest
+end
+
+function tracks.isInCity()
+	return selectedTrack.isInCity
 end
 
 function tracks.getSong()
@@ -112,6 +145,8 @@ end
 function tracks.selectNextTrack()
 	if (selectedTrack == track1) then
 		selectedTrack = track2
+	elseif (selectedTrack == track2) then
+		selectedTrack = track3
 	else
 		selectedTrack = track1
 	end

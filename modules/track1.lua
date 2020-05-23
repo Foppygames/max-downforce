@@ -1,5 +1,5 @@
 -- Max Downforce - modules/track1.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 local track1 = {}
 
@@ -23,7 +23,11 @@ local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
 -- =========================================================
 
 track1.name = "Forest"
+track1.number = 1
 track1.hasRavine = false
+track1.isInMountains = false
+track1.isInForest = true
+track1.isInCity = false
 track1.song = sound.RACE_MUSIC_FOREST
 
 track1.totalLength = 0

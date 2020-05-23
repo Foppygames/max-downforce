@@ -45,8 +45,13 @@ local STATE_GAME_OVER = 2
 local CAR_COUNT = 6
 local COLORS_CURBS_NO_RAVINE = {{1, 0.26, 0}, {1, 0.95, 0.95}}
 local COLORS_CURBS_RAVINE = {{0.1, 0.26, 0.8}, {1, 0.95, 0.95}}
+local COLORS_CURBS_CITY = {
+	light = {{1, 0.26, 0}, {1, 0.95, 0.95}},
+	no_light = {{0.8, 0.1, 0}, {0.8, 0.6, 0.6}}
+}
 local COLORS_GRASS_NO_RAVINE = {{0.45, 0.8, 0.25}, {0.36, 0.6, 0.20}}
 local COLORS_GRASS_RAVINE = {{0.5, 0.36, 0.03}, {0.45, 0.31, 0.01}}
+local COLORS_GRASS_CITY = {{0.03, 0.0, 0.0}, {0.06, 0.05, 0.05}}
 local COLORS_STRIPES_RAVINE = {
 	tunnel = {0.9, 0.9, 0},
 	no_tunnel = {1, 0.95, 0.95}
@@ -55,6 +60,10 @@ local COLORS_STRIPES_NO_RAVINE = {
 	tunnel = {0.8, 0.8, 0},
 	no_tunnel = {1, 0.95, 0.95}
 }
+local COLORS_STRIPES_CITY = {
+	tunnel = {1, 0.95, 0.95},
+	no_tunnel = {0.8, 0.6, 0.6}
+}
 local COLORS_TARMAC_RAVINE = {
 	tunnel = {{0.24, 0.2, 0.26}, {0.24, 0.2, 0.26}},
 	no_tunnel = {{0.39, 0.28, 0.28}, {0.42, 0.30, 0.30}}
@@ -62,6 +71,10 @@ local COLORS_TARMAC_RAVINE = {
 local COLORS_TARMAC_NO_RAVINE = {
 	tunnel = {{0.1, 0.1, 0.13}, {0.11, 0.11, 0.14}},
 	no_tunnel = {{0.34, 0.28, 0.28}, {0.37, 0.30, 0.30}}
+}
+local COLORS_TARMAC_CITY = {
+	tunnel = {{0.39, 0.28, 0.28}, {0.42, 0.30, 0.30}},
+	no_tunnel = {{0.22, 0.14, 0.18}, {0.24, 0.16, 0.20}}
 }
 local LAP_COUNT = 10
 local TIME_AFTER_FINISHED = 5
@@ -97,6 +110,9 @@ local title = ""
 local titleShineIndex = 0
 local titleShineTimer = 0
 local trackHasRavine
+local trackIsInMountains
+local trackIsInForest
+local trackIsInCity
 local tunnelWallDistance = 0
 local version = ""
 
@@ -115,37 +131,37 @@ local function drawGameOverScreen()
 	if (not finished) then
 		love.graphics.push()
 		love.graphics.scale(2,2)
-		love.graphics.print("GAME OVER",45,20)
+		love.graphics.print("GAME OVER",54,20)
 		love.graphics.pop()
 		
 		-- still in first lap
 		if (lap < 2) then
-			love.graphics.print("Don't give up!",120,70)
+			love.graphics.print("Don't give up!",138,70)
 		-- beyond first lap
 		else
 			love.graphics.setColor(1,1,0)
 			-- in second lap
 			if (lap == 2) then
-				love.graphics.print("You completed 1 full lap",85,70)
+				love.graphics.print("You completed 1 full lap",103,70)
 				love.graphics.setColor(1,1,1)
-				love.graphics.print("Well done!",131,95)
+				love.graphics.print("Well done!",149,95)
 			-- beyond second lap
 			else
-				love.graphics.print("You completed "..(lap-1).." full laps",80,70)
+				love.graphics.print("You completed "..(lap-1).." full laps",98,70)
 				-- completed more than one lap
 				if (lap > 2) then
 					love.graphics.setColor(1,1,1)
 					-- completed nine laps
 					if (lap == 10) then
-						love.graphics.print("You win the silver cup!",89,95)
+						love.graphics.print("You win the silver cup!",107,95)
 						love.graphics.draw(imageTrophySilver,aspect.GAME_WIDTH/2-imageTrophySilver:getWidth()/2,120)
 					-- completed eight laps
 					elseif (lap == 9) then
-						love.graphics.print("You win the bronze cup!",85,95)
+						love.graphics.print("You win the bronze cup!",103,95)
 						love.graphics.draw(imageTrophyBronze,aspect.GAME_WIDTH/2-imageTrophyBronze:getWidth()/2,120)
 					-- completed between two and seven laps
 					else
-						love.graphics.print("Well done!",131,95)
+						love.graphics.print("Well done!",149,95)
 					end
 				end
 			end
@@ -153,16 +169,16 @@ local function drawGameOverScreen()
 	else
 		love.graphics.push()
 		love.graphics.scale(2,2)
-		love.graphics.print("CONGRATULATIONS!",15,20)
+		love.graphics.print("CONGRATULATIONS!",24,20)
 		love.graphics.pop()
 		love.graphics.setColor(1,1,0)
-		love.graphics.print("You finished the race",92,70)
+		love.graphics.print("You finished the race",110,70)
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("You win the gold cup!",95,95)
+		love.graphics.print("You win the gold cup!",113,95)
 		love.graphics.draw(imageTrophyGold,aspect.GAME_WIDTH/2-imageTrophyGold:getWidth()/2,120)
 		love.graphics.setColor(0.471,0.902,1)
-		love.graphics.print("You may consider yourself a member of",30,150)
-		love.graphics.print("an elite group of grand prix racers",40,170)
+		love.graphics.print("You may consider yourself a member of",48,150)
+		love.graphics.print("an elite group of grand prix racers",58,170)
 	end
 end
 
@@ -179,46 +195,46 @@ local function drawTitleScreen()
 		else
 			love.graphics.setColor(1,1,1)
 		end
-		love.graphics.print(string.sub(titleAllCaps,i,i),8 + i * 10,6)
+		love.graphics.print(string.sub(titleAllCaps,i,i),17 + i * 10,6)
 	end
 	love.graphics.pop()
 	
 	love.graphics.setColor(0.1,0.1,0.3)
-	love.graphics.print(version,260,4)
+	love.graphics.print(version,278,4)
 	
 	love.graphics.setColor(1,1,1)
-	love.graphics.print("Written by Robbert Prins",75,45)
+	love.graphics.print("Written by Robbert Prins",93,45)
 	love.graphics.print(sound.MUSIC_CREDITS,sound.MUSIC_CREDITS_X,65)
 	
 	love.graphics.setColor(0.470,0.902,1)
-	love.graphics.print("T = track: '"..tracks.getSelectedTrackName().."'",75,90)
-	love.graphics.print("W = windowed / full screen",75,105)
-	love.graphics.print("M = music: "..sound.getMusicEnabledLabel(),75,120)
+	love.graphics.print("T = track "..tracks.getSelectedTrackNumber().."/"..tracks.getTrackCount()..": "..tracks.getSelectedTrackName(),93,90)
+	love.graphics.print("W = windowed / full screen",93,105)
+	love.graphics.print("M = music: "..sound.getMusicEnabledLabel(),93,120)
 
 	-- more than one control method available
 	if (controls.getAvailableCount() > 1) then
 		love.graphics.setColor(0.470,0.902,1)
-		love.graphics.print("C = controls: "..controls.getSelected().label,75,135)
+		love.graphics.print("C = controls: "..controls.getSelected().label,93,135)
 	-- one control method available (note: assuming there is never less than one)
 	else
 		love.graphics.setColor(1,1,1)
-		love.graphics.print("Controls: "..controls.getSelected().label,75,135)
+		love.graphics.print("Controls: "..controls.getSelected().label,93,135)
 	end
 
 	if (controls.getSelected().type == controls.GAMEPAD) then
 		love.graphics.setColor(1,1,1)
 		if (controls.getSelected().mode == controls.GAMEPAD_MODE_R) then
-			love.graphics.draw(imageGamepadModeR,225,135)
+			love.graphics.draw(imageGamepadModeR,243,135)
 		else
-			love.graphics.draw(imageGamepadModeL,225,135)
+			love.graphics.draw(imageGamepadModeL,243,135)
 		end
 	end
 
 	love.graphics.setColor(1,1,1)
-	love.graphics.print(controls.getSelected().startText,90+controls.getSelected().startTextDx,160)
+	love.graphics.print(controls.getSelected().startText,108+controls.getSelected().startTextDx,160)
 	
 	love.graphics.setColor(1,1,0)
-	love.graphics.print("Foppygames 2019",102,178)
+	love.graphics.print("Foppygames 2019-2020",100,178)
 end
 
 local function drawInfoCurrentLap()
@@ -255,19 +271,31 @@ local function drawInfoTime()
 	love.graphics.pop()
 end
 
-local function drawGrass(trackHasRavine,tunnel,colorIndex,ravineX,screenY,roadX)
-	love.graphics.setColor(grassColors[colorIndex])
+local function drawGrass(trackHasRavine,trackIsInCity,tunnel,crossroads,light,colorIndex,ravineX,screenY,roadX)
+	if (crossroads) then
+		if (tunnel or light) then
+			love.graphics.setColor(tarmacColors.tunnel[colorIndex])
+		else
+			love.graphics.setColor(tarmacColors.no_tunnel[colorIndex])
+		end
+	else
+		love.graphics.setColor(grassColors[colorIndex])
+	end
 	if (trackHasRavine) then	
 		if (not tunnel) then
 			love.graphics.line(ravineX,screenY,aspect.GAME_WIDTH,screenY)	
 		else
 			love.graphics.line(ravineX,screenY,roadX,screenY)
-			love.graphics.setColor(0,0,0)
+			love.graphics.setColor(0.45,0.32,0.027)
 			love.graphics.line(roadX,screenY,aspect.GAME_WIDTH,screenY)
 		end
 	else
 		if (tunnel) then
-			love.graphics.setColor(0,0,0)
+			if trackIsInCity then
+				love.graphics.setColor(1,1,0.6)
+			else
+				love.graphics.setColor(0,0,0)
+			end
 		end
 		love.graphics.line(0,screenY,aspect.GAME_WIDTH,screenY)
 	end
@@ -293,50 +321,86 @@ local function drawTunnelRoof(segment,screenY,x,roadWidth)
 	end
 end
 
-local function drawCurbs(trackHasRavine,colorIndex,roadX,screenY,curbWidth,roadWidth)
-	love.graphics.setColor(curbColors[colorIndex])
-	love.graphics.line(roadX,screenY,roadX+curbWidth,screenY)
-	love.graphics.line(roadX+roadWidth-curbWidth,screenY,roadX+roadWidth,screenY)
-end
-
-local function drawStripes(tunnel,trackHasRavine,screenX,stripeWidth,screenY)
+local function drawCrosswalk(tunnel,screenX,stripeWidth,screenY,crosswalk)
 	if (tunnel) then
 		love.graphics.setColor(stripeColors.tunnel)
 	else
 		love.graphics.setColor(stripeColors.no_tunnel)
 	end
-	love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
+	for i = -4, 4 do
+		local startX = screenX+i*2*stripeWidth-stripeWidth/2
+		love.graphics.line(startX,screenY,startX+stripeWidth,screenY)
+	end
+end
+
+local function drawCurbs(light,colorIndex,roadX,screenY,curbWidth,roadWidth)
+	if (trackIsInCity) then
+		if (light) then
+			love.graphics.setColor(curbColors.light[colorIndex])
+		else
+			love.graphics.setColor(curbColors.no_light[colorIndex])
+		end
+	else
+		love.graphics.setColor(curbColors[colorIndex])
+	end
+	love.graphics.line(roadX,screenY,roadX+curbWidth,screenY)
+	love.graphics.line(roadX+roadWidth-curbWidth,screenY,roadX+roadWidth,screenY)
+end
+
+local function drawStripes(tunnel,screenX,stripeWidth,screenY,crosswalk)
+	if (tunnel) then
+		love.graphics.setColor(stripeColors.tunnel)
+	else
+		love.graphics.setColor(stripeColors.no_tunnel)
+	end
+	if (crosswalk) then
+		local width = stripeWidth * 2
+		for i = -4, 4 do
+			local startX = screenX+i*2*width-width/2
+			love.graphics.line(startX,screenY,startX+width,screenY)
+		end
+	else
+		love.graphics.line(screenX-stripeWidth/2,screenY,screenX+stripeWidth/2,screenY)
+	end
 end
 
 local function setCurbColors()
-	if (trackHasRavine) then
+	if (trackIsInMountains) then
 		curbColors = COLORS_CURBS_RAVINE
-	else
+	elseif (trackIsInForest) then
 		curbColors = COLORS_CURBS_NO_RAVINE
+	else
+		curbColors = COLORS_CURBS_CITY
 	end
 end
 
 local function setGrassColors()
-	if (trackHasRavine) then
+	if (trackIsInMountains) then
 		grassColors = COLORS_GRASS_RAVINE
-	else
+	elseif (trackIsInForest) then
 		grassColors = COLORS_GRASS_NO_RAVINE
+	else
+		grassColors = COLORS_GRASS_CITY
 	end
 end
 
 local function setStripeColors()
-	if (trackHasRavine) then
+	if (trackIsInMountains) then
 		stripeColors = COLORS_STRIPES_RAVINE
-	else
+	elseif (trackIsInForest) then
 		stripeColors = COLORS_STRIPES_NO_RAVINE
+	else
+		stripeColors = COLORS_STRIPES_CITY
 	end
 end
 
 local function setTarmacColors()
-	if (trackHasRavine) then
+	if (trackIsInMountains) then
 		tarmacColors = COLORS_TARMAC_RAVINE
-	else
+	elseif (trackIsInForest) then
 		tarmacColors = COLORS_TARMAC_NO_RAVINE
+	else
+		tarmacColors = COLORS_TARMAC_CITY
 	end
 end
 
@@ -381,7 +445,7 @@ local function switchToState(newState)
 			sound.stop(sound.TITLE_MUSIC)
 		end
 	end
-	entities.reset(tracks.hasRavine())
+	entities.reset(tracks.hasRavine(),tracks.isInCity())
 
 	-- init new state
 	state = newState
@@ -398,6 +462,9 @@ local function switchToState(newState)
 		afterFinishedTimer = 0
 		previousDisplayTime = nil
 		trackHasRavine = tracks.hasRavine()
+		trackIsInMountains = tracks.isInMountains()
+		trackIsInForest = tracks.isInForest()
+		trackIsInCity = tracks.isInCity()
 
 		horizon.reset()
 		schedule.reset()
@@ -737,13 +804,15 @@ function states.draw()
 			entities.setupForDraw(z,screenX,screenY,perspective.scale[i],previousZ,previousScreenX,previousScreenY,previousScale,segment)
 			
 			-- draw grass and road elements
-			drawGrass(trackHasRavine,segment.tunnel,colorIndex,ravineX,screenY,roadX)
-			drawTarmac(trackHasRavine,segment.tunnel,colorIndex,roadX,screenY,roadWidth)
-			if (colorIndex ~= 1) then
-				drawStripes(segment.tunnel,trackHasRavine,screenX,stripeWidth,screenY)
+			drawGrass(trackHasRavine,trackIsInCity,segment.tunnel,segment.crossroads,segment.light,colorIndex,ravineX,screenY,roadX)
+			drawTarmac(trackHasRavine,segment.tunnel or segment.light,colorIndex,roadX,screenY,roadWidth)
+			if (segment.crosswalk) then
+				drawCrosswalk(segment.tunnel or segment.light,screenX,stripeWidth*2,screenY)
+			elseif (colorIndex ~= 1) then
+				drawStripes(segment.tunnel or segment.light,screenX,stripeWidth,screenY)
 			end
-			if (not segment.tunnel) then
-				drawCurbs(trackHasRavine,colorIndex,roadX,screenY,curbWidth,roadWidth)
+			if (not (segment.tunnel or segment.crossroads)) then
+				drawCurbs(segment.light,colorIndex,roadX,screenY,curbWidth,roadWidth)
 			end
 			
 			-- draw tunnel roof as upside down road, see function for details

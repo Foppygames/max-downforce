@@ -1,5 +1,5 @@
 -- Max Downforce - modules/track2.lua
--- 2019 Foppygames
+-- 2019-2020 Foppygames
 
 local track2 = {}
 
@@ -24,7 +24,11 @@ local REMAINING_HEIGHT = aspect.GAME_HEIGHT - SKY_HEIGHT
 -- =========================================================
 
 track2.name = "Mountain"
+track2.number = 2
 track2.hasRavine = true
+track2.isInMountains = true
+track2.isInForest = false
+track2.isInCity = false
 track2.song = sound.RACE_MUSIC_MOUNTAIN
 
 track2.totalLength = 0

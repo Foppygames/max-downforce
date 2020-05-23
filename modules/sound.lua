@@ -13,12 +13,13 @@ sound.EXPLOSION = 3
 sound.COLLISION = 4
 sound.RACE_MUSIC_FOREST = 5
 sound.RACE_MUSIC_MOUNTAIN = 6
-sound.CROWD = 7
-sound.TITLE_MUSIC = 8
-sound.BEEP_1 = 9
-sound.BEEP_2 = 10
-sound.LAP = 11
-sound.COUNTDOWN = 12
+sound.RACE_MUSIC_CITY = 7
+sound.CROWD = 8
+sound.TITLE_MUSIC = 9
+sound.BEEP_1 = 10
+sound.BEEP_2 = 11
+sound.LAP = 12
+sound.COUNTDOWN = 13
 
 sound.VOLUME_EFFECTS = 0.3
 sound.VOLUME_EFFECTS_BEEPS = 0.9
@@ -33,28 +34,45 @@ sound.USE_OFFICIAL_MUSIC = false
 
 -- use official music by PlayOnLoop.com (excluded from repository)
 if (sound.USE_OFFICIAL_MUSIC) then
-	sound.RACE_MUSIC_PATH_FOREST = "music/POL-galactic-chase-long.wav"
+	sound.RACE_MUSIC_PATH_FOREST =  "music/POL-galactic-chase-long.wav"
 	sound.RACE_MUSIC_PATH_MOUNTAIN = "music/POL-combat-plan-long.wav"
+	sound.RACE_MUSIC_PATH_CITY = "music/POL-future-shock-long.wav"
 	sound.TITLE_MUSIC_PATH = "music/POL-smash-bros-long.wav"
 	sound.MUSIC_CREDITS = "Music from PlayOnLoop.com"
-	sound.MUSIC_CREDITS_X = 70
+	sound.MUSIC_CREDITS_X = 88
 -- use music by Kevin MacLeod licensed under Creative Commons (included in repository)
 else
+	-- Note: city track and title screen play the same music
 	sound.RACE_MUSIC_PATH_FOREST = "music/5029-raving-energy-by-kevin-macleod.mp3"
 	sound.RACE_MUSIC_PATH_MOUNTAIN = "music/5018-your-call-by-kevin-macleod.mp3"
+	sound.RACE_MUSIC_PATH_CITY = "music/4616-werq-by-kevin-macleod.mp3"
 	sound.TITLE_MUSIC_PATH = "music/4616-werq-by-kevin-macleod.mp3"
 	sound.MUSIC_CREDITS = "Music by Kevin MacLeod (incompetech.com)"
-	sound.MUSIC_CREDITS_X = 20
+	sound.MUSIC_CREDITS_X = 38
 end
 
 -- =========================================================
 -- variables
 -- =========================================================
 
+sound.paths = {}
 sound.sources = {}
 
 local crowdVolume = 0
 local musicEnabled = true
+
+-- =========================================================
+-- private functions
+-- =========================================================
+
+-- returns source for provided path if created before, nil otherwise
+-- Note: used to avoid duplicate music sources, not used for sound effects
+local function getSourceForPath(path)
+	if (sound.paths[path] ~= nil) then
+		return sound.sources[sound.paths[path]]
+	end
+	return nil
+end
 
 -- =========================================================
 -- public functions
@@ -65,6 +83,7 @@ function sound.init()
 
 	sound.initMusic(sound.RACE_MUSIC_PATH_FOREST,sound.RACE_MUSIC_FOREST)
 	sound.initMusic(sound.RACE_MUSIC_PATH_MOUNTAIN,sound.RACE_MUSIC_MOUNTAIN)
+	sound.initMusic(sound.RACE_MUSIC_PATH_CITY,sound.RACE_MUSIC_CITY)
 	sound.initMusic(sound.TITLE_MUSIC_PATH,sound.TITLE_MUSIC)
 
 	sound.initSound("sounds/engine_idle.wav",sound.ENGINE_IDLE,true,sound.VOLUME_EFFECTS)
@@ -89,16 +108,23 @@ function sound.initSound(path,id,loop,volume)
 end
 
 function sound.initMusic(path,id)
-	local info = love.filesystem.getInfo(path)
-	
-	-- file exists
-	if (info ~= nil) then
-		sound.sources[id] = love.audio.newSource(path,"static")
-		sound.sources[id]:setLooping(true)
-		sound.sources[id]:setVolume(sound.VOLUME_MUSIC)
-	-- file does not exist
+	local existingSource = getSourceForPath(path)
+	sound.paths[path] = id
+	-- source for this path was created before
+	if (existingSource ~= nil) then
+		sound.sources[id] = existingSource
+	-- source for this path not yet created
 	else
-		sound.sources[id] = nil
+		local info = love.filesystem.getInfo(path)
+		-- file exists
+		if (info ~= nil) then
+			sound.sources[id] = love.audio.newSource(path,"static")
+			sound.sources[id]:setLooping(true)
+			sound.sources[id]:setVolume(sound.VOLUME_MUSIC)
+		-- file does not exist
+		else
+			sound.sources[id] = nil
+		end
 	end
 end
 

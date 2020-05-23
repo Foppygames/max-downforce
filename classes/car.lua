@@ -1,5 +1,5 @@
 -- Max Downforce - classes/car.lua
--- 2018-2019 Foppygames
+-- 2018-2020 Foppygames
 
 -- modules
 local aspect = require("modules.aspect")
@@ -134,7 +134,7 @@ function Car.init()
 	baseTotalCarWidth =  (bodyWidth + frontWheelWidth * 2) * WIDTH_MODIFIER
 end
 
-function Car:new(lane,z,isPlayer,progress,pause,ravine)
+function Car:new(lane,z,isPlayer,progress,pause,ravine,city)
 	local x = Car.getXFromLane(lane,true)
 	
 	o = Entity:new(x,z)	
@@ -168,7 +168,9 @@ function Car:new(lane,z,isPlayer,progress,pause,ravine)
 	o.aiBlockingCarSpeed = nil
 	o.pause = pause
 	o.ravine = ravine
+	o.city = city
 	o.inTunnel = false
+	o.inLight = false
 
 	o.imgWing = imgWing[math.random(5)]
 	o.wingWidth = o.imgWing:getWidth()
@@ -207,6 +209,11 @@ function Car:new(lane,z,isPlayer,progress,pause,ravine)
 		o.colorInTunnel[i] = o.color[i] / 2
 	end
 	
+	o.colorInDark = {}
+	for i = 1,3 do
+		o.colorInDark[i] = o.color[i] / 4
+	end
+	
 	o.topSpeedForAcceleration = (3 * TOP_SPEED + o.topSpeed) / 4
 	o.speedLimitHigherAcceleration = o.topSpeed*0.96
 	o.segmentDdx = 0
@@ -229,7 +236,8 @@ function Car:new(lane,z,isPlayer,progress,pause,ravine)
 	o.fallDx = 0
 	o.fallDy = 0
 	o.explodingAfterFall = false
-	
+	o.braking = false
+
 	return o
 end
 
@@ -515,6 +523,7 @@ function Car:updateSteer(dt)
 end
 
 function Car:updateSpeedPlayerKeyboard(acc,dt)
+	self.braking = love.keyboard.isDown("down")
 	if (self.pause > 0) then
 		self.pause = self.pause - dt
 	else
@@ -527,9 +536,10 @@ function Car:updateSpeedPlayerKeyboard(acc,dt)
 			end
 		else
 			if (self.speed > 0) then
-				if love.keyboard.isDown("down") then
+				if self.braking then
 					self.speed = self.speed - BRAKE * dt
 					self.accEffect = -BRAKE
+					self.braking = true
 				else
 					self.speed = self.speed - IDLE_BRAKE * dt
 					self.accEffect = self.accEffect * 0.9
@@ -545,23 +555,30 @@ function Car:updateSpeedPlayerKeyboard(acc,dt)
 end
 
 function Car:updateSpeedPlayerGamepad(acc,dt)
+	self.braking = false
+	local throttle = 0
+	local triggerLeft = 0
+	local triggerRight = 0
+	if (controls.joystick ~= nil) then
+		throttle = -controls.joystick:getGamepadAxis(controls.joystickThrottleAxis)
+		if (throttle == 0) then
+			triggerLeft = controls.joystick:getGamepadAxis("triggerleft")
+			triggerRight = controls.joystick:getGamepadAxis("triggerright")
+			if (triggerLeft > 0) then
+				throttle = -triggerLeft
+			elseif (triggerRight > 0) then
+				throttle = triggerRight
+			end
+		end
+		self.braking = (throttle < 0)
+	end
+
 	if (self.pause > 0) then
 		self.pause = self.pause - dt
 	else
 		if (controls.joystick ~= nil) then
-			local throttle = -controls.joystick:getGamepadAxis(controls.joystickThrottleAxis)
 			local relSpeed = self.speed / self.topSpeed
 			
-			if (throttle == 0) then
-				local triggerLeft = controls.joystick:getGamepadAxis("triggerleft")
-				local triggerRight = controls.joystick:getGamepadAxis("triggerright")
-				if (triggerLeft > 0) then
-					throttle = -triggerLeft
-				elseif (triggerRight > 0) then
-					throttle = triggerRight
-				end
-			end
-
 			-- player wants to go faster
 			if (throttle > relSpeed) then
 				local howMuchFaster = (throttle-relSpeed) / (1-relSpeed)
@@ -576,7 +593,7 @@ function Car:updateSpeedPlayerGamepad(acc,dt)
 			else
 				if (self.speed > 0) then
 					-- applying the brakes
-					if (throttle < 0) then
+					if (self.braking) then
 						self.speed = self.speed - BRAKE * dt
 						self.accEffect = -BRAKE
 					-- reducing throttle
@@ -600,11 +617,17 @@ function Car:updateSpeedPlayerGamepad(acc,dt)
 end
 
 function Car:updateSpeedCPU(acc,dt)
+	self.braking = false
 	if (self.pause > 0) then
 		self.pause = self.pause - dt
 	else
 		if (self.aiBlockingCarSpeed ~= nil) then
 			if (self.speed > self.aiBlockingCarSpeed) then
+				-- difference is considerable
+				if ((self.speed - self.aiBlockingCarSpeed) > (self.speed * 0.1)) then
+					-- Note: this is to avoid brake light flickering while behind a car
+					self.braking = true
+				end
 				self.speed = self.speed - BRAKE * dt
 			end
 			self.aiBlockingCarSpeed = nil
@@ -736,6 +759,11 @@ function Car:updateEngineSoundPlayer()
 				if (math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC) < 0.01) then
 					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN,sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL)
 				end
+			elseif (self.city) then
+				-- volume not already modified such as by countdown
+				if (math.abs(sound.getVolume(sound.RACE_MUSIC_CITY) - sound.VOLUME_MUSIC) < 0.01) then
+					sound.setVolume(sound.RACE_MUSIC_CITY,sound.VOLUME_MUSIC_IN_TUNNEL)
+				end
 			else
 				-- volume not already modified such as by countdown
 				if (math.abs(sound.getVolume(sound.RACE_MUSIC_FOREST) - sound.VOLUME_MUSIC) < 0.01) then
@@ -751,8 +779,11 @@ function Car:updateEngineSoundPlayer()
 				-- volume not already modified such as by countdown
 				if (math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL) < 0.01) then
 					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN,sound.VOLUME_MUSIC)
-				else
-					print(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN).." ~= "..sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL)
+				end
+			elseif (self.city) then
+				-- volume not already modified such as by countdown
+				if (math.abs(sound.getVolume(sound.RACE_MUSIC_CITY) - sound.VOLUME_MUSIC_IN_TUNNEL) < 0.01) then
+					sound.setVolume(sound.RACE_MUSIC_CITY,sound.VOLUME_MUSIC)
 				end
 			else
 				-- volume not already modified such as by countdown
@@ -962,6 +993,7 @@ function Car:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previous
 	self.segmentDdx = segment.ddx
 	self.targetSpeed = self.topSpeed
 	self.inTunnel = segment.tunnel
+	self.inLight = segment.light
 end
 
 function Car:draw()
@@ -988,7 +1020,7 @@ function Car:draw()
 		local accEffect = self.accEffect * 0.01
 		
 		-- draw shadow
-		if ((not self.falling)) then -- and (not self.inTunnel)) then
+		if ((not self.falling)) then
 			love.graphics.draw(imgShadow,screenX - shadowWidth/2, screenY - 6)
 		end
 
@@ -1003,9 +1035,23 @@ function Car:draw()
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelLeftDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex],screenX + frontWheelRightDx + perspectiveEffect,screenY + frontWheelDy - accEffect*2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
-		local mainColor = self.color
-		if ((self.inTunnel) and (not self.ravine) and (not self.falling)) then
-			mainColor = self.colorInTunnel
+		local mainColor
+		-- car is in city at night
+		if (self.city) then
+			-- car is in lighted tunnel or in light
+			if ((self.inTunnel) or (self.inLight)) then
+				-- use bright color
+				mainColor = self.color
+			else
+				-- use dark color
+				mainColor = self.colorInDark
+			end
+		-- car is in forest or on mountain by daylight
+		else
+			mainColor = self.color
+			if ((self.inTunnel) and (not self.ravine) and (not self.falling)) then
+				mainColor = self.colorInTunnel
+			end
 		end
 		
 		-- draw body
@@ -1022,8 +1068,8 @@ function Car:draw()
 		
 		-- draw rear wheels
 		love.graphics.setColor(1,1,1)
-		love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect,screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
-		love.graphics.draw(imgRearWheel[self.rearWheelIndex],screenX + bodyWidth/2 - perspectiveEffect,screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
+		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX - bodyWidth/2 - rearWheelWidth - perspectiveEffect, screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
+		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX + bodyWidth/2 - perspectiveEffect, screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
 		-- draw rear wing
 		local wingDegreesChange = bodyDegreesChange
@@ -1033,6 +1079,33 @@ function Car:draw()
 		
 		-- draw diffuser
 		love.graphics.draw(imgDiffuser,screenX - diffuserWidth/2  - perspectiveEffect,screenY - diffuserHeight + accEffect*3)
+	
+		-- draw rear light
+		local lightSize = 4
+		love.graphics.setColor(0,0,0)
+		love.graphics.rectangle("fill",screenX - (lightSize+4)/2 - perspectiveEffect * 1.4,screenY - bodyHeight + accEffect * 2.8 + bumpDy,lightSize+4,lightSize+4)
+		if (not self.braking) then
+			if (not self.inTunnel) then
+				if (self.city) then
+					if (not self.inLight) then
+						love.graphics.setColor(0.8,0,0)
+					else
+						love.graphics.setColor(0.4,0,0)
+					end
+				else
+					love.graphics.setColor(0.4,0,0)
+				end
+			else
+				if (self.city) then
+					love.graphics.setColor(0.4,0,0)
+				else
+					love.graphics.setColor(0.6,0,0)
+				end
+			end
+		else
+			love.graphics.setColor(1,0,0)
+		end
+		love.graphics.rectangle("fill",screenX - lightSize/2 - perspectiveEffect * 1.6,screenY - bodyHeight + 2 + accEffect * 3.6 + bumpDy,lightSize,lightSize)
 	end
 	
 	if (self.explosionTime > EXPLOSION_WAIT) then

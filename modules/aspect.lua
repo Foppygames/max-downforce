@@ -13,7 +13,7 @@ local utils = require("modules.utils")
 -- constants
 -- =========================================================
 
-aspect.WINDOW_WIDTH = 1065
+aspect.WINDOW_WIDTH = 1068
 aspect.WINDOW_HEIGHT = 600
 aspect.GAME_WIDTH = 356
 aspect.GAME_HEIGHT = 200

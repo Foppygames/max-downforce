@@ -1,5 +1,5 @@
 -- Max Downforce - modules/states.lua
--- 2019-2020 Foppygames
+-- 2019-2021 Foppygames
 
 local states = {}
 
@@ -234,7 +234,7 @@ local function drawTitleScreen()
 	love.graphics.print(controls.getSelected().startText,108+controls.getSelected().startTextDx,160)
 	
 	love.graphics.setColor(1,1,0)
-	love.graphics.print("Foppygames 2019-2020",100,178)
+	love.graphics.print("Foppygames 2019-2021",100,178)
 end
 
 local function drawInfoCurrentLap()

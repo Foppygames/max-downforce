@@ -1,5 +1,5 @@
 -- Max Downforce - classes/car.lua
--- 2018-2020 Foppygames
+-- 2018-2021 Foppygames
 
 -- modules
 local aspect = require("modules.aspect")
@@ -13,10 +13,12 @@ require "classes.entity"
 
 -- local constants
 local WIDTH_MODIFIER = 0.85
-local MAX_STEER_KEYBOARD = 40
-local MAX_STEER_GAMEPAD = MAX_STEER_KEYBOARD * 0.65
-local STEER_CHANGE = 48
-local STEER_RETURN_FACTOR = 57
+local MAX_STEER_KEYBOARD = 1260
+local MAX_STEER_GAMEPAD = MAX_STEER_KEYBOARD * 0.9
+local STEER_CHANGE = 2900
+local STEER_RESULT_CHANGE = 2800
+local STEER_RETURN = 1650
+local OUTWARD_FORCE = 75
 local TOP_SPEED = 90
 local TOP_SPEED_IN_KMH = 360
 local BRAKE = 40
@@ -34,9 +36,11 @@ local AI_MIN_PERFORMANCE_FRACTION = 0.65
 local AI_MAX_PERFORMANCE_FRACTION = 0.92
 local AI_TOP_SPEED = TOP_SPEED
 local AI_TARGET_X_MARGIN = road.ROAD_WIDTH / 25
-local AI_MAX_STEER = MAX_STEER_KEYBOARD * 0.9
-local AI_STEER_CHANGE = STEER_CHANGE * 0.9
-local AI_STEER_RETURN_FACTOR = STEER_RETURN_FACTOR * 0.7
+local AI_MAX_STEER = MAX_STEER_KEYBOARD * 0.45
+local AI_STEER_CHANGE = STEER_CHANGE * 0.5
+local AI_STEER_RESULT_CHANGE = STEER_RESULT_CHANGE * 2
+local AI_STEER_RETURN = STEER_RETURN * 2
+local AI_OUTWARD_FORCE = OUTWARD_FORCE * 0.3
 local MAX_WHEEL_SCALE_CHANGE = 0.05
 local MAX_BODY_DEGREES_CHANGE = 2
 local MAX_STEER_PERSPECTIVE_EFFECT = 8
@@ -425,25 +429,33 @@ function Car.getBaseTotalCarWidth()
 end
 
 function Car:updateSteerPlayerKeyboard(dt)
-	local steerBackHardFactor = 1
+    local steerBackHardFactor = 1
 	if love.keyboard.isDown("left") then
 		if (self.steer > 0) then
-			steerBackHardFactor = 1 + (2 * self.steer/MAX_STEER_KEYBOARD)
+			steerBackHardFactor = 1 + (4 * self.steer/MAX_STEER_KEYBOARD)
 		end
-		self.steer = self.steer - STEER_CHANGE * steerBackHardFactor * dt
+        self.steer = self.steer - STEER_CHANGE * steerBackHardFactor * dt
 		if (self.steer < -MAX_STEER_KEYBOARD) then
 			self.steer = -MAX_STEER_KEYBOARD
 		end
 	elseif love.keyboard.isDown("right") then
 		if (self.steer < 0) then
-			steerBackHardFactor = 1 + math.abs(self.steer)/MAX_STEER_KEYBOARD
+			steerBackHardFactor = 1 + (4 * -self.steer/MAX_STEER_KEYBOARD)
 		end
-		self.steer = self.steer + STEER_CHANGE * steerBackHardFactor * dt
+        self.steer = self.steer + STEER_CHANGE * steerBackHardFactor * dt
 		if (self.steer > MAX_STEER_KEYBOARD) then
 			self.steer = MAX_STEER_KEYBOARD
 		end
-	elseif (self.steer ~= 0) then
-		self.steer = self.steer * STEER_RETURN_FACTOR * dt
+	elseif (self.steer > 0) then
+		self.steer = self.steer - STEER_RETURN * dt
+        if (self.steer < 0) then
+            self.steer = 0
+        end
+    elseif (self.steer < 0) then
+	    self.steer = self.steer + STEER_RETURN * dt
+        if (self.steer > 0) then
+            self.steer = 0
+        end 
 	end
 	self.steerFactor = self.steer / MAX_STEER_KEYBOARD
 end
@@ -496,9 +508,17 @@ function Car:updateSteerCpu(dt)
 		if (self.steer > AI_MAX_STEER) then
 			self.steer = AI_MAX_STEER
 		end
-	elseif (self.steer ~= 0) then
-		self.steer = self.steer * AI_STEER_RETURN_FACTOR * dt
-	end
+	elseif (self.steer > 0) then
+        self.steer = self.steer - AI_STEER_RETURN * dt   
+        if (self.steer < 0) then
+            self.steer = 0
+        end
+    elseif (self.steer < 0) then
+        self.steer = self.steer + AI_STEER_RETURN * dt
+        if (self.steer > 0) then
+            self.steer = 0
+        end 
+    end
 	
 	-- add random steering
 	if (self.speed > 0) then
@@ -676,14 +696,13 @@ function Car:updateWheelAnimation(dt)
 end
 
 function Car:updateSteerResultPlayer(dt)
-	local steerUpdateSpeed = 300
 	if (self.steerResult < self.steer) then
-		self.steerResult = self.steerResult + steerUpdateSpeed * dt
+		self.steerResult = self.steerResult + STEER_RESULT_CHANGE * dt
 		if (self.steerResult > self.steer) then
 			self.steerResult = self.steer
 		end
 	elseif (self.steerResult > self.steer) then
-		self.steerResult = self.steerResult - steerUpdateSpeed * dt
+		self.steerResult = self.steerResult - STEER_RESULT_CHANGE * dt
 		if (self.steerResult < self.steer) then
 			self.steerResult = self.steer
 		end
@@ -691,14 +710,13 @@ function Car:updateSteerResultPlayer(dt)
 end
 
 function Car:updateSteerResultCpu(dt)
-	local steerUpdateSpeed = 1200
 	if (self.steerResult < self.steer) then
-		self.steerResult = self.steerResult + steerUpdateSpeed * dt
+		self.steerResult = self.steerResult + AI_STEER_RESULT_CHANGE * dt
 		if (self.steerResult > self.steer) then
 			self.steerResult = self.steer
 		end
 	elseif (self.steerResult > self.steer) then
-		self.steerResult = self.steerResult - steerUpdateSpeed * dt
+		self.steerResult = self.steerResult - AI_STEER_RESULT_CHANGE * dt
 		if (self.steerResult < self.steer) then
 			self.steerResult = self.steer
 		end
@@ -714,20 +732,20 @@ function Car:updateSteerResult(dt)
 end
 
 function Car:updateOutwardForcePlayer(dt)
-	local newOutwardForce = self.segmentDdx*self.speed*self.speed*84*dt
+	local newOutwardForce = self.segmentDdx * self.speed * self.speed * OUTWARD_FORCE
 	if (math.abs(newOutwardForce) < math.abs(self.outwardForce)) then
-		self.outwardForce = newOutwardForce
+		self.outwardForce = (4 * self.outwardForce + 1 * newOutwardForce) / 5
 	else
-		self.outwardForce = (14*self.outwardForce + 1*newOutwardForce) / 15
+		self.outwardForce = (14 * self.outwardForce + 1 * newOutwardForce) / 15
 	end	
 end
 
 function Car:updateOutwardForceCpu(dt)
-	local newOutwardForce = self.segmentDdx*self.speed*self.speed*54*dt
+	local newOutwardForce = self.segmentDdx * self.speed * self.speed * AI_OUTWARD_FORCE
 	if (math.abs(newOutwardForce) < math.abs(self.outwardForce)) then
-		self.outwardForce = newOutwardForce
+		self.outwardForce = (1 * self.outwardForce + 1 * newOutwardForce) / 2
 	else
-		self.outwardForce = (9*self.outwardForce + 1*newOutwardForce) / 10
+		self.outwardForce = (9 * self.outwardForce + 1 * newOutwardForce) / 10
 	end	
 end
 
@@ -843,6 +861,7 @@ function Car:updateExplosion(dt)
 			self.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME * sound.VOLUME_EFFECTS)
 			self.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
 			self.steer = 0
+            self.steerResult = 0
 			self.x = 0
 		else
 			delete = true
@@ -936,12 +955,12 @@ function Car:update(dt)
 	if (self.explosionTime == 0) then
 		if (not self.falling) then
 			-- apply outward force to x
-			self.x = self.x - self.outwardForce
+			self.x = self.x - self.outwardForce * dt
 	
 			-- apply steer result to x
-			self.x = self.x + self.steerResult
+			self.x = self.x + self.steerResult * dt
 		else
-			self.x = self.x + self.fallDx
+			self.x = self.x + self.fallDx * dt
 		end
 	end
 	
@@ -1015,7 +1034,7 @@ function Car:draw()
 		end
 		
 		local steerPerspectiveEffect = self.steerFactor * MAX_STEER_PERSPECTIVE_EFFECT
-		local perspectiveEffect = (aspect.GAME_WIDTH/2-newScreenX)/(aspect.GAME_WIDTH/2) * 10 + steerPerspectiveEffect
+		local perspectiveEffect = (aspect.GAME_WIDTH / 2 - newScreenX) / (aspect.GAME_WIDTH / 2) * 10 + steerPerspectiveEffect
 		local frontWheelDy = -imgFrontWheel[1]:getHeight() - 5 * imageScale
 		local accEffect = self.accEffect * 0.01
 		

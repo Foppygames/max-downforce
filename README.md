@@ -10,6 +10,6 @@ The songs included in this repository are by Kevin MacLeod and fall under the At
 
 ## Executables
 
-Executables for Windows and Linux (AppImage) can be downloaded from Game Jolt:
+Executables for Windows and Linux (AppImage) can be downloaded from itch.io:
 
-https://gamejolt.com/games/max_downforce/286316
+https://foppygames.itch.io/max-downforce

@@ -3,33 +3,17 @@
 
 local segments = {}
 
--- =========================================================
--- modules
--- =========================================================
-
 local entities = require("modules.entities")
 local perspective = require("modules.perspective")
 local schedule = require("modules.schedule")
 local tracks = require("modules.tracks")
 
--- =========================================================
--- constants
--- =========================================================
-
 segments.MAX_SEGMENT_DDX = 0.0030
-
--- =========================================================
--- variables
--- =========================================================
 
 local track = nil
 local segmentIndex
 local active
 local tunnelStarted
-
--- =========================================================
--- functions
--- =========================================================
 
 function segments.init()
 	tracks.init()

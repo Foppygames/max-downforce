@@ -1,16 +1,10 @@
 -- Max Downforce - classes/grass.lua
 -- 2019 Foppygames
 
--- classes
 require "classes.entity"
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 
--- grass is based on entity
 Grass = Entity:new()
 
 function Grass.init()

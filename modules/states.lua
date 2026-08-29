@@ -3,10 +3,6 @@
 
 local states = {}
 
--- =========================================================
--- includes
--- =========================================================
-
 require "classes.banner"
 require "classes.building"
 require "classes.car"
@@ -33,10 +29,6 @@ local segments = require("modules.segments")
 local sound = require("modules.sound")
 local timer = require("modules.timer")
 local tracks = require("modules.tracks")
-
--- =========================================================
--- constants
--- =========================================================
 
 local STATE_TITLE = 0
 local STATE_RACE = 1
@@ -81,10 +73,6 @@ local TIME_AFTER_FINISHED = 5
 local TIME_BEFORE_BEEPS = 0.7
 local TIME_BEFORE_START = 2.5
 
--- =========================================================
--- variables
--- =========================================================
-
 local afterFinishedTimer = 0
 local beepCounter = 0
 local beepTimer = 0
@@ -121,10 +109,6 @@ local imageTrophySilver = nil
 local imageTrophyGold = nil
 local imageGamepadModeR = nil
 local imageGamepadModeL = nil
-
--- =========================================================
--- private functions
--- =========================================================
 
 local function drawGameOverScreen()
 	love.graphics.setColor(1,1,1)
@@ -481,10 +465,6 @@ local function switchToState(newState)
 		setTarmacColors()
 	end
 end
-
--- =========================================================
--- public functions
--- =========================================================
 
 function states.init(gameVersion,gameTitle)
 	version = gameVersion

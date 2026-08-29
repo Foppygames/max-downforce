@@ -1,22 +1,15 @@
 -- Max Downforce - classes/tunnelend.lua
 -- 2019-2020 Foppygames
 
--- classes
 require "classes.entity"
 
--- modules
 local aspect = require("modules.aspect")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 
--- local constants
--- ...
-
--- local variables
 local colorAngle = 0
 local count = 0
 
--- tunnel end is based on entity
 TunnelEnd = Entity:new()
 
 function TunnelEnd.init()

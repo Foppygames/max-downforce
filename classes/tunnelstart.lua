@@ -1,20 +1,11 @@
 -- Max Downforce - classes/tunnelstart.lua
 -- 2019-2020 Foppygames
 
--- classes
 require "classes.entity"
 
--- modules
 local aspect = require("modules.aspect")
 local road = require("modules.road")
 
--- local constants
--- ...
-
--- local variables
--- ...
-
--- tunnel start is based on entity
 TunnelStart = Entity:new()
 
 function TunnelStart.init()

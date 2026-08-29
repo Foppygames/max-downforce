@@ -1,17 +1,14 @@
 -- Max Downforce - classes/car.lua
 -- 2018-2021 Foppygames
 
--- modules
 local aspect = require("modules.aspect")
 local controls = require("modules.controls")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 local sound = require("modules.sound")
 
--- classes
 require "classes.entity"
 
--- local constants
 local WIDTH_MODIFIER = 0.85
 local MAX_STEER_KEYBOARD = 1260
 local MAX_STEER_GAMEPAD = MAX_STEER_KEYBOARD * 0.9
@@ -51,7 +48,6 @@ local PLAYER_ENGINE_SOUND_POWER_VOLUME = 0.8
 local PLAYER_ENGINE_SOUND_IDLE_VOLUME = 0.8
 local AI_ENGINE_SOUND_POWER_VOLUME = 0.65
 
--- local variables
 local colors = {}
 local imgBody = nil
 local imgFrontWheel = {}
@@ -80,7 +76,6 @@ local frontWheelRightDx = 0
 local frontWheelDy = 0
 local baseTotalCarWidth = 0
 
--- car is based on entity
 Car = Entity:new()
 
 function Car.init()

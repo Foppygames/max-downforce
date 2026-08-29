@@ -3,27 +3,15 @@
 
 local opponents = {}
 
--- =========================================================
--- includes
--- =========================================================
-
 local entities = require("modules.entities")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 local segments = require("modules.segments")
 
--- =========================================================
--- constants
--- =========================================================
-
 local OPPONENT_SPEED = 70
 local MAX_OPPONENTS_ON_SCREEN = 5
 local YELLOW_MIN_TRACK_LENGTHS = 0.6
 local YELLOW_MAX_TRACK_LENGTHS = 2.6
-
--- =========================================================
--- variables
--- =========================================================
 
 local minOpponentZ
 local maxOpponentZ
@@ -31,10 +19,6 @@ local opponentZ
 local yellowFlagDistance
 local yellowFlagCount
 local yellowFlagSide
-
--- =========================================================
--- public functions
--- =========================================================
 
 function opponents.init()
 	minOpponentZ = perspective.maxZ / 8

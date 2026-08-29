@@ -3,15 +3,7 @@
 
 local timer = {}
 
--- =========================================================
--- includes
--- =========================================================
-
 local utils = require("modules.utils")
-
--- =========================================================
--- constants
--- =========================================================
 
 -- note: reasonably quick lap is around 50 seconds
 
@@ -20,17 +12,9 @@ local MIN_TIME = 50 -- time available for last lap
 local CARRY_FACTOR = 0.1 -- factor of remaining time carried to next lap
 local TIME_DANGEROUS = 9
 
--- =========================================================
--- variables
--- =========================================================
-
 local remaining
 local pauseRemaining
 local halted
-
--- =========================================================
--- functions
--- =========================================================
 
 function timer.init()
 	-- ...

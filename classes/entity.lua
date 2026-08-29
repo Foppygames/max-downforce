@@ -1,10 +1,8 @@
 -- Max Downforce - classes/entity.lua
 -- 2018-2020 Foppygames
 
--- modules
 local perspective = require("modules.perspective")
 
--- entity is not based on another class
 Entity = {}
 
 function Entity:new(x,z)

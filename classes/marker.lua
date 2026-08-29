@@ -1,16 +1,10 @@
 -- Max Downforce - classes/marker.lua
 -- 2019 Foppygames
 
--- classes
 require "classes.entity"
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 
--- marker is based on entity
 Marker = Entity:new()
 
 function Marker.init()

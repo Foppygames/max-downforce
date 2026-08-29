@@ -1,19 +1,12 @@
 -- Max Downforce - classes/spark.lua
 -- 2019 Foppygames
 
--- classes
 require "classes.entity"
 
--- modules
 local perspective = require("modules.perspective")
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 
--- spark is based on entity
 Spark = Entity:new()
 
 function Spark.init()

@@ -1,17 +1,11 @@
 -- Max Downforce - classes/sign.lua
 -- 2018 Foppygames
 
--- classes
 require "classes.entity"
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 local imgIndex = 1
 
--- sign is based on entity
 Sign = Entity:new()
 
 function Sign.init()

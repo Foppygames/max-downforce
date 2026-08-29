@@ -5,10 +5,6 @@ love.joystick.loadGamepadMappings("gamecontrollerdb.txt")
 	
 local controls = {}
 
--- =========================================================
--- constants
--- =========================================================
-
 controls.KEYBOARD = 1
 controls.GAMEPAD = 2
 
@@ -27,20 +23,12 @@ controls.GAMEPAD_X_DEADZONE = 0.04
 controls.GAMEPAD_MODE_R = 1
 controls.GAMEPAD_MODE_L = 2
 
--- =========================================================
--- variables
--- =========================================================
-
 controls.available = {}
 controls.joystick = nil
 controls.selectedIndex = 0
 controls.selected = nil
 controls.joystickSteerAxis = ""
 controls.joystickThrottleAxis = ""
-
--- =========================================================
--- public functions
--- =========================================================
 
 -- returns joystick object if gamepad method selected
 function controls.init()

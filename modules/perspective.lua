@@ -3,32 +3,16 @@
 
 local perspective = {}
 
--- =========================================================
--- includes
--- =========================================================
-
 local aspect = require("modules.aspect")
-
--- =========================================================
--- constants
--- =========================================================
 
 perspective.GROUND_HEIGHT = aspect.GAME_HEIGHT / 2
 perspective.HORIZON_Y = aspect.GAME_HEIGHT - perspective.GROUND_HEIGHT
-
--- =========================================================
--- variables
--- =========================================================
 
 perspective.carLength = nil
 perspective.maxZ = nil
 perspective.minZ = nil
 perspective.scale = {}
 perspective.zMap = {}
-
--- =========================================================
--- public functions
--- =========================================================
 
 function perspective.initZMapAndScaling()
 	for i = 1, perspective.GROUND_HEIGHT do

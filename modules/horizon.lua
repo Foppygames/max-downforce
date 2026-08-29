@@ -3,18 +3,10 @@
 
 local horizon = {}
 
--- =========================================================
--- includes
--- =========================================================
-
 local aspect = require("modules.aspect")
 local perspective = require("modules.perspective")
 local segments = require("modules.segments")
 local tracks = require("modules.tracks")
-
--- =========================================================
--- constants
--- =========================================================
 
 local IMAGE_INDEXES_FOREST_TRACK = {1, 2, 3}
 local IMAGE_INDEXES_MOUNTAIN_TRACK = {1, 5, 2, 5}
@@ -23,10 +15,6 @@ local IMAGE_INDEXES_CITY_TRACK = {4, 6, 7}
 local COLOR_FOREST_TRACK = {1,1,1}
 local COLOR_MOUNTAIN_TRACK = {0.2,0.3,0.6}
 local COLOR_CITY_TRACK = {1,1,1}
-
--- =========================================================
--- variables
--- =========================================================
 
 local image = {}
 local imageIndexes = {}
@@ -37,10 +25,6 @@ local y = {}
 local speed = {}
 local layerCount = 0
 local color
-
--- =========================================================
--- public functions
--- =========================================================
 
 function horizon.init()
 	image = {

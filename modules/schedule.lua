@@ -3,16 +3,8 @@
 
 local schedule = {}
 
--- =========================================================
--- includes
--- =========================================================
-
 local entities = require("modules.entities")
 local perspective = require("modules.perspective")
-
--- =========================================================
--- public constants
--- =========================================================
 
 schedule.ITEM_BANNER_START = "banner_start"
 schedule.ITEM_BANNER_FOREST_BRIDGE = "banner_forest_bridge"
@@ -50,15 +42,7 @@ schedule.ITEM_TUNNEL_START = "tunnel_start"
 schedule.ITEM_STADIUM_L = "stadium_l"
 schedule.ITEM_STADIUM_R = "stadium_r"
 
--- =========================================================
--- variables
--- =========================================================
-
 local items = {}
-
--- =========================================================
--- private functions
--- =========================================================
 
 function processItem(itemType,z)
 	if itemType == schedule.ITEM_CITY_BUILDING_L_R then
@@ -163,10 +147,6 @@ function processItem(itemType,z)
 		entities.addBanner(0,z,4)
 	end
 end
-
--- =========================================================
--- public functions
--- =========================================================
 
 function schedule.reset()
 	items = {}

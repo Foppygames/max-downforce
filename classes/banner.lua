@@ -1,18 +1,14 @@
 -- Max Downforce - classes/banner.lua
 -- 2018-2020 Foppygames
 
--- classes
 require "classes.entity"
 
--- local constants
 local POLE_WIDTH = 1
 local POLE_HEIGHT = 30
 
--- local variables
 local img = nil
 local imgIndex = 1
 
--- banner is based on entity
 Banner = Entity:new()
 
 function Banner.init()

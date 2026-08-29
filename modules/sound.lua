@@ -3,10 +3,6 @@
 
 local sound = {}
 
--- =========================================================
--- constants
--- =========================================================
-
 sound.ENGINE_IDLE = 1
 sound.ENGINE_POWER = 2
 sound.EXPLOSION = 3
@@ -51,19 +47,11 @@ else
 	sound.MUSIC_CREDITS_X = 38
 end
 
--- =========================================================
--- variables
--- =========================================================
-
 sound.paths = {}
 sound.sources = {}
 
 local crowdVolume = 0
 local musicEnabled = true
-
--- =========================================================
--- private functions
--- =========================================================
 
 -- returns source for provided path if created before, nil otherwise
 -- Note: used to avoid duplicate music sources, not used for sound effects
@@ -73,10 +61,6 @@ local function getSourceForPath(path)
 	end
 	return nil
 end
-
--- =========================================================
--- public functions
--- =========================================================
 
 function sound.init()
 	sound.initEffects()

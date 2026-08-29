@@ -1,16 +1,10 @@
 -- Max Downforce - classes/light.lua
 -- 2019 Foppygames
 
--- classes
 require "classes.entity"
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 
--- light is based on entity
 Light = Entity:new()
 
 function Light.init()

@@ -1,20 +1,14 @@
 -- Max Downforce - classes/tree.lua
 -- 2018-2019 Foppygames
 
--- classes
 require "classes.entity"
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 local shadowImg = nil
 local ravineShadowImg = nil
 local shadowHalfWidth = 0
 local shadowHalfHeight = 0
 
--- tree is based on entity
 Tree = Entity:new()
 
 function Tree.init()

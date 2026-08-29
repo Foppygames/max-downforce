@@ -1,16 +1,12 @@
 -- Max Downforce - classes/flagger.lua
 -- 2019 Foppygames
 
--- classes
 require "classes.entity"
 
--- local constants
 local WAVE_TIME = 0.2
 
--- local variables
 local img = nil
 
--- grass is based on entity
 Flagger = Entity:new()
 
 function Flagger.init()

@@ -3,10 +3,6 @@
 
 local utils = {}
 
--- =========================================================
--- public functions
--- =========================================================
-
 function utils.round(num) 
 	if num >= 0 then 
 		return math.floor(num+.5) 

@@ -3,24 +3,12 @@
 
 local track1 = {}
 
--- =========================================================
--- modules
--- =========================================================
-
 local aspect = require("modules.aspect")
 local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
--- =========================================================
--- constants
--- =========================================================
-
 local FIRST_SEGMENT_LENGTH = 0.55
 local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
-
--- =========================================================
--- variables
--- =========================================================
 
 track1.name = "Forest"
 track1.number = 1

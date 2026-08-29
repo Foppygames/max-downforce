@@ -3,10 +3,6 @@
 
 local entities = {}
 
--- =========================================================
--- includes
--- =========================================================
-
 require "classes.banner"
 require "classes.building"
 require "classes.car"
@@ -27,10 +23,6 @@ local perspective = require("modules.perspective")
 local road = require("modules.road")
 local utils = require("modules.utils")
 
--- =========================================================
--- variables
--- =========================================================
-
 local baseScale = {}
 local images = {}
 local index = nil
@@ -38,10 +30,6 @@ local lap = false
 local list = {}
 local ravine = false
 local city = false
-
--- =========================================================
--- public functions
--- =========================================================
 
 function entities.init()
 	list = {}

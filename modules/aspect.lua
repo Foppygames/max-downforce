@@ -3,15 +3,7 @@
 
 local aspect = {}
 
--- =========================================================
--- includes
--- =========================================================
-
 local utils = require("modules.utils")
-
--- =========================================================
--- constants
--- =========================================================
 
 aspect.WINDOW_WIDTH = 1068
 aspect.WINDOW_HEIGHT = 600
@@ -19,10 +11,6 @@ aspect.GAME_WIDTH = 356
 aspect.GAME_HEIGHT = 200
 
 local BAR_COLOR = {0,0,0}
-
--- =========================================================
--- variables
--- =========================================================
 
 local windowWidth
 local windowHeight
@@ -32,10 +20,6 @@ local scale
 local bars
 local gameX
 local gameY
-
--- =========================================================
--- public functions
--- =========================================================
 
 function aspect.init(fullScreen)
 	if (fullScreen) then

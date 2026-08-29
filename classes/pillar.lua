@@ -1,18 +1,12 @@
 -- Max Downforce - classes/pillar.lua
 -- 2019 Foppygames
 
--- classes
 require "classes.entity"
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 local shadowImg = nil
 local shadowHalfHeight = 0
 
--- pillar is based on entity
 Pillar = Entity:new()
 
 function Pillar.init()

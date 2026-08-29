@@ -3,32 +3,16 @@
 
 local tracks = {}
 
--- =========================================================
--- modules
--- =========================================================
-
 local perspective = require("modules.perspective")
 local schedule = require("modules.schedule")
 local track1 = require("modules.track1")
 local track2 = require("modules.track2")
 local track3 = require("modules.track3")
 
--- =========================================================
--- constants
--- =========================================================
-
 local SMOOTHING_SEGMENT_DDX_STEP = 0.04
 local SMOOTHING_SEGMENT_LENGTH = 0.05
 
--- =========================================================
--- variables
--- =========================================================
-
 local selectedTrack = nil
-
--- =========================================================
--- functions
--- =========================================================
 
 local function initTrackModule(trackModule)
 	-- smoothen corner exits

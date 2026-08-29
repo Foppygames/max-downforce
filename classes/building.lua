@@ -1,19 +1,10 @@
 -- Max Downforce - classes/building.lua
 -- 2018 Foppygames
 
--- modules
--- ...
-
--- classes
 require "classes.entity"
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 
--- building is based on entity
 Building = Entity:new()
 
 function Building.init()

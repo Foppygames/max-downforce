@@ -1,19 +1,10 @@
 -- Max Downforce - classes/stadium.lua
 -- 2018 Foppygames
 
--- modules
--- ...
-
--- classes
 require "classes.entity"
 
--- local constants
--- ...
-
--- local variables
 local img = nil
 
--- stadium is based on entity
 Stadium = Entity:new()
 
 function Stadium.init()

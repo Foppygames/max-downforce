@@ -450,12 +450,12 @@ track2.segments = {
 
 function track2.drawSky()
 	-- draw sky above horizon
-	love.graphics.setColor(0.9,0.4,0.5)
-	love.graphics.rectangle("fill",0,0,aspect.GAME_WIDTH,SKY_HEIGHT)
+	love.graphics.setColor(0.9, 0.4, 0.5)
+	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
 
  	-- draw mountain color below horizon
-	love.graphics.setColor(0.06,0.16,0.415)
-	love.graphics.rectangle("fill",0,SKY_HEIGHT,aspect.GAME_WIDTH,REMAINING_HEIGHT)
+	love.graphics.setColor(0.06, 0.16, 0.415)
+	love.graphics.rectangle("fill", 0, SKY_HEIGHT, aspect.GAME_WIDTH, REMAINING_HEIGHT)
 end
 
 return track2

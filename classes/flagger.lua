@@ -18,12 +18,14 @@ function Flagger.init()
 	}
 end
 
-function Flagger:new(x,z)
-	o = Entity:new(x,z)	
+function Flagger:new(x, z)
+	o = Entity:new(x, z)
+
 	setmetatable(o, self)
+
 	self.__index = self
 	
-	if (x < 0) then
+	if x < 0 then
 		o.index = 1
 	else
 		o.index = 3
@@ -43,11 +45,14 @@ end
 
 function Flagger:update(dt)
 	self.waveTime = self.waveTime - dt
-	if (self.waveTime <= 0) then
+
+	if self.waveTime <= 0 then
 		self.index = self.index + 1
-		if ((self.index == 3) or (self.index == 5)) then
+
+		if (self.index == 3) or (self.index == 5) then
 			self.index = self.index - 2
 		end
+		
 		self.image = img[self.index]
 		self.waveTime = WAVE_TIME
 	end

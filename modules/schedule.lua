@@ -44,107 +44,106 @@ schedule.ITEM_STADIUM_R = "stadium_r"
 
 local items = {}
 
-function processItem(itemType,z)
+function processItem(itemType, z)
 	if itemType == schedule.ITEM_CITY_BUILDING_L_R then
-		entities.addCityBuilding(-1600,z)
-		entities.addCityBuilding(-900,z)
-		entities.addCityBuilding(900,z)
-		entities.addCityBuilding(1600,z)
-	elseif (itemType == schedule.ITEM_LOW_BUILDING_L) then
-		entities.addLowBuilding(-700,z)
-	elseif (itemType == schedule.ITEM_LOW_BUILDING_R) then
-		entities.addLowBuilding(700,z)
-	elseif (itemType == schedule.ITEM_HIGH_BUILDING_R) then
-		entities.addHighBuilding(700,z)
-	elseif (itemType == schedule.ITEM_FLAG_L) then
-		entities.addFlag(-540,z)
-	elseif (itemType == schedule.ITEM_FLAG_R) then
-		entities.addFlag(540,z)
-	elseif (itemType == schedule.ITEM_GRASS_L) then
-		entities.addGrass(-1200,z,false)
-		entities.addGrass(-600,z-4,false)
-	elseif (itemType == schedule.ITEM_GRASS_L_R) then
-		entities.addGrass(-1200,z,false)
-		entities.addGrass(-600,z-4,false)
-		entities.addGrass(600,z-4,false)
-		entities.addGrass(1200,z,false)
-	elseif (itemType == schedule.ITEM_GRASS_MOUNTAIN_L) then
-		entities.addGrass(-400,z,true)
-	elseif (itemType == schedule.ITEM_GRASS_MOUNTAIN_R) then
-		entities.addGrass(1000,z,true)
-		entities.addGrass(700,z-3,true)
-		entities.addGrass(400,z-6,true)
-	elseif (itemType == schedule.ITEM_GRASS_R) then
-		entities.addGrass(600,z-4,false)
-		entities.addGrass(1200,z,false)
-	elseif (itemType == schedule.ITEM_LIGHT_L) then
-		entities.addLight(-450,z)
-	elseif (itemType == schedule.ITEM_LIGHT_L_R) then
-		entities.addLight(-450,z)
-		entities.addLight(450,z)
-	elseif (itemType == schedule.ITEM_LIGHT_R) then
-		entities.addLight(450,z)
-	elseif (itemType == schedule.ITEM_MARKER_L) then
-		entities.addMarker(-310,z)
-	elseif (itemType == schedule.ITEM_MARKER_L_R) then
-		entities.addMarker(-310,z)
-		entities.addMarker(310,z)
-	elseif (itemType == schedule.ITEM_PILLAR_L) then
-		entities.addPillar(-260,z)
-	elseif (itemType == schedule.ITEM_SIGN_L) then
-		entities.addSign(-700,z)
-	elseif (itemType == schedule.ITEM_SIGN_R) then
-		entities.addSign(700,z)
-	elseif (itemType == schedule.ITEM_STADIUM_L) then
-		entities.addStadium(-850,z)
-	elseif (itemType == schedule.ITEM_STADIUM_R) then
-		entities.addStadium(850,z)
-	elseif (itemType == schedule.ITEM_TREES_L) then
-		entities.addTree(-2500,z,0.4,false)
-		entities.addTree(-1300,z-4,0.7,false)
-		entities.addTree(-505,z-8,1,false)
-	elseif (itemType == schedule.ITEM_TREES_L_CITY) then
-		--entities.addTree(-2500,z,0.4,false)
-		entities.addTree(-1300,z-4,0.7,false)
-		entities.addTree(-705,z-8,1,false)
-	elseif (itemType == schedule.ITEM_TREES_L_R) then
-		entities.addTree(-2500,z,0.4,false)
-		entities.addTree(-1300,z-4,0.7,false)
-		entities.addTree(-505,z-8,1,false)
-		entities.addTree(505,z-8,1,false)
-		entities.addTree(1300,z-4,0.7,false)
-		entities.addTree(2500,z,0.4,false)
-	elseif (itemType == schedule.ITEM_TREES_R) then
-		entities.addTree(505,z-8,1,false)
-		entities.addTree(1300,z-4,0.7,false)
-		entities.addTree(2500,z,0.4,false)
-	elseif (itemType == schedule.ITEM_TREES_R_CITY) then
-		entities.addTree(705,z-8,1,false)
-		entities.addTree(1300,z-4,0.7,false)
-		--entities.addTree(2500,z,0.4,false)
-	elseif (itemType == schedule.ITEM_TREES_MOUNTAIN_L) then
-		entities.addTree(-440,z-8,0.7,true)
-		entities.addTree(-430,z,1 ,true)
-	elseif (itemType == schedule.ITEM_TREES_MOUNTAIN_R) then
-		entities.addTree(505,z-8,1,true)
-		entities.addTree(1300,z-4,0.7,true)
-		entities.addTree(2500,z,0.4,true)
-	elseif (itemType == schedule.ITEM_TREES_MOUNTAIN_R_BACK) then
-		entities.addTree(905,z-8,1,true)
-		entities.addTree(1700,z-4,0.7,true)
-		entities.addTree(2900,z,0.4,true)
-	elseif (itemType == schedule.ITEM_TUNNEL_END) then
+		entities.addCityBuilding(-1600, z)
+		entities.addCityBuilding(-900, z)
+		entities.addCityBuilding(900, z)
+		entities.addCityBuilding(1600, z)
+	elseif itemType == schedule.ITEM_LOW_BUILDING_L then
+		entities.addLowBuilding(-700, z)
+	elseif itemType == schedule.ITEM_LOW_BUILDING_R then
+		entities.addLowBuilding(700, z)
+	elseif itemType == schedule.ITEM_HIGH_BUILDING_R then
+		entities.addHighBuilding(700, z)
+	elseif itemType == schedule.ITEM_FLAG_L then
+		entities.addFlag(-540, z)
+	elseif itemType == schedule.ITEM_FLAG_R then
+		entities.addFlag(540, z)
+	elseif itemType == schedule.ITEM_GRASS_L then
+		entities.addGrass(-1200, z, false)
+		entities.addGrass(-600, z - 4, false)
+	elseif itemType == schedule.ITEM_GRASS_L_R then
+		entities.addGrass(-1200, z, false)
+		entities.addGrass(-600, z - 4, false)
+		entities.addGrass(600, z - 4, false)
+		entities.addGrass(1200, z, false)
+	elseif itemType == schedule.ITEM_GRASS_MOUNTAIN_L then
+		entities.addGrass(-400, z, true)
+	elseif itemType == schedule.ITEM_GRASS_MOUNTAIN_R then
+		entities.addGrass(1000, z, true)
+		entities.addGrass(700, z - 3, true)
+		entities.addGrass(400, z - 6, true)
+	elseif itemType == schedule.ITEM_GRASS_R then
+		entities.addGrass(600, z - 4, false)
+		entities.addGrass(1200, z, false)
+	elseif itemType == schedule.ITEM_LIGHT_L then
+		entities.addLight(-450, z)
+	elseif itemType == schedule.ITEM_LIGHT_L_R then
+		entities.addLight(-450, z)
+		entities.addLight(450, z)
+	elseif itemType == schedule.ITEM_LIGHT_R then
+		entities.addLight(450, z)
+	elseif itemType == schedule.ITEM_MARKER_L then
+		entities.addMarker(-310, z)
+	elseif itemType == schedule.ITEM_MARKER_L_R then
+		entities.addMarker(-310, z)
+		entities.addMarker(310, z)
+	elseif itemType == schedule.ITEM_PILLAR_L then
+		entities.addPillar(-260, z)
+	elseif itemType == schedule.ITEM_SIGN_L then
+		entities.addSign(-700, z)
+	elseif itemType == schedule.ITEM_SIGN_R then
+		entities.addSign(700, z)
+	elseif itemType == schedule.ITEM_STADIUM_L then
+		entities.addStadium(-850, z)
+	elseif itemType == schedule.ITEM_STADIUM_R then
+		entities.addStadium(850, z)
+	elseif itemType == schedule.ITEM_TREES_L then
+		entities.addTree(-2500, z, 0.4, false)
+		entities.addTree(-1300, z - 4, 0.7, false)
+		entities.addTree(-505, z - 8, 1, false)
+	elseif itemType == schedule.ITEM_TREES_L_CITY then
+		entities.addTree(-1300, z - 4, 0.7, false)
+		entities.addTree(-705, z - 8, 1, false)
+	elseif itemType == schedule.ITEM_TREES_L_R then
+		entities.addTree(-2500, z, 0.4, false)
+		entities.addTree(-1300, z - 4, 0.7, false)
+		entities.addTree(-505, z - 8, 1, false)
+		entities.addTree(505, z - 8, 1, false)
+		entities.addTree(1300, z - 4, 0.7, false)
+		entities.addTree(2500, z, 0.4, false)
+	elseif itemType == schedule.ITEM_TREES_R then
+		entities.addTree(505, z - 8, 1, false)
+		entities.addTree(1300, z - 4, 0.7, false)
+		entities.addTree(2500, z, 0.4, false)
+	elseif itemType == schedule.ITEM_TREES_R_CITY then
+		entities.addTree(705, z - 8, 1, false)
+		entities.addTree(1300, z - 4, 0.7, false)
+		--entities.addTree(2500, z, 0.4, false)
+	elseif itemType == schedule.ITEM_TREES_MOUNTAIN_L then
+		entities.addTree(-440, z - 8, 0.7, true)
+		entities.addTree(-430, z, 1 , true)
+	elseif itemType == schedule.ITEM_TREES_MOUNTAIN_R then
+		entities.addTree(505, z - 8, 1, true)
+		entities.addTree(1300, z - 4, 0.7, true)
+		entities.addTree(2500, z, 0.4, true)
+	elseif itemType == schedule.ITEM_TREES_MOUNTAIN_R_BACK then
+		entities.addTree(905, z - 8, 1, true)
+		entities.addTree(1700, z - 4, 0.7, true)
+		entities.addTree(2900, z, 0.4, true)
+	elseif itemType == schedule.ITEM_TUNNEL_END then
 		entities.addTunnelEnd(z)
-	elseif (itemType == schedule.ITEM_TUNNEL_START) then
+	elseif itemType == schedule.ITEM_TUNNEL_START then
 		entities.addTunnelStart(z)
-	elseif (itemType == schedule.ITEM_BANNER_FOREST_BRIDGE) then
-		entities.addBanner(0,z,2)
-	elseif (itemType == schedule.ITEM_BANNER_START) then
-		entities.addBanner(0,z,1)
-	elseif (itemType == schedule.ITEM_BANNER_CITY_LIGHTS) then
-		entities.addBanner(0,z,3)
-	elseif (itemType == schedule.ITEM_BANNER_CITY_LANTERNS) then
-		entities.addBanner(0,z,4)
+	elseif itemType == schedule.ITEM_BANNER_FOREST_BRIDGE then
+		entities.addBanner(0, z, 2)
+	elseif itemType == schedule.ITEM_BANNER_START then
+		entities.addBanner(0, z, 1)
+	elseif itemType == schedule.ITEM_BANNER_CITY_LIGHTS then
+		entities.addBanner(0, z, 3)
+	elseif itemType == schedule.ITEM_BANNER_CITY_LANTERNS then
+		entities.addBanner(0, z, 4)
 	end
 end
 
@@ -154,9 +153,9 @@ end
 
 -- note: z parameter is starting z for series of items
 -- if z is smaller than maxZ this means items may have to be processed right away
-function schedule.add(itemType,dz,count,z)
-	if (count > 0) then
-		if (items[itemType] ~= nil) then
+function schedule.add(itemType, dz, count, z)
+	if count > 0 then
+		if items[itemType] ~= nil then
 			items[itemType].dz = dz
 			items[itemType].count = count
 		else
@@ -168,14 +167,16 @@ function schedule.add(itemType,dz,count,z)
 		end
 		
 		-- process items right away
-		if (z < perspective.maxZ) then
+		if z < perspective.maxZ then
 			repeat
-				processItem(itemType,z)
+				processItem(itemType, z)
+
 				z = z + items[itemType].dz
+
 				items[itemType].count = items[itemType].count - 1
 			until (z >= perspective.maxZ) or (items[itemType].count <= 0)
 			
-			if (items[itemType].count <= 0) then
+			if items[itemType].count <= 0 then
 				items[itemType] = nil
 			else
 				-- set correct distance to next item
@@ -188,15 +189,19 @@ function schedule.add(itemType,dz,count,z)
 	end
 end
 
-function schedule.update(playerSpeed,dt)
+function schedule.update(playerSpeed, dt)
 	for itemType,data in pairs(items) do
 		data.distance = data.distance - playerSpeed * dt
-		if (data.distance <= 0) then
-			processItem(itemType,perspective.maxZ + data.distance)
+
+		if data.distance <= 0 then
+			processItem(itemType, perspective.maxZ + data.distance)
+
 			data.distance = data.distance + data.dz
-			if (data.count ~= -1) then
+
+			if data.count ~= -1 then
 				data.count = data.count - 1
-				if (data.count <= 0) then
+
+				if data.count <= 0 then
 					items[itemType] = nil
 				end
 			end

@@ -7,7 +7,7 @@ local VERSION = "1.2.1"
 local TITLE = "Max Downforce"
 
 function love.load()
-	states.init(VERSION,TITLE)
+	states.init(VERSION, TITLE)
 end
 
 function love.update(dt)
@@ -18,8 +18,8 @@ function love.keypressed(key)
 	states.updateKeyPressed(key)
 end
 
-function love.gamepadpressed(joystick,button)
-	states.updateGamepadPressed(joystick,button)
+function love.gamepadpressed(joystick, button)
+	states.updateGamepadPressed(joystick, button)
 end
 
 function love.joystickadded(joystick)

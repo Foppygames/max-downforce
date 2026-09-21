@@ -20,14 +20,17 @@ function timer.init()
 	-- ...
 end
 
-function timer.reset(progress,pause)
+function timer.reset(progress, pause)
 	halted = false
-	if (progress == 0) then
+
+	if progress == 0 then
 		remaining = MAX_TIME
 	else
 		local bonus = remaining * CARRY_FACTOR
+
 		remaining = math.ceil(MAX_TIME - (progress * (MAX_TIME - MIN_TIME)) + bonus)
 	end
+
 	pauseRemaining = pause
 end
 
@@ -36,20 +39,23 @@ function timer.getDisplayTime()
 end
 
 function timer.update(dt)
-	if (not halted) then
-		if (pauseRemaining > 0) then
+	if not halted then
+		if pauseRemaining > 0 then
 			pauseRemaining = pauseRemaining - dt
-			if (pauseRemaining < 0) then
+
+			if pauseRemaining < 0 then
 				remaining = remaining + pauseRemaining
 			end
 		else
 			remaining = remaining - dt
 		end
-		if (remaining < 0) then
+
+		if remaining < 0 then
 			remaining = 0
 		end
 	end
-	return (remaining > 0)
+
+	return remaining > 0
 end
 
 function timer.getTimeDangerous()
@@ -57,7 +63,7 @@ function timer.getTimeDangerous()
 end
 
 function timer.isDangerous()
-	return (remaining < TIME_DANGEROUS)
+	return remaining < TIME_DANGEROUS
 end
 
 function timer.halt()

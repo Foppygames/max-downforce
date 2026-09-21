@@ -22,6 +22,7 @@ function perspective.initZMapAndScaling()
 
 	-- normalize scaling so that scale 1.0 is used at y=1
 	local correct = 1.0 / perspective.scale[1]
+	
 	for i = 1, perspective.GROUND_HEIGHT do
 		perspective.scale[i] = perspective.scale[i] * correct
 	end

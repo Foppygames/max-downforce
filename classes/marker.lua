@@ -11,9 +11,11 @@ function Marker.init()
 	img = love.graphics.newImage("images/marker.png")
 end
 
-function Marker:new(x,z)
-	o = Entity:new(x,z)	
+function Marker:new(x, z)
+	o = Entity:new(x, z)
+
 	setmetatable(o, self)
+	
 	self.__index = self
 	
 	o.image = img

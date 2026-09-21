@@ -29,7 +29,7 @@ sound.VOLUME_COUNTDOWN_MAX = 1.0
 sound.USE_OFFICIAL_MUSIC = false
 
 -- use official music by PlayOnLoop.com (excluded from repository)
-if (sound.USE_OFFICIAL_MUSIC) then
+if sound.USE_OFFICIAL_MUSIC then
 	sound.RACE_MUSIC_PATH_FOREST =  "music/POL-galactic-chase-long.wav"
 	sound.RACE_MUSIC_PATH_MOUNTAIN = "music/POL-combat-plan-long.wav"
 	sound.RACE_MUSIC_PATH_CITY = "music/POL-future-shock-long.wav"
@@ -56,53 +56,59 @@ local musicEnabled = true
 -- returns source for provided path if created before, nil otherwise
 -- Note: used to avoid duplicate music sources, not used for sound effects
 local function getSourceForPath(path)
-	if (sound.paths[path] ~= nil) then
+	if sound.paths[path] ~= nil then
 		return sound.sources[sound.paths[path]]
 	end
+
 	return nil
 end
 
 function sound.init()
 	sound.initEffects()
 
-	sound.initMusic(sound.RACE_MUSIC_PATH_FOREST,sound.RACE_MUSIC_FOREST)
-	sound.initMusic(sound.RACE_MUSIC_PATH_MOUNTAIN,sound.RACE_MUSIC_MOUNTAIN)
-	sound.initMusic(sound.RACE_MUSIC_PATH_CITY,sound.RACE_MUSIC_CITY)
-	sound.initMusic(sound.TITLE_MUSIC_PATH,sound.TITLE_MUSIC)
+	sound.initMusic(sound.RACE_MUSIC_PATH_FOREST, sound.RACE_MUSIC_FOREST)
+	sound.initMusic(sound.RACE_MUSIC_PATH_MOUNTAIN, sound.RACE_MUSIC_MOUNTAIN)
+	sound.initMusic(sound.RACE_MUSIC_PATH_CITY, sound.RACE_MUSIC_CITY)
+	sound.initMusic(sound.TITLE_MUSIC_PATH, sound.TITLE_MUSIC)
 
-	sound.initSound("sounds/engine_idle.wav",sound.ENGINE_IDLE,true,sound.VOLUME_EFFECTS)
-	sound.initSound("sounds/power3.ogg",sound.ENGINE_POWER,true,sound.VOLUME_EFFECTS)
-	sound.initSound("sounds/explosion.wav",sound.EXPLOSION,nil,sound.VOLUME_EFFECTS)
-	sound.initSound("sounds/collision.wav",sound.COLLISION,nil,sound.VOLUME_EFFECTS)
-	sound.initSound("sounds/crowd.wav",sound.CROWD,true,sound.VOLUME_EFFECTS)
-	sound.initSound("sounds/beep1.wav",sound.BEEP_1,nil,sound.VOLUME_EFFECTS_BEEPS)
-	sound.initSound("sounds/beep2.wav",sound.BEEP_2,nil,sound.VOLUME_EFFECTS_BEEPS)
-	sound.initSound("sounds/lap.wav",sound.LAP,nil,sound.VOLUME_EFFECTS_BEEPS)
-	sound.initSound("sounds/countdown.wav",sound.COUNTDOWN,nil,nil)
+	sound.initSound("sounds/engine_idle.wav", sound.ENGINE_IDLE, true, sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/power3.ogg", sound.ENGINE_POWER, true, sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/explosion.wav", sound.EXPLOSION, nil, sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/collision.wav", sound.COLLISION, nil, sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/crowd.wav", sound.CROWD, true, sound.VOLUME_EFFECTS)
+	sound.initSound("sounds/beep1.wav", sound.BEEP_1, nil, sound.VOLUME_EFFECTS_BEEPS)
+	sound.initSound("sounds/beep2.wav", sound.BEEP_2, nil, sound.VOLUME_EFFECTS_BEEPS)
+	sound.initSound("sounds/lap.wav", sound.LAP, nil, sound.VOLUME_EFFECTS_BEEPS)
+	sound.initSound("sounds/countdown.wav", sound.COUNTDOWN, nil, nil)
 end
 
-function sound.initSound(path,id,loop,volume)
-	sound.sources[id] = love.audio.newSource(path,"static")
-	if (loop) then
+function sound.initSound(path, id, loop, volume)
+	sound.sources[id] = love.audio.newSource(path, "static")
+
+	if loop then
 		sound.sources[id]:setLooping(loop)
 	end
-	if (volume) then
+
+	if volume then
 		sound.sources[id]:setVolume(volume)
 	end
 end
 
-function sound.initMusic(path,id)
+function sound.initMusic(path, id)
 	local existingSource = getSourceForPath(path)
+
 	sound.paths[path] = id
+
 	-- source for this path was created before
-	if (existingSource ~= nil) then
+	if existingSource ~= nil then
 		sound.sources[id] = existingSource
 	-- source for this path not yet created
 	else
 		local info = love.filesystem.getInfo(path)
+
 		-- file exists
-		if (info ~= nil) then
-			sound.sources[id] = love.audio.newSource(path,"static")
+		if info ~= nil then
+			sound.sources[id] = love.audio.newSource(path, "static")
 			sound.sources[id]:setLooping(true)
 			sound.sources[id]:setVolume(sound.VOLUME_MUSIC)
 		-- file does not exist
@@ -113,7 +119,7 @@ function sound.initMusic(path,id)
 end
 
 function sound.initEffects()
-	love.audio.setEffect("tunnel_echo",{
+	love.audio.setEffect("tunnel_echo", {
 		type = "echo",
 		volume = 1,
 		delay = 0.2,
@@ -121,7 +127,7 @@ function sound.initEffects()
 		spread = 1
 	})
 	
-	love.audio.setEffect("countdown_echo",{
+	love.audio.setEffect("countdown_echo", {
 		type = "echo",
 		volume = 0.8,
 		delay = 0.2,
@@ -135,36 +141,39 @@ function sound.musicIsEnabled()
 end
 
 function sound.getMusicEnabledLabel()
-	if (musicEnabled) then
+	if musicEnabled then
 		return "on"
 	end
+
 	return "off"
 end
 
 function sound.play(index)
-	if (sound.sources[index] ~= nil) then
-		if (sound.sources[index]:isPlaying()) then
+	if sound.sources[index] ~= nil then
+		if sound.sources[index]:isPlaying() then
 			love.audio.stop(sound.sources[index])
 		end
+
 		love.audio.play(sound.sources[index])
 	end
 end
 
 function sound.stop(index)
-	if (sound.sources[index] ~= nil) then
+	if sound.sources[index] ~= nil then
 		love.audio.stop(sound.sources[index])
 	end
 end
 
 function sound.isPlaying(index)
-	if (sound.sources[index] ~= nil) then
+	if sound.sources[index] ~= nil then
 		return sound.sources[index]:isPlaying()
 	end
+
 	return false
 end
 
-function sound.setVolume(index,volume)
-	if (sound.sources[index] ~= nil) then
+function sound.setVolume(index, volume)
+	if sound.sources[index] ~= nil then
 		sound.sources[index]:setVolume(volume)
 	end
 end
@@ -172,7 +181,8 @@ end
 -- Note: only used while on title screen
 function sound.toggleMusicEnabled()
 	musicEnabled = not musicEnabled
-	if (sound.isPlaying(sound.TITLE_MUSIC)) then
+
+	if sound.isPlaying(sound.TITLE_MUSIC) then
 		sound.stop(sound.TITLE_MUSIC)
 	else
 		sound.play(sound.TITLE_MUSIC)
@@ -180,9 +190,10 @@ function sound.toggleMusicEnabled()
 end
 
 function sound.getVolume(index)
-	if (sound.sources[index] ~= nil) then
+	if sound.sources[index] ~= nil then
 		return sound.sources[index]:getVolume()
 	end
+
 	return 0
 end
 
@@ -190,24 +201,30 @@ function sound.getClone(index)
 	return sound.sources[index]:clone()
 end
 
-function sound.updateCrowdVolume(stadiumNear,dt)
-	if (stadiumNear) then
+function sound.updateCrowdVolume(stadiumNear, dt)
+	if stadiumNear then
 		crowdVolume = crowdVolume + 0.35 * dt
-		if (crowdVolume > sound.VOLUME_EFFECTS) then
+
+		if crowdVolume > sound.VOLUME_EFFECTS then
 			crowdVolume = sound.VOLUME_EFFECTS
 		end
-		sound.setVolume(sound.CROWD,crowdVolume)
-		if (not sound.isPlaying(sound.CROWD)) then
+
+		sound.setVolume(sound.CROWD, crowdVolume)
+
+		if not sound.isPlaying(sound.CROWD) then
 			sound.play(sound.CROWD)
 		end
 	else
-		if (sound.isPlaying(sound.CROWD)) then
+		if sound.isPlaying(sound.CROWD) then
 			crowdVolume = crowdVolume - 0.15 * dt
-			if (crowdVolume <= 0) then
+
+			if crowdVolume <= 0 then
 				crowdVolume = 0
+
 				sound.stop(sound.CROWD)
 			end
-			sound.setVolume(sound.CROWD,crowdVolume)
+
+			sound.setVolume(sound.CROWD, crowdVolume)
 		end
 	end
 end

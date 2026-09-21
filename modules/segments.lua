@@ -20,30 +20,32 @@ function segments.init()
 	active = {}
 end
 
-local function addFromIndex(index,z)
+local function addFromIndex(index, z)
 	local segment = {
 		z = z
 	}
 	
-	for key,value in pairs(track.segments[segmentIndex]) do
-		if (key == "scheduleItems") then
+	for key, value in pairs(track.segments[segmentIndex]) do
+		if key == "scheduleItems" then
 			for i = 1, #value do
-				schedule.add(value[i].itemType,value[i].dz,value[i].count,z+value[i].startZ)
+				schedule.add(value[i].itemType, value[i].dz, value[i].count, z + value[i].startZ)
 			end
 		else
 			segment[key] = value
 			
-			if (key == "tunnel") then
+			if key == "tunnel" then
 				-- segment has tunnel
-				if (value) then
-					if (not tunnelStarted) then
+				if value then
+					if not tunnelStarted then
 						entities.addTunnelStart(z)
+
 						tunnelStarted = true
 					end
 				-- segment has no tunnel
 				else
-					if (tunnelStarted) then
-						entities.addTunnelEnd(z,true)
+					if tunnelStarted then
+						entities.addTunnelEnd(z, true)
+
 						tunnelStarted = false
 					end
 				end
@@ -53,20 +55,22 @@ local function addFromIndex(index,z)
 	
 	segment.length = segment.length - (perspective.maxZ - z)
 	segment.ddxFraction = segment.ddx
-	segment.ddx = segment.ddx*segments.MAX_SEGMENT_DDX
+	segment.ddx = segment.ddx * segments.MAX_SEGMENT_DDX
 
 	-- store track properties in segment, to be inspected by entities in segment
 	segment.isInCity = track.isInCity
 
-	table.insert(active,segment)
+	table.insert(active, segment)
 end
 
 local function addNext(dz)
 	segmentIndex = segmentIndex + 1
-	if (segmentIndex > #track.segments) then
+
+	if segmentIndex > #track.segments then
 		segmentIndex = 1
 	end
-	addFromIndex(segmentIndex,perspective.maxZ+dz)
+
+	addFromIndex(segmentIndex, perspective.maxZ + dz)
 end
 
 function segments.reset()
@@ -77,34 +81,40 @@ end
 
 function segments.addFirst()
 	segmentIndex = 1
-	addFromIndex(segmentIndex,0)
+
+	addFromIndex(segmentIndex, 0)
 end
 
-function segments.update(speed,dt)
+function segments.update(speed, dt)
 	local removeFromStart = 0
+
 	for i, segment in ipairs(active) do
-		if (segment.z > perspective.minZ) then
+		if segment.z > perspective.minZ then
 			segment.z = segment.z - speed * dt
-			if (segment.z <= perspective.minZ) then
+
+			if segment.z <= perspective.minZ then
 				segment.z = perspective.minZ
-				if (i > 1) then
+
+				if i > 1 then
 					removeFromStart = removeFromStart + 1
 				end
 			end
 		end
+
 		segment.length = segment.length - speed * dt
 	end
 	
-	if (#active > 0) then
-		if (active[#active].length <= 0) then
+	if #active > 0 then
+		if active[#active].length <= 0 then
 			-- add next segment
 			addNext(active[#active].length)
 		end
 	end
 	
 	-- remove segments now behind us
-	while (removeFromStart > 0) do
-		table.remove(active,1)
+	while removeFromStart > 0 do
+		table.remove(active, 1)
+		
 		removeFromStart = removeFromStart - 1
 	end
 end

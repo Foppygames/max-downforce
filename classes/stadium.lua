@@ -14,12 +14,14 @@ function Stadium.init()
 	}
 end
 
-function Stadium:new(x,z)
-	o = Entity:new(x,z)	
+function Stadium:new(x, z)
+	o = Entity:new(x, z)
+
 	setmetatable(o, self)
+
 	self.__index = self
 	
-	if (x < 0) then
+	if x < 0 then
 		o.image = img[1]
 	else
 		o.image = img[2]

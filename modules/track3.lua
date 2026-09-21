@@ -755,8 +755,8 @@ track3.segments = {
 }
 
 function track3.drawSky()
-	love.graphics.setColor(0,0,0.1)
-	love.graphics.rectangle("fill",0,0,aspect.GAME_WIDTH,SKY_HEIGHT)
+	love.graphics.setColor(0, 0, 0.1)
+	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
 end
 
 return track3

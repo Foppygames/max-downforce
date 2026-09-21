@@ -35,7 +35,7 @@ function controls.init()
 	local selectedType = nil
 
 	-- method was selected previously
-	if (controls.selected ~= nil) then
+	if controls.selected ~= nil then
 		-- store its type so it can be reselected if available
 		selectedType = controls.selected.type
 	end
@@ -47,7 +47,7 @@ function controls.init()
 	controls.selected = nil
 
 	-- keyboard is assumed available
-	table.insert(controls.available,{
+	table.insert(controls.available, {
 		type = controls.KEYBOARD,
 		label = controls.KEYBOARD_LABEL,
 		labelDx = controls.KEYBOARD_LABEL_DX,
@@ -57,20 +57,21 @@ function controls.init()
 	})
 
 	-- joysticks were detected
-	if (love.joystick.getJoystickCount() > 0) then
+	if love.joystick.getJoystickCount() > 0 then
 		local joysticks = love.joystick.getJoysticks()
 
 		-- look for first gamepad joystick
-		for i,j in ipairs(joysticks) do
-			if (j:isGamepad()) then
+		for i, j in ipairs(joysticks) do
+			if j:isGamepad() then
 				controls.joystick = j
+
 				break
 			end
 		end
 
 		-- gamepad joystick is available
-		if (controls.joystick ~= nil) then
-			table.insert(controls.available,{
+		if controls.joystick ~= nil then
+			table.insert(controls.available, {
 				type = controls.GAMEPAD,
 				label = controls.GAMEPAD_LABEL,
 				labelDx = controls.GAMEPAD_LABEL_DX,
@@ -78,7 +79,8 @@ function controls.init()
 				startTextDx = controls.GAMEPAD_START_TEXT_DX,
 				mode = controls.GAMEPAD_MODE_R
 			})
-			table.insert(controls.available,{
+
+			table.insert(controls.available, {
 				type = controls.GAMEPAD,
 				label = controls.GAMEPAD_LABEL,
 				labelDx = controls.GAMEPAD_LABEL_DX,
@@ -89,23 +91,26 @@ function controls.init()
 		end
 	end
 
-	if (#controls.available > 0) then
+	if #controls.available > 0 then
 		-- previously selected type is known
-		if (selectedType ~= nil) then
+		if selectedType ~= nil then
 			-- try to select it again
 			local i = 1
+
 			while i <= #controls.available do
-				if (controls.available[i].type == selectedType) then
+				if controls.available[i].type == selectedType then
 					controls.selectedIndex = i
 					controls.selected = controls.available[controls.selectedIndex]
+
 					break
 				end
+
 				i = i + 1
 			end
 		end
 
 		-- no method selected yet
-		if (controls.selected == nil) then
+		if controls.selected == nil then
 			-- select the first available control method
 			controls.selectedIndex = 1
 			controls.selected = controls.available[controls.selectedIndex]
@@ -114,8 +119,8 @@ function controls.init()
 
 	controls.updateJoystickAxes()
 	
-	if (controls.selected ~= nil) then
-		if (controls.selected.type == controls.GAMEPAD) then
+	if controls.selected ~= nil then
+		if controls.selected.type == controls.GAMEPAD then
 			return controls.joystick
 		end
 	end
@@ -134,15 +139,17 @@ end
 -- returns joystick object if gamepad method selected
 function controls.selectNextAvailable()
 	controls.selectedIndex = controls.selectedIndex + 1
-	if (controls.selectedIndex > #controls.available) then
+
+	if controls.selectedIndex > #controls.available then
 		controls.selectedIndex = 1
 	end
+
 	controls.selected = controls.available[controls.selectedIndex]
 
 	controls.updateJoystickAxes()
 
-	if (controls.selected ~= nil) then
-		if (controls.selected.type == controls.GAMEPAD) then
+	if controls.selected ~= nil then
+		if controls.selected.type == controls.GAMEPAD then
 			return controls.joystick
 		end
 	end
@@ -153,9 +160,10 @@ end
 function controls.updateJoystickAxes()
 	controls.joystickSteerAxis = ""
 	controls.joystickThrottleAxis = ""
-	if (controls.selected ~= nil) then
-		if (controls.selected.type == controls.GAMEPAD) then
-			if (controls.selected.mode == controls.GAMEPAD_MODE_R) then
+
+	if controls.selected ~= nil then
+		if controls.selected.type == controls.GAMEPAD then
+			if controls.selected.mode == controls.GAMEPAD_MODE_R then
 				controls.joystickSteerAxis = "rightx"
 				controls.joystickThrottleAxis = "lefty"
 			else

@@ -12,17 +12,20 @@ function TunnelStart.init()
 	-- ...
 end
 
-function TunnelStart:new(z,trackHasRavine,trackIsInCity)
-	o = Entity:new(0,z)	
+function TunnelStart:new(z, trackHasRavine, trackIsInCity)
+	o = Entity:new(0, z)
+
 	setmetatable(o, self)
+
 	self.__index = self
 	
 	o.solid = true
 	o.ravine = trackHasRavine
+
 	if trackIsInCity then
-		o.color = {0.10,0.08,0.08}
+		o.color = {0.10, 0.08, 0.08}
 	else
-		o.color = {1,1,1}
+		o.color = {1, 1, 1}
 	end
 	
 	return o
@@ -42,13 +45,14 @@ function TunnelStart:draw()
 	height = height + 0.5
 
 	love.graphics.setColor(self.color)
-	if (not self.ravine) then
-		love.graphics.rectangle("fill",0,y,leftWidth,height)
-		love.graphics.rectangle("fill",rightX,y,aspect.WINDOW_WIDTH-rightX,height)
-		love.graphics.rectangle("fill",0,y-roofHeight,aspect.WINDOW_WIDTH,roofHeight)
+
+	if not self.ravine then
+		love.graphics.rectangle("fill", 0, y, leftWidth, height)
+		love.graphics.rectangle("fill", rightX, y, aspect.WINDOW_WIDTH - rightX, height)
+		love.graphics.rectangle("fill", 0, y - roofHeight, aspect.WINDOW_WIDTH, roofHeight)
 	else
-		love.graphics.rectangle("fill",rightX,y,aspect.WINDOW_WIDTH-rightX,height)
-		love.graphics.rectangle("fill",leftWidth,y-roofHeight,aspect.WINDOW_WIDTH-leftWidth,roofHeight)
+		love.graphics.rectangle("fill", rightX, y, aspect.WINDOW_WIDTH - rightX, height)
+		love.graphics.rectangle("fill", leftWidth, y - roofHeight, aspect.WINDOW_WIDTH - leftWidth, roofHeight)
 	end
 end
 

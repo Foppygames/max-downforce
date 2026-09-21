@@ -5,9 +5,11 @@ local perspective = require("modules.perspective")
 
 Entity = {}
 
-function Entity:new(x,z)
+function Entity:new(x, z)
 	o = {}
+
 	setmetatable(o, self)
+
 	self.__index = self
 	
 	o.x = x
@@ -33,14 +35,15 @@ function Entity:update(dt)
 	return false
 end
 
-function Entity:scroll(playerSpeed,dt)
+function Entity:scroll(playerSpeed, dt)
 	local lap = false
 	local delete = false
 	
 	self.z = self.z - playerSpeed * dt
-	if ((self.z < perspective.minZ) or (self.z > perspective.maxZ)) then
+
+	if (self.z < perspective.minZ) or (self.z > perspective.maxZ) then
 		-- entity is start banner; count lap
-		if (self:isStartBanner()) then
+		if self:isStartBanner() then
 			lap = true
 		end
 		
@@ -54,12 +57,14 @@ function Entity:scroll(playerSpeed,dt)
 	}
 end
 
-function Entity:setupForDraw(z,roadX,screenY,scale,previousZ,previousRoadX,previousScreenY,previousScale,segment)
-	if (self.segment == nil) then
+function Entity:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
+	if self.segment == nil then
 		self:setSegment(segment)
 	end
+
 	local fractionTowardsZ = (self.z - previousZ) / (z - previousZ)
 	local fractionRemaining = 1 - fractionTowardsZ
+
 	self.roadX = fractionTowardsZ * roadX + fractionRemaining * previousRoadX
 	self.screenY = fractionTowardsZ * screenY + fractionRemaining * previousScreenY
 	self.scale = fractionTowardsZ * scale + fractionRemaining * previousScale
@@ -71,22 +76,24 @@ end
 
 function Entity:computeNewScreenX()
 	local newScreenX = self.roadX + self.x * self.scale
-	if (self.smoothX) then
-		if (self.storedScreenX ~= -1) then
-			return (newScreenX + self.storedScreenX * 1) / 2
-		end
+
+	if self.smoothX and (self.storedScreenX ~= -1) then
+		return (newScreenX + self.storedScreenX * 1) / 2
 	end
+
 	return newScreenX
 end
 
 function Entity:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
+
 	love.graphics.push()
-	love.graphics.scale(imageScale,imageScale)
-	love.graphics.setColor(self.color,self.color,self.color)
-	love.graphics.draw(self.image,newScreenX/imageScale - self.width/2,self.screenY/imageScale - self.height)
+	love.graphics.scale(imageScale, imageScale)
+	love.graphics.setColor(self.color, self.color, self.color)
+	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2,self.screenY / imageScale - self.height)
 	love.graphics.pop()
+	
 	self.storedScreenX = newScreenX
 end
 

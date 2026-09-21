@@ -27,42 +27,51 @@ end
 
 function opponents.reset()
 	opponentZ = maxOpponentZ
+
 	opponents.resetYellowFlag()
 end
 
 function opponents.resetYellowFlag()
 	yellowFlagDistance = (YELLOW_MIN_TRACK_LENGTHS + math.random() * (YELLOW_MAX_TRACK_LENGTHS - YELLOW_MIN_TRACK_LENGTHS)) * segments.getTotalLength()
 	yellowFlagCount = 0
-	yellowFlagSide = -1 + math.random(0,1) * 2
+	yellowFlagSide = -1 + math.random(0, 1) * 2
 end
 
-function opponents.update(playerSpeed,progress,aiCarCount,dt)
+function opponents.update(playerSpeed, progress, aiCarCount, dt)
 	opponentZ = opponentZ + OPPONENT_SPEED * dt - playerSpeed * dt
 
-	if (opponentZ > maxOpponentZ) then
+	if opponentZ > maxOpponentZ then
 		-- move opponent closer to avoid long delay
 		opponentZ = minOpponentZ
-	elseif (opponentZ < 0) then
-		if (aiCarCount < MAX_OPPONENTS_ON_SCREEN) then
-			local car = entities.addCar(-1 + math.random(0,1) * 2,perspective.maxZ,false,progress,0)
+	elseif opponentZ < 0 then
+		if aiCarCount < MAX_OPPONENTS_ON_SCREEN then
+			local car = entities.addCar(-1 + math.random(0, 1) * 2, perspective.maxZ, false, progress, 0)
+
 			car.speed = car.topSpeed
 			car.targetSpeed = car.topSpeed
 		end
-		opponentZ = math.random(minOpponentZ,maxOpponentZ)
+
+		opponentZ = math.random(minOpponentZ, maxOpponentZ)
 	end
 	
 	yellowFlagDistance = yellowFlagDistance - playerSpeed * dt
-	if (yellowFlagDistance <= 0) then
+
+	if yellowFlagDistance <= 0 then
 		yellowFlagCount = yellowFlagCount + 1
-		if (yellowFlagCount <= 3) then
-			entities.addFlagger(yellowFlagSide * road.ROAD_WIDTH / 2.4,perspective.maxZ)
+
+		if yellowFlagCount <= 3 then
+			entities.addFlagger(yellowFlagSide * road.ROAD_WIDTH / 2.4, perspective.maxZ)
+
 			yellowFlagDistance = yellowFlagCount * (perspective.maxZ / 5.5)
-			if (yellowFlagCount == 3) then
+
+			if yellowFlagCount == 3 then
 				yellowFlagDistance = 0
 			end
 		else
-			local car = entities.addCar(yellowFlagSide,perspective.maxZ,false,progress,0)
+			local car = entities.addCar(yellowFlagSide, perspective.maxZ, false, progress, 0)
+
 			car:breakDown(yellowFlagSide)
+			
 			opponents.resetYellowFlag()
 		end
 	end

@@ -19,27 +19,31 @@ function Tree.init()
 		love.graphics.newImage("images/tree5.png"),
 		love.graphics.newImage("images/tree6.png")
 	}
+
 	shadowImg = love.graphics.newImage("images/shadow_tree.png")
 	ravineShadowImg = love.graphics.newImage("images/shadow_tree_ravine.png")
 end
 
-function Tree:new(x,z,color,mountain)
-	o = Entity:new(x,z)	
+function Tree:new(x, z, color, mountain)
+	o = Entity:new(x, z)
+
 	setmetatable(o, self)
+
 	self.__index = self
 	
-	if (mountain) then
-		if (x > 0) then
+	if mountain then
+		if x > 0 then
 			o.image = img[3]
 			o.shadowImg = shadowImg
 		else
-			o.image = img[3+math.random(2)]
+			o.image = img[3 + math.random(2)]
 			o.shadowImg = ravineShadowImg
 		end
 	else
 		o.image = img[math.random(2)]
 		o.shadowImg = shadowImg
 	end
+
 	o.shadowHalfWidth = o.shadowImg:getWidth() / 2
 	o.shadowHalfHeight = o.shadowImg:getHeight() / 2
 	o.width = o.image:getWidth()
@@ -54,12 +58,14 @@ end
 function Tree:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
+
 	love.graphics.push()
-	love.graphics.scale(imageScale,imageScale)
-	love.graphics.draw(self.shadowImg,newScreenX/imageScale - self.shadowHalfWidth,self.screenY/imageScale - self.shadowHalfHeight)
-	love.graphics.setColor(self.color,self.color,self.color)
-	love.graphics.draw(self.image,newScreenX/imageScale - self.width/2,self.screenY/imageScale - self.height)
+	love.graphics.scale(imageScale, imageScale)
+	love.graphics.draw(self.shadowImg, newScreenX / imageScale - self.shadowHalfWidth, self.screenY / imageScale - self.shadowHalfHeight)
+	love.graphics.setColor(self.color, self.color, self.color)
+	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2, self.screenY / imageScale - self.height)
 	love.graphics.pop()
+
 	self.storedScreenX = newScreenX
 end
 
@@ -70,7 +76,8 @@ end
 
 function Tree:setSegment(segment)
 	self.segment = segment
-	if (segment.isInCity and (not segment.light)) then
+
+	if segment.isInCity and (not segment.light) then
 		self.color = 0.25
 	end
 end

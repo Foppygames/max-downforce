@@ -13,18 +13,23 @@ function Flag.init()
 		love.graphics.newImage("images/flag1.png"),
 		love.graphics.newImage("images/flag2.png")
 	}
+
 	index = 1
 end
 
-function Flag:new(x,z)
-	o = Entity:new(x,z)	
+function Flag:new(x, z)
+	o = Entity:new(x, z)
+
 	setmetatable(o, self)
+
 	self.__index = self
 	
 	index = index + 1
-	if (index > #img) then
+
+	if index > #img then
 		index = 1
 	end
+	
 	o.image = img[index]
 	o.width = o.image:getWidth()
 	o.height = o.image:getHeight()

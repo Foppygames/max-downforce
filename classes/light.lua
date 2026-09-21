@@ -11,9 +11,11 @@ function Light.init()
 	img = love.graphics.newImage("images/light.png")
 end
 
-function Light:new(x,z)
-	o = Entity:new(x,z)	
+function Light:new(x, z)
+	o = Entity:new(x, z)
+
 	setmetatable(o, self)
+	
 	self.__index = self
 	
 	o.image = img

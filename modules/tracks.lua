@@ -17,23 +17,27 @@ local selectedTrack = nil
 local function initTrackModule(trackModule)
 	-- smoothen corner exits
 	local nextDdx
+
 	for i = #trackModule.segments, 1, -1 do
-		if (i == #trackModule.segments) then
+		if i == #trackModule.segments then
 			nextDdx = trackModule.segments[1].ddx
 		else
-			nextDdx = trackModule.segments[i+1].ddx
+			nextDdx = trackModule.segments[i + 1].ddx
 		end
-		if ((trackModule.segments[i].ddx ~= 0) and (nextDdx == 0)) then
+
+		if (trackModule.segments[i].ddx ~= 0) and (nextDdx == 0) then
 			local ddx = trackModule.segments[i].ddx
 			local tunnel = trackModule.segments[i].tunnel
 			local light = trackModule.segments[i].light
 			local crossroads = trackModule.segments[i].crossroads
 			local crosswalk = trackModule.segments[i].crosswalk
 			local j = 1
-			if (ddx > 0) then
+
+			if ddx > 0 then
 				ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
-				while (ddx > 0) do
-					table.insert(trackModule.segments,i+j,{
+
+				while ddx > 0 do
+					table.insert(trackModule.segments, i + j, {
 						ddx = ddx,
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
@@ -42,13 +46,15 @@ local function initTrackModule(trackModule)
 						crossroads = crossroads,
 						crosswalk = crosswalk
 					})
+
 					ddx = ddx - SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1
 				end
 			else
 				ddx = ddx + SMOOTHING_SEGMENT_DDX_STEP
-				while (ddx < 0) do
-					table.insert(trackModule.segments,i+j,{
+
+				while ddx < 0 do
+					table.insert(trackModule.segments, i + j, {
 						ddx = ddx,
 						length = SMOOTHING_SEGMENT_LENGTH,
 						scheduleItems = {},
@@ -57,6 +63,7 @@ local function initTrackModule(trackModule)
 						crossroads = crossroads,
 						crosswalk = crosswalk
 					})
+
 					ddx = ddx + SMOOTHING_SEGMENT_DDX_STEP
 					j = j + 1
 				end
@@ -66,9 +73,11 @@ local function initTrackModule(trackModule)
 
 	-- compute final segment lengths and schedule item startz and dz values
 	trackModule.totalLength = 0
+
 	for i = 1, #trackModule.segments do
 		trackModule.segments[i].length = trackModule.segments[i].length * (perspective.maxZ - perspective.minZ)
 		trackModule.totalLength = trackModule.totalLength + trackModule.segments[i].length
+
 		for j = 1, #trackModule.segments[i].scheduleItems do
 			trackModule.segments[i].scheduleItems[j].startZ = trackModule.segments[i].scheduleItems[j].startZ * (perspective.maxZ - perspective.minZ)
 			trackModule.segments[i].scheduleItems[j].dz = trackModule.segments[i].scheduleItems[j].dz * (perspective.maxZ - perspective.minZ)
@@ -127,9 +136,9 @@ function tracks.getSong()
 end
 
 function tracks.selectNextTrack()
-	if (selectedTrack == track1) then
+	if selectedTrack == track1 then
 		selectedTrack = track2
-	elseif (selectedTrack == track2) then
+	elseif selectedTrack == track2 then
 		selectedTrack = track3
 	else
 		selectedTrack = track1

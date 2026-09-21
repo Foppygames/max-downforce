@@ -20,9 +20,11 @@ function Sign.resetIndex()
 	imgIndex = 1
 end
 
-function Sign:new(x,z)
-	o = Entity:new(x,z)	
+function Sign:new(x, z)
+	o = Entity:new(x, z)
+
 	setmetatable(o, self)
+
 	self.__index = self
 	
 	o.image = img[imgIndex]
@@ -32,7 +34,8 @@ function Sign:new(x,z)
 	o.baseScale = 12
 	
 	imgIndex = imgIndex + 1
-	if (imgIndex > #img) then
+
+	if imgIndex > #img then
 		imgIndex = 1
 	end
 	
@@ -41,7 +44,8 @@ end
 
 function Sign:setSegment(segment)
 	self.segment = segment
-	if (segment.isInCity and (not segment.light)) then
+
+	if segment.isInCity and (not segment.light) then
 		self.color = 0.35
 	end
 end

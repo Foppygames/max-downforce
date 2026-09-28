@@ -1,6 +1,3 @@
--- Max Downforce - modules/states.lua
--- 2019-2021 Foppygames
-
 local states = {}
 
 require "classes.banner"
@@ -78,7 +75,7 @@ local beepCounter = 0
 local beepTimer = 0
 local curbColors = nil
 local finished = false
-local fullScreen = true
+local fullScreen = false --true
 local grassColors = nil
 local lap = 0
 local player = nil
@@ -214,13 +211,19 @@ local function drawTitleScreen()
 		love.graphics.print("Controls: "..controls.getSelected().label, 93, 135)
 	end
 
-	if controls.getSelected().type == controls.GAMEPAD then
-		love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(1, 1, 1)
 
-		if controls.getSelected().mode == controls.GAMEPAD_MODE_R then
-			love.graphics.draw(imageGamepadModeR, 243, 135)
-		else
-			love.graphics.draw(imageGamepadModeL, 243, 135)
+	if controls.getSelected().type == controls.TYPE_GAMEPAD then
+		if controls.getSelected().config == controls.CONFIG_GAMEPAD_L then
+			love.graphics.draw(imageGamepadModeL, 255, 128)
+		elseif controls.getSelected().config == controls.CONFIG_GAMEPAD_R then
+			love.graphics.draw(imageGamepadModeR, 255, 128)
+		end
+	else
+		if controls.getSelected().config == controls.CONFIG_KEYBOARD_ARROWS then
+			love.graphics.draw(imageKeyboardModeArrows, 255, 120)
+		elseif controls.getSelected().config == controls.CONFIG_KEYBOARD_AZ_COMMA_PERIOD then
+			love.graphics.draw(imageKeyboardModeAzCommaPeriod, 259, 120)
 		end
 	end
 
@@ -228,7 +231,7 @@ local function drawTitleScreen()
 	love.graphics.print(controls.getSelected().startText, 108 + controls.getSelected().startTextDx, 160)
 	
 	love.graphics.setColor(1, 1, 0)
-	love.graphics.print("Foppygames 2019-2021", 100, 178)
+	love.graphics.print("Foppygames 2019-2026", 100, 178)
 end
 
 local function drawInfoCurrentLap()
@@ -507,12 +510,14 @@ function states.init(gameVersion, gameTitle)
 	love.graphics.setLineStyle("rough")
 	love.graphics.setFont(love.graphics.newFont("Retroville_NC.ttf", 10))
 	
-	imageTrophyBronze = love.graphics.newImage("images/trophy_bronze.png")
-	imageTrophySilver = love.graphics.newImage("images/trophy_silver.png")
-	imageTrophyGold = love.graphics.newImage("images/trophy_gold.png")
-	imageGamepadModeR = love.graphics.newImage("images/gamepad_r.png")
-	imageGamepadModeL = love.graphics.newImage("images/gamepad_l.png")
-
+	imageGamepadModeL = love.graphics.newImage("images/interface/gamepad_l.png")
+	imageGamepadModeR = love.graphics.newImage("images/interface/gamepad_r.png")
+	imageKeyboardModeArrows = love.graphics.newImage("images/interface/keyboard_arrows.png")
+	imageKeyboardModeAzCommaPeriod = love.graphics.newImage("images/interface/keyboard_az_comma_period.png")
+	imageTrophyBronze = love.graphics.newImage("images/interface/trophy_bronze.png")
+	imageTrophyGold = love.graphics.newImage("images/interface/trophy_gold.png")
+	imageTrophySilver = love.graphics.newImage("images/interface/trophy_silver.png")
+	
 	Banner.init()
 	Building.init()
 	Car.init()

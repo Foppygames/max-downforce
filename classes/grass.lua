@@ -1,6 +1,3 @@
--- Max Downforce - classes/grass.lua
--- 2019 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -9,9 +6,9 @@ Grass = Entity:new()
 
 function Grass.init()
 	img = {
-		love.graphics.newImage("images/grass.png"),
-		love.graphics.newImage("images/grass_flowers.png"),
-		love.graphics.newImage("images/grass_mountain.png")
+		love.graphics.newImage("images/props/grass.png"),
+		love.graphics.newImage("images/props/grass_flowers.png"),
+		love.graphics.newImage("images/props/grass_mountain.png")
 	}
 end
 

@@ -1,6 +1,3 @@
--- Max Downforce - main.lua
--- 2017-2021 Foppygames
-
 local states = require("modules.states")
 
 local VERSION = "1.2.1"

@@ -1,6 +1,3 @@
--- Max Downforce - modules/segments.lua
--- 2017-2019 Foppygames
-
 local segments = {}
 
 local entities = require("modules.entities")

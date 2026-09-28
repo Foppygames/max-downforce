@@ -1,6 +1,3 @@
--- Max Downforce - classes/stadium.lua
--- 2018 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -9,8 +6,8 @@ Stadium = Entity:new()
 
 function Stadium.init()
 	img = {
-		love.graphics.newImage("images/stadium_left.png"),
-		love.graphics.newImage("images/stadium_right.png")
+		love.graphics.newImage("images/props/stadium_left.png"),
+		love.graphics.newImage("images/props/stadium_right.png")
 	}
 end
 

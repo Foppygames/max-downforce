@@ -1,6 +1,3 @@
--- Max Downforce - classes/building.lua
--- 2018 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -9,9 +6,9 @@ Building = Entity:new()
 
 function Building.init()
 	img = {
-		love.graphics.newImage("images/building_low.png"),
-		love.graphics.newImage("images/building_high.png"),
-		love.graphics.newImage("images/building_city.png")
+		love.graphics.newImage("images/props/building_low.png"),
+		love.graphics.newImage("images/props/building_high.png"),
+		love.graphics.newImage("images/props/building_city.png")
 	}
 end
 

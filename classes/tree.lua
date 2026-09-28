@@ -1,6 +1,3 @@
--- Max Downforce - classes/tree.lua
--- 2018-2019 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -13,15 +10,15 @@ Tree = Entity:new()
 
 function Tree.init()
 	img = {
-		love.graphics.newImage("images/tree2.png"),
-		love.graphics.newImage("images/tree3.png"),
-		love.graphics.newImage("images/tree4.png"),
-		love.graphics.newImage("images/tree5.png"),
-		love.graphics.newImage("images/tree6.png")
+		love.graphics.newImage("images/props/tree2.png"),
+		love.graphics.newImage("images/props/tree3.png"),
+		love.graphics.newImage("images/props/tree4.png"),
+		love.graphics.newImage("images/props/tree5.png"),
+		love.graphics.newImage("images/props/tree6.png")
 	}
 
-	shadowImg = love.graphics.newImage("images/shadow_tree.png")
-	ravineShadowImg = love.graphics.newImage("images/shadow_tree_ravine.png")
+	shadowImg = love.graphics.newImage("images/shadows/shadow_tree.png")
+	ravineShadowImg = love.graphics.newImage("images/shadows/shadow_tree_ravine.png")
 end
 
 function Tree:new(x, z, color, mountain)

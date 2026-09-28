@@ -1,6 +1,3 @@
--- Max Downforce - modules/opponents.lua
--- 2019 Foppygames
-
 local opponents = {}
 
 local entities = require("modules.entities")

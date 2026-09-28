@@ -1,6 +1,3 @@
--- Max Downforce - modules/utils.lua
--- 2017 Foppygames
-
 local utils = {}
 
 function utils.round(num) 

@@ -1,6 +1,3 @@
--- Max Downforce - classes/spark.lua
--- 2019 Foppygames
-
 require "classes.entity"
 
 local perspective = require("modules.perspective")
@@ -11,11 +8,11 @@ Spark = Entity:new()
 
 function Spark.init()
 	img = {
-		love.graphics.newImage("images/spark1.png"),
-		love.graphics.newImage("images/spark2.png"),
-		love.graphics.newImage("images/spark3.png"),
-		love.graphics.newImage("images/spark4.png"),
-		love.graphics.newImage("images/spark5.png")
+		love.graphics.newImage("images/effects/spark/spark1.png"),
+		love.graphics.newImage("images/effects/spark/spark2.png"),
+		love.graphics.newImage("images/effects/spark/spark3.png"),
+		love.graphics.newImage("images/effects/spark/spark4.png"),
+		love.graphics.newImage("images/effects/spark/spark5.png")
 	}
 end
 

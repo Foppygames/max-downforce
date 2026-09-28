@@ -1,6 +1,3 @@
--- Max Downforce - modules/horizon.lua
--- 2017-2020 Foppygames
-
 local horizon = {}
 
 local aspect = require("modules.aspect")
@@ -28,13 +25,13 @@ local color
 
 function horizon.init()
 	image = {
-		love.graphics.newImage("images/horizon_clouds.png"),
-		love.graphics.newImage("images/horizon_hills.png"),
-		love.graphics.newImage("images/horizon_trees.png"),
-		love.graphics.newImage("images/horizon_clouds_2.png"),
-		love.graphics.newImage("images/horizon_hills_2.png"),
-		love.graphics.newImage("images/horizon_skyscrapers.png"),
-		love.graphics.newImage("images/horizon_buildings.png")
+		love.graphics.newImage("images/horizon/horizon_clouds.png"),
+		love.graphics.newImage("images/horizon/horizon_hills.png"),
+		love.graphics.newImage("images/horizon/horizon_trees.png"),
+		love.graphics.newImage("images/horizon/horizon_clouds_2.png"),
+		love.graphics.newImage("images/horizon/horizon_hills_2.png"),
+		love.graphics.newImage("images/horizon/horizon_skyscrapers.png"),
+		love.graphics.newImage("images/horizon/horizon_buildings.png")
 	}
 end
 

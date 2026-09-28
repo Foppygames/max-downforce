@@ -1,6 +1,3 @@
--- Max Downforce - classes/banner.lua
--- 2018-2020 Foppygames
-
 require "classes.entity"
 
 local POLE_WIDTH = 1
@@ -13,10 +10,10 @@ Banner = Entity:new()
 
 function Banner.init()
 	img = {
-		love.graphics.newImage("images/banner_start.png"),
-		love.graphics.newImage("images/banner_forest_bridge.png"),
-		love.graphics.newImage("images/banner_city_lights.png"),
-		love.graphics.newImage("images/banner_city_lanterns.png")
+		love.graphics.newImage("images/props/banner_start.png"),
+		love.graphics.newImage("images/props/banner_forest_bridge.png"),
+		love.graphics.newImage("images/props/banner_city_lights.png"),
+		love.graphics.newImage("images/props/banner_city_lanterns.png")
 	}
 end
 

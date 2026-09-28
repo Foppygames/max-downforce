@@ -1,6 +1,3 @@
--- Max Downforce - classes/car.lua
--- 2018-2021 Foppygames
-
 local aspect = require("modules.aspect")
 local controls = require("modules.controls")
 local perspective = require("modules.perspective")
@@ -78,6 +75,26 @@ local baseTotalCarWidth = 0
 
 Car = Entity:new()
 
+function Car.getBaseTotalCarWidth()
+	return baseTotalCarWidth
+end
+
+function Car.getSparkTime(broken)
+	if not broken then
+		return 3 + math.random() * 20
+	else
+		return 0.1 + math.random() * 0.3
+	end
+end
+
+function Car.getXFromLane(lane, random)
+	if random then
+		return lane * road.ROAD_WIDTH / (5 + math.random())
+	else
+		return lane * road.ROAD_WIDTH / 5
+	end
+end
+
 function Car.init()
 	colors = {
 		{1, 0, 0}, -- red
@@ -98,25 +115,25 @@ function Car.init()
 		{0.75, 1, 0.25} -- olive
 	}
 
-	imgBody = love.graphics.newImage("images/car_body.png")
+	imgBody = love.graphics.newImage("images/car/car_body.png")
 
 	for i = 1, 4 do
-		imgFrontWheel[i] = love.graphics.newImage("images/car_front_wheel_"..i..".png")
-		imgRearWheel[i] = love.graphics.newImage("images/car_rear_wheel_"..i..".png")
+		imgFrontWheel[i] = love.graphics.newImage("images/car/car_front_wheel_"..i..".png")
+		imgRearWheel[i] = love.graphics.newImage("images/car/car_rear_wheel_"..i..".png")
 	end
 
-	imgDiffuser = love.graphics.newImage("images/car_diffuser.png")
+	imgDiffuser = love.graphics.newImage("images/car/car_diffuser.png")
 
 	for i = 1, 5 do
-		imgWing[i] = love.graphics.newImage("images/car_wing_"..i..".png")
+		imgWing[i] = love.graphics.newImage("images/car/car_wing_"..i..".png")
 	end
 
-	imgAirScoop = love.graphics.newImage("images/car_air_scoop.png")
-	imgHelmet = love.graphics.newImage("images/car_helmet.png")
-	imgShadow = love.graphics.newImage("images/shadow.png")
+	imgAirScoop = love.graphics.newImage("images/car/car_air_scoop.png")
+	imgHelmet = love.graphics.newImage("images/car/car_helmet.png")
+	imgShadow = love.graphics.newImage("images/shadows/shadow.png")
 
 	for i = 1, 6 do
-		table.insert(imgExplosion, love.graphics.newImage("images/explosion"..i..".png"))
+		table.insert(imgExplosion, love.graphics.newImage("images/effects/explosion/explosion"..i..".png"))
 	end
 	
 	bodyWidth = imgBody:getWidth()
@@ -136,6 +153,211 @@ function Car.init()
 	frontWheelRightDx = imgBody:getWidth() / 2 - 2
 	frontWheelDy = -imgFrontWheel[1]:getHeight() - 4
 	baseTotalCarWidth =  (bodyWidth + frontWheelWidth * 2) * WIDTH_MODIFIER
+end
+
+function Car:breakDown(lane)
+	self.broken = true
+	self.sparkTime = 0
+	self.topSpeed = self.topSpeed * 0.7
+	self.speed = self.topSpeed
+	self.targetSpeed = self.topSpeed
+
+	-- only move more towards road side if not on ravine track
+	if not self.ravine then
+		self.targetX = self.targetX + lane * road.ROAD_WIDTH / 3
+	end
+end
+
+function Car:clean()
+	if self.sndEngineIdle ~= nil then
+		love.audio.stop(self.sndEngineIdle)
+
+		self.sndEngineIdle = nil
+	end
+
+	if self.sndEnginePower ~= nil then
+		love.audio.stop(self.sndEnginePower)
+		
+		self.sndEnginePower = nil
+	end
+end
+
+function Car:draw()
+	local imageScale = self:computeImageScale() * WIDTH_MODIFIER
+	local newScreenX = self:computeNewScreenX()
+
+	love.graphics.push()
+	love.graphics.scale(imageScale, imageScale)
+	love.graphics.setColor(1, 1, 1)
+	
+	local screenX = newScreenX / imageScale
+	local screenY = (self.screenY + self.fallDy) / imageScale
+	
+	if (self.explosionTime == 0) or ((self.explosionTime > EXPLOSION_WAIT + EXPLOSION_TIME / 2) and (not self.explodeAfterFall)) then
+		local bumpDy = 0
+		
+		if (self.leftBumpDy ~= 0) or (self.rightBumpDy ~= 0) then
+			bumpDy = (self.leftBumpDy + self.rightBumpDy) * 0.9
+			screenY = screenY + bumpDy
+		end
+		
+		local steerPerspectiveEffect = self.steerFactor * MAX_STEER_PERSPECTIVE_EFFECT
+		local perspectiveEffect = (aspect.GAME_WIDTH / 2 - newScreenX) / (aspect.GAME_WIDTH / 2) * 10 + steerPerspectiveEffect
+		local frontWheelDy = -imgFrontWheel[1]:getHeight() - 5 * imageScale
+		local accEffect = self.accEffect * 0.01
+		
+		-- draw shadow
+		if not self.falling then
+			love.graphics.draw(imgShadow,screenX - shadowWidth / 2, screenY - 6)
+		end
+
+		-- compute body rotation
+		local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
+		local bodyRotation = bodyDegreesChange * math.pi / 180
+		
+		-- draw front wheels
+		local wheelScaleChange = bodyDegreesChange / MAX_BODY_DEGREES_CHANGE * MAX_WHEEL_SCALE_CHANGE
+		local leftWheelScale = 1 + wheelScaleChange
+		local rightWheelScale = 1 - wheelScaleChange
+
+		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelLeftDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
+		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelRightDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
+		
+		local mainColor
+
+		if self.city then
+			if (self.inTunnel) or (self.inLight) then
+				mainColor = self.color
+			else
+				mainColor = self.colorInDark
+			end
+		else
+			mainColor = self.color
+
+			if (self.inTunnel) and (not self.ravine) and (not self.falling) then
+				mainColor = self.colorInTunnel
+			end
+		end
+		
+		-- draw body
+		love.graphics.setColor(mainColor)
+		love.graphics.draw(imgBody, screenX - perspectiveEffect * 0.2, screenY - bodyHeight / 2 + accEffect, bodyRotation, 1, 1, bodyWidth / 2, bodyHeight / 2)
+		
+		-- draw helmet
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.draw(imgHelmet, screenX - helmetWidth / 2  - perspectiveEffect * 0.2, screenY - bodyHeight - helmetHeight + accEffect)
+		
+		-- draw air scoop
+		love.graphics.setColor(mainColor)
+		love.graphics.draw(imgAirScoop, screenX - airScoopWidth / 2  - perspectiveEffect * 0.6, screenY - bodyHeight - airScoopHeight + accEffect + math.abs(perspectiveEffect) * 0.02)
+		
+		-- draw rear wheels
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX - bodyWidth / 2 - rearWheelWidth - perspectiveEffect, screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
+		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX + bodyWidth / 2 - perspectiveEffect, screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
+		
+		-- draw rear wing
+		local wingDegreesChange = bodyDegreesChange
+		local wingRotation = wingDegreesChange * math.pi / 180
+
+		love.graphics.setColor(mainColor)
+		love.graphics.draw(self.imgWing, screenX - perspectiveEffect * 1.2, screenY - bodyHeight + 4 + accEffect * 2.5 + bumpDy, wingRotation, 1, 1, self.wingWidth / 2, self.wingHeight)
+		
+		-- draw diffuser
+		love.graphics.draw(imgDiffuser, screenX - diffuserWidth / 2  - perspectiveEffect, screenY - diffuserHeight + accEffect * 3)
+	
+		-- draw rear light
+		local lightSize = 4
+
+		love.graphics.setColor(0, 0, 0)
+		love.graphics.rectangle("fill", screenX - (lightSize + 4) / 2 - perspectiveEffect * 1.4, screenY - bodyHeight + accEffect * 2.8 + bumpDy, lightSize + 4, lightSize + 4)
+		
+		if not self.braking then
+			if not self.inTunnel then
+				if self.city then
+					if not self.inLight then
+						love.graphics.setColor(0.8, 0, 0)
+					else
+						love.graphics.setColor(0.4, 0, 0)
+					end
+				else
+					love.graphics.setColor(0.4, 0, 0)
+				end
+			else
+				if self.city then
+					love.graphics.setColor(0.4, 0, 0)
+				else
+					love.graphics.setColor(0.6, 0, 0)
+				end
+			end
+		else
+			love.graphics.setColor(1, 0, 0)
+		end
+
+		love.graphics.rectangle("fill", screenX - lightSize / 2 - perspectiveEffect * 1.6, screenY - bodyHeight + 2 + accEffect * 3.6 + bumpDy, lightSize, lightSize)
+	end
+	
+	if self.explosionTime > EXPLOSION_WAIT then
+		if not self.explodeAfterFall then
+			local progress = 1 - ((self.explosionTime - EXPLOSION_WAIT) / EXPLOSION_TIME)
+			local total = #imgExplosion
+			local i = math.ceil(total * progress)
+
+			love.graphics.setColor(1, 1, 1)
+			love.graphics.draw(imgExplosion[i], screenX - imgExplosion[i]:getWidth() / 2 * EXPLOSION_SCALE, screenY - imgExplosion[i]:getHeight() * EXPLOSION_SCALE, 0, EXPLOSION_SCALE, EXPLOSION_SCALE)
+		end
+	end
+	
+	love.graphics.pop()
+
+	self.storedScreenX = newScreenX
+end
+
+function Car:explode(afterFall)
+	self.explodeAfterFall = afterFall
+
+	if self.isPlayer then
+		self.sndEngineIdle:setVolume(0)
+		self.sndEnginePower:setVolume(0)
+	end
+
+	sound.play(sound.EXPLOSION)
+
+	self.speed = 0
+	self.explosionTime = EXPLOSION_TIME + EXPLOSION_WAIT
+end
+
+function Car:exploding()
+	return self.explosionTime ~= 0
+end
+
+function Car:fall()
+	self.falling = true
+	self.fallDy = 1
+	self.fallDx = -self.outwardForce + self.steerResult
+end
+
+function Car:getAcceleration()
+	local diff = self.topSpeedForAcceleration - self.speed
+
+	if self.speed < self.speedLimitHigherAcceleration then
+		return diff / 6
+	end
+	
+	return diff / 14
+end
+
+function Car:getSparks()
+	return self.sparks
+end
+
+-- Note: currently ai top speed same as player top speed in kmh even though actual ai top speed may be lower
+function Car:getSpeedAsKMH()
+	return math.floor(self.speed / self.topSpeed * TOP_SPEED_IN_KMH)
+end
+
+function Car:isCar()
+	return true
 end
 
 function Car:new(lane, z, isPlayer, progress, pause, ravine, city)
@@ -254,20 +476,279 @@ function Car:new(lane, z, isPlayer, progress, pause, ravine, city)
 	return o
 end
 
-function Car.getSparkTime(broken)
-	if not broken then
-		return 3 + math.random() * 20
+function Car:outsideTunnelBounds()
+	return (self.x < -MAX_DIST_BEFORE_TUNNEL_WALL) or (self.x > MAX_DIST_BEFORE_TUNNEL_WALL)
+end
+
+function Car:resetSparks()
+	self.sparks = nil
+end
+
+function Car:scroll(playerSpeed, dt)
+	local lap = false
+	local delete = false
+	
+	if not self.isPlayer then
+		self.z = self.z - playerSpeed * dt
+
+		if (self.z < perspective.minZ) or (self.z > perspective.maxZ) then
+			-- remove car
+			delete = true
+		end
+	end
+	
+	return {
+		lap = lap,
+		delete = delete
+	}
+end
+
+function Car:selectNewLane(collisionX, collisionDz, blockingCarSpeed, otherLaneResult)
+	-- other lane blocked
+	if otherLaneResult.collision then
+		-- consider braking
+		self.aiBlockingCarSpeed = blockingCarSpeed
 	else
-		return 0.1 + math.random() * 0.3
+		if collisionX < 0 then
+			self.targetX = Car.getXFromLane(1, true)
+		else
+			self.targetX = Car.getXFromLane(-1, true)
+		end
 	end
 end
 
-function Car.getXFromLane(lane, random)
-	if random then
-		return lane * road.ROAD_WIDTH / (5 + math.random())
-	else
-		return lane * road.ROAD_WIDTH / 5
+-- used to turn player into cpu car after finish
+function Car:setIsPlayer(isPlayer)
+	self.isPlayer = isPlayer
+end
+
+function Car:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
+	Entity.setupForDraw(self, z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
+
+	self.segmentDdx = segment.ddx
+	self.targetSpeed = self.topSpeed
+	self.inTunnel = segment.tunnel
+	self.inLight = segment.light
+end
+
+function Car:update(dt)
+	local delete = false
+	local explodeAfterFall = false
+	local offRoad = self:updateOffRoad(dt)
+	local acc = self:getAcceleration()
+
+	if offRoad then
+		acc = acc * OFF_ROAD_ACC_FACTOR
+
+		if self.ravine and (self.x < -MAX_DIST_BEFORE_RAVINE) and (self.explosionTime == 0) then
+			if not self.falling then
+				self:fall()
+			end
+		end
 	end
+	
+	if self.explosionTime == 0 then
+		self:updateSteer(dt)
+	
+		if self.collision == nil then
+			self:updateSpeed(acc, dt)
+		else
+			-- 50% crash
+			if self.collision.speed > (self.topSpeed * 0.5) then
+				self:explode(false)
+			-- 20% crash
+			elseif self.collision.speed > (self.topSpeed * 0.2) then
+				sound.play(sound.COLLISION)
+			-- light touch
+			else
+				-- ...
+			end
+		end
+	end
+	
+	if self.explosionTime == 0 then
+		if not self.falling then
+			self:updateSteerResult(dt)
+			self:updateOutwardForce(dt)
+			self:updateSpark(dt)
+		else
+			explodeAfterFall = self:updateFall(dt)
+		end
+	end
+
+	if explodeAfterFall then
+		self:explode(true)
+	end
+
+	if self.explosionTime ~= 0 then
+		delete = self:updateExplosion(dt)
+	end
+
+	self:updateEngineSound()	
+	
+	if not self.isPlayer then
+		-- update z
+		self.z = self.z + self.speed * dt
+	end
+	
+	self:updateWheelAnimation(dt)
+	
+	if self.explosionTime == 0 then
+		if not self.falling then
+			-- apply outward force to x
+			self.x = self.x - self.outwardForce * dt
+	
+			-- apply steer result to x
+			self.x = self.x + self.steerResult * dt
+		else
+			self.x = self.x + self.fallDx * dt
+		end
+	end
+	
+	if self.x < -(road.ROAD_WIDTH * 2) then
+		self.x = -road.ROAD_WIDTH * 2
+		self.steer = 0
+	elseif self.x > (road.ROAD_WIDTH * 2) then
+		self.x = road.ROAD_WIDTH * 2
+		self.steer = 0
+	end
+	
+	return delete
+end
+
+function Car:updateEngineSound()
+	if self.isPlayer then
+		self:updateEngineSoundPlayer()
+	else
+		self:updateEngineSoundCpu()
+	end
+end
+
+function Car:updateEngineSoundCpu()
+	local gear = math.floor((self.speed / self.topSpeed) / (1.0 / self.gears))
+	local gearSpeed = (self.speed - (gear * (self.topSpeed / self.gears))) / (self.topSpeed / self.gears)
+
+	self.sndEnginePower:setPitch(0.5 + gear * 0.045 + gearSpeed * 0.4)
+	
+	local volume = 1 - (self.z - perspective.minZ) / (perspective.maxZ / 2 - perspective.minZ)
+
+	if volume > 1 then
+		volume = 1
+	end
+
+	if volume < 0 then
+		volume = 0
+	end
+
+	self.sndEnginePower:setVolume(volume * AI_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
+end
+
+function Car:updateEngineSoundPlayer()
+	local gear = math.floor((self.speed / self.topSpeed) / (1.0 / self.gears))
+	local gearSpeed = (self.speed - (gear * (self.topSpeed / self.gears))) / (self.topSpeed / self.gears)
+
+	self.sndEngineIdle:setPitch(1 + 2.5 * (self.speed / self.topSpeed))
+
+	local pitch = 0.5 + gear * 0.045 + gearSpeed * 0.4
+
+	if self.falling then
+		pitch = pitch * 1.4
+	end
+
+	self.sndEnginePower:setPitch(pitch)
+	
+	if self.inTunnel then
+		if not self.echoEnabled then
+			self.sndEnginePower:setEffect("tunnel_echo")
+			self.echoEnabled = true
+
+			if self.ravine then
+				-- volume not already modified such as by countdown
+				-- note: taking floating point error into account in check for equality
+				if math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC) < 0.01 then
+					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN, sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL)
+				end
+			elseif self.city then
+				-- volume not already modified such as by countdown
+				if math.abs(sound.getVolume(sound.RACE_MUSIC_CITY) - sound.VOLUME_MUSIC) < 0.01 then
+					sound.setVolume(sound.RACE_MUSIC_CITY, sound.VOLUME_MUSIC_IN_TUNNEL)
+				end
+			else
+				-- volume not already modified such as by countdown
+				if math.abs(sound.getVolume(sound.RACE_MUSIC_FOREST) - sound.VOLUME_MUSIC) < 0.01 then
+					sound.setVolume(sound.RACE_MUSIC_FOREST, sound.VOLUME_MUSIC_IN_TUNNEL)
+				end
+			end
+		end
+	else
+		if self.echoEnabled then
+			self.sndEnginePower:setEffect("tunnel_echo", false)
+			self.echoEnabled = false
+
+			if self.ravine then
+				-- volume not already modified such as by countdown
+				if math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL) < 0.01 then
+					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN, sound.VOLUME_MUSIC)
+				end
+			elseif self.city then
+				-- volume not already modified such as by countdown
+				if math.abs(sound.getVolume(sound.RACE_MUSIC_CITY) - sound.VOLUME_MUSIC_IN_TUNNEL) < 0.01 then
+					sound.setVolume(sound.RACE_MUSIC_CITY, sound.VOLUME_MUSIC)
+				end
+			else
+				-- volume not already modified such as by countdown
+				if math.abs(sound.getVolume(sound.RACE_MUSIC_FOREST) - sound.VOLUME_MUSIC_IN_TUNNEL) < 0.01 then
+					sound.setVolume(sound.RACE_MUSIC_FOREST, sound.VOLUME_MUSIC)
+				end
+			end
+		end
+	end
+end
+
+function Car:updateExplosion(dt)
+	local delete = false
+
+	self.explosionTime = self.explosionTime - dt
+
+	if self.explosionTime <= 0 then
+		if self.isPlayer then
+			self.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME * sound.VOLUME_EFFECTS)
+			self.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
+			self.steer = 0
+            self.steerResult = 0
+			self.x = 0
+		else
+			delete = true
+		end
+
+		self.explosionTime = 0
+	end
+
+	return delete
+end
+
+function Car:updateFall(dt)
+	local explode = false
+
+	self.fallDy = self.fallDy + (self.fallDy * 8) * dt
+
+	local fallDistance = 70
+
+	if not self.isPlayer then
+		-- cars are not drawn behind road so cars falling in distance will show
+		-- through road; therefore for cpu cars the fall distance is limited
+		fallDistance = 10
+	end
+
+	if self.fallDy >= fallDistance then
+		self.falling = false
+		self.fallDy = 0
+		self.fallDx = 0
+
+		explode = true
+	end
+
+	return explode
 end
 
 function Car:updateOffRoad(dt)
@@ -417,6 +898,34 @@ function Car:updateOffRoad(dt)
 	return offRoad
 end
 
+function Car:updateOutwardForce(dt)
+	if self.isPlayer then
+		self:updateOutwardForcePlayer(dt)
+	else
+		self:updateOutwardForceCpu(dt)
+	end
+end
+
+function Car:updateOutwardForceCpu(dt)
+	local newOutwardForce = self.segmentDdx * self.speed * self.speed * AI_OUTWARD_FORCE
+
+	if math.abs(newOutwardForce) < math.abs(self.outwardForce) then
+		self.outwardForce = (1 * self.outwardForce + 1 * newOutwardForce) / 2
+	else
+		self.outwardForce = (9 * self.outwardForce + 1 * newOutwardForce) / 10
+	end	
+end
+
+function Car:updateOutwardForcePlayer(dt)
+	local newOutwardForce = self.segmentDdx * self.speed * self.speed * OUTWARD_FORCE
+
+	if math.abs(newOutwardForce) < math.abs(self.outwardForce) then
+		self.outwardForce = (4 * self.outwardForce + 1 * newOutwardForce) / 5
+	else
+		self.outwardForce = (14 * self.outwardForce + 1 * newOutwardForce) / 15
+	end	
+end
+
 function Car:updateSpark(dt)
 	self.sparkTime = self.sparkTime - dt
 
@@ -442,161 +951,64 @@ function Car:updateSpark(dt)
 	end
 end
 
-function Car:getAcceleration()
-	local diff = self.topSpeedForAcceleration - self.speed
-
-	if self.speed < self.speedLimitHigherAcceleration then
-		return diff / 6
-	end
-	
-	return diff / 14
-end
-
-function Car.getBaseTotalCarWidth()
-	return baseTotalCarWidth
-end
-
-function Car:updateSteerPlayerKeyboard(dt)
-    local steerBackHardFactor = 1
-
-	if love.keyboard.isDown("left") then
-		if self.steer > 0 then
-			steerBackHardFactor = 1 + (4 * self.steer / MAX_STEER_KEYBOARD)
-		end
-
-        self.steer = self.steer - STEER_CHANGE * steerBackHardFactor * dt
-
-		if self.steer < -MAX_STEER_KEYBOARD then
-			self.steer = -MAX_STEER_KEYBOARD
-		end
-	elseif love.keyboard.isDown("right") then
-		if self.steer < 0 then
-			steerBackHardFactor = 1 + (4 * -self.steer / MAX_STEER_KEYBOARD)
-		end
-
-        self.steer = self.steer + STEER_CHANGE * steerBackHardFactor * dt
-
-		if self.steer > MAX_STEER_KEYBOARD then
-			self.steer = MAX_STEER_KEYBOARD
-		end
-	elseif self.steer > 0 then
-		self.steer = self.steer - STEER_RETURN * dt
-
-        if self.steer < 0 then
-            self.steer = 0
-        end
-    elseif self.steer < 0 then
-	    self.steer = self.steer + STEER_RETURN * dt
-
-        if self.steer > 0 then
-            self.steer = 0
-        end 
-	end
-
-	self.steerFactor = self.steer / MAX_STEER_KEYBOARD
-end
-
-function Car:updateSteerPlayerGamepad(dt)
-	if controls.joystick ~= nil then
-		local steerBackHardFactor = 1
-		local gamepadX = controls.joystick:getGamepadAxis(controls.joystickSteerAxis)
-
-		if (gamepadX ~= 0) and (math.abs(gamepadX) <= controls.GAMEPAD_X_DEADZONE) then
-			gamepadX = 0
-		end
-
-		local targetSteer = gamepadX * MAX_STEER_GAMEPAD
-
-		if self.steer > targetSteer then
-			if (self.steer > 0) and (targetSteer < 0) then
-				steerBackHardFactor = 1 + (2 * self.steer / MAX_STEER_GAMEPAD)
-			end
-
-			self.steer = self.steer - STEER_CHANGE * steerBackHardFactor * dt
-
-			if self.steer < targetSteer then
-				self.steer = targetSteer
-			end
-		elseif self.steer < targetSteer then
-			if (self.steer < 0) and (targetSteer > 0) then
-				steerBackHardFactor = 1 + (2 * -self.steer / MAX_STEER_GAMEPAD)
-			end
-
-			self.steer = self.steer + STEER_CHANGE * steerBackHardFactor * dt
-
-			if self.steer > targetSteer then
-				self.steer = targetSteer
-			end
-		end
-
-		self.steerFactor = self.steer / MAX_STEER_GAMEPAD
-	end
-end
-
-function Car:updateSteerCpu(dt)
-	-- stay on track
-	if self.x < -MAX_DIST_BEFORE_CURB then
-		self.targetX = -road.ROAD_WIDTH / 4
-	elseif self.x > MAX_DIST_BEFORE_CURB then
-		self.targetX = road.ROAD_WIDTH / 4
-	end
-
-	-- steer towards target
-	if self.x > (self.targetX + AI_TARGET_X_MARGIN) then
-		self.steer = self.steer - AI_STEER_CHANGE * (1 + math.abs(self.segmentDdx)) * dt
-
-		if self.steer < -AI_MAX_STEER then
-			self.steer = -AI_MAX_STEER
-		end
-	elseif self.x < (self.targetX - AI_TARGET_X_MARGIN) then
-		self.steer = self.steer + AI_STEER_CHANGE * (1 + math.abs(self.segmentDdx)) * dt
-
-		if self.steer > AI_MAX_STEER then
-			self.steer = AI_MAX_STEER
-		end
-	elseif self.steer > 0 then
-        self.steer = self.steer - AI_STEER_RETURN * dt  
-
-        if self.steer < 0 then
-            self.steer = 0
-        end
-    elseif self.steer < 0 then
-        self.steer = self.steer + AI_STEER_RETURN * dt
-
-        if self.steer > 0 then
-            self.steer = 0
-        end 
-    end
-	
-	-- add random steering
-	if self.speed > 0 then
-		self.steer = self.steer - 0.2 + math.random() * 0.4
-	end
-	
-	self.steerFactor = self.steer / AI_MAX_STEER
-end
-
-function Car:updateSteer(dt)
+function Car:updateSpeed(acc, dt)
 	if self.isPlayer then
 		if controls.selected ~= nil then
-			if controls.selected.type == controls.KEYBOARD then
-				self:updateSteerPlayerKeyboard(dt)
-			elseif controls.selected.type == controls.GAMEPAD then
-				self:updateSteerPlayerGamepad(dt)
+			if controls.selected.type == controls.TYPE_KEYBOARD then
+				self:updateSpeedPlayerKeyboard(acc, dt, controls.selected.config)
+			elseif controls.selected.type == controls.TYPE_GAMEPAD then
+				self:updateSpeedPlayerGamepad(acc, dt)
 			end
 		end
 	else
-		self:updateSteerCpu(dt)
+		self:updateSpeedCPU(acc, dt)
 	end
 end
 
-function Car:updateSpeedPlayerKeyboard(acc, dt)
-	self.braking = love.keyboard.isDown("down")
+function Car:updateSpeedCPU(acc, dt)
+	self.braking = false
 
 	if self.pause > 0 then
 		self.pause = self.pause - dt
 	else
-		if love.keyboard.isDown("up") then
+		if self.aiBlockingCarSpeed ~= nil then
+			if self.speed > self.aiBlockingCarSpeed then
+				-- difference is considerable
+				if (self.speed - self.aiBlockingCarSpeed) > (self.speed * 0.1) then
+					-- Note: this is to avoid brake light flickering while behind a car
+					self.braking = true
+				end
+
+				self.speed = self.speed - BRAKE * dt
+			end
+
+			self.aiBlockingCarSpeed = nil
+		elseif self.speed < self.targetSpeed then
+			self.speed = self.speed + acc * dt
+
+			if self.speed > self.topSpeed then
+				self.speed = self.topSpeed
+			end
+		else
+			if self.speed > 0 then
+				self.speed = self.speed - BRAKE * dt
+			end
+
+			if self.speed <= 0 then
+				self.speed = 0
+				self.steer = 0
+			end
+		end
+	end
+end
+
+function Car:updateSpeedPlayerDigital(acc, inputDown, inputUp, dt)
+	self.braking = inputDown
+
+	if self.pause > 0 then
+		self.pause = self.pause - dt
+	else
+		if inputUp then
 			self.speed = self.speed + acc * dt
 			self.accEffect = acc
 
@@ -697,68 +1109,190 @@ function Car:updateSpeedPlayerGamepad(acc, dt)
 	end
 end
 
-function Car:updateSpeedCPU(acc, dt)
-	self.braking = false
+function Car:updateSpeedPlayerKeyboard(acc, dt, controlsConfig)
+	local inputDown = false
+	local inputUp = false
 
-	if self.pause > 0 then
-		self.pause = self.pause - dt
-	else
-		if self.aiBlockingCarSpeed ~= nil then
-			if self.speed > self.aiBlockingCarSpeed then
-				-- difference is considerable
-				if (self.speed - self.aiBlockingCarSpeed) > (self.speed * 0.1) then
-					-- Note: this is to avoid brake light flickering while behind a car
-					self.braking = true
-				end
-
-				self.speed = self.speed - BRAKE * dt
-			end
-
-			self.aiBlockingCarSpeed = nil
-		elseif self.speed < self.targetSpeed then
-			self.speed = self.speed + acc * dt
-
-			if self.speed > self.topSpeed then
-				self.speed = self.topSpeed
-			end
-		else
-			if self.speed > 0 then
-				self.speed = self.speed - BRAKE * dt
-			end
-
-			if self.speed <= 0 then
-				self.speed = 0
-				self.steer = 0
-			end
-		end
+	if controlsConfig == controls.CONFIG_KEYBOARD_ARROWS then
+		inputDown = love.keyboard.isDown("down")
+		inputUp = love.keyboard.isDown("up")
+	elseif controlsConfig == controls.CONFIG_KEYBOARD_AZ_COMMA_PERIOD then
+		inputDown = love.keyboard.isDown("z") or love.keyboard.isDown("y")
+		inputUp = love.keyboard.isDown("a")
 	end
+
+	self:updateSpeedPlayerDigital(acc, inputDown, inputUp, dt)
 end
 
-function Car:updateSpeed(acc, dt)
+function Car:updateSteer(dt)
 	if self.isPlayer then
 		if controls.selected ~= nil then
-			if controls.selected.type == controls.KEYBOARD then
-				self:updateSpeedPlayerKeyboard(acc, dt)
-			elseif controls.selected.type == controls.GAMEPAD then
-				self:updateSpeedPlayerGamepad(acc, dt)
+			if controls.selected.type == controls.TYPE_KEYBOARD then
+				self:updateSteerPlayerKeyboard(dt, controls.selected.config)
+			elseif controls.selected.type == controls.TYPE_GAMEPAD then
+				self:updateSteerPlayerGamepad(dt)
 			end
 		end
 	else
-		self:updateSpeedCPU(acc, dt)
+		self:updateSteerCpu(dt)
 	end
 end
 
-function Car:updateWheelAnimation(dt)
+function Car:updateSteerCpu(dt)
+	-- stay on track
+	if self.x < -MAX_DIST_BEFORE_CURB then
+		self.targetX = -road.ROAD_WIDTH / 4
+	elseif self.x > MAX_DIST_BEFORE_CURB then
+		self.targetX = road.ROAD_WIDTH / 4
+	end
+
+	-- steer towards target
+	if self.x > (self.targetX + AI_TARGET_X_MARGIN) then
+		self.steer = self.steer - AI_STEER_CHANGE * (1 + math.abs(self.segmentDdx)) * dt
+
+		if self.steer < -AI_MAX_STEER then
+			self.steer = -AI_MAX_STEER
+		end
+	elseif self.x < (self.targetX - AI_TARGET_X_MARGIN) then
+		self.steer = self.steer + AI_STEER_CHANGE * (1 + math.abs(self.segmentDdx)) * dt
+
+		if self.steer > AI_MAX_STEER then
+			self.steer = AI_MAX_STEER
+		end
+	elseif self.steer > 0 then
+        self.steer = self.steer - AI_STEER_RETURN * dt  
+
+        if self.steer < 0 then
+            self.steer = 0
+        end
+    elseif self.steer < 0 then
+        self.steer = self.steer + AI_STEER_RETURN * dt
+
+        if self.steer > 0 then
+            self.steer = 0
+        end 
+    end
+	
+	-- add random steering
 	if self.speed > 0 then
-		self.rearWheelCount = self.rearWheelCount + self.speed * dt
+		self.steer = self.steer - 0.2 + math.random() * 0.4
+	end
+	
+	self.steerFactor = self.steer / AI_MAX_STEER
+end
 
-		if self.rearWheelCount > 1.1 then
-			self.rearWheelCount = 0
-			self.rearWheelIndex = self.rearWheelIndex + 1
+function Car:updateSteerPlayerDigital(inputLeft, inputRight, dt)
+    local steerBackHardFactor = 1
 
-			if self.rearWheelIndex > 4 then
-				self.rearWheelIndex = 1
+	if inputLeft then
+		if self.steer > 0 then
+			steerBackHardFactor = 1 + (4 * self.steer / MAX_STEER_KEYBOARD)
+		end
+
+        self.steer = self.steer - STEER_CHANGE * steerBackHardFactor * dt
+
+		if self.steer < -MAX_STEER_KEYBOARD then
+			self.steer = -MAX_STEER_KEYBOARD
+		end
+	elseif inputRight then
+		if self.steer < 0 then
+			steerBackHardFactor = 1 + (4 * -self.steer / MAX_STEER_KEYBOARD)
+		end
+
+        self.steer = self.steer + STEER_CHANGE * steerBackHardFactor * dt
+
+		if self.steer > MAX_STEER_KEYBOARD then
+			self.steer = MAX_STEER_KEYBOARD
+		end
+	elseif self.steer > 0 then
+		self.steer = self.steer - STEER_RETURN * dt
+
+        if self.steer < 0 then
+            self.steer = 0
+        end
+    elseif self.steer < 0 then
+	    self.steer = self.steer + STEER_RETURN * dt
+
+        if self.steer > 0 then
+            self.steer = 0
+        end 
+	end
+
+	self.steerFactor = self.steer / MAX_STEER_KEYBOARD
+end
+
+function Car:updateSteerPlayerGamepad(dt)
+	if controls.joystick ~= nil then
+		local steerBackHardFactor = 1
+		local gamepadX = controls.joystick:getGamepadAxis(controls.joystickSteerAxis)
+
+		if (gamepadX ~= 0) and (math.abs(gamepadX) <= controls.GAMEPAD_X_DEADZONE) then
+			gamepadX = 0
+		end
+
+		local targetSteer = gamepadX * MAX_STEER_GAMEPAD
+
+		if self.steer > targetSteer then
+			if (self.steer > 0) and (targetSteer < 0) then
+				steerBackHardFactor = 1 + (2 * self.steer / MAX_STEER_GAMEPAD)
 			end
+
+			self.steer = self.steer - STEER_CHANGE * steerBackHardFactor * dt
+
+			if self.steer < targetSteer then
+				self.steer = targetSteer
+			end
+		elseif self.steer < targetSteer then
+			if (self.steer < 0) and (targetSteer > 0) then
+				steerBackHardFactor = 1 + (2 * -self.steer / MAX_STEER_GAMEPAD)
+			end
+
+			self.steer = self.steer + STEER_CHANGE * steerBackHardFactor * dt
+
+			if self.steer > targetSteer then
+				self.steer = targetSteer
+			end
+		end
+
+		self.steerFactor = self.steer / MAX_STEER_GAMEPAD
+	end
+end
+
+function Car:updateSteerPlayerKeyboard(dt, controlsConfig)
+	local inputLeft = false
+	local inputRight = false
+
+	if controlsConfig == controls.CONFIG_KEYBOARD_ARROWS then
+		inputLeft = love.keyboard.isDown("left")
+		inputRight = love.keyboard.isDown("right")
+	elseif controlsConfig == controls.CONFIG_KEYBOARD_AZ_COMMA_PERIOD then
+		inputLeft = love.keyboard.isDown(",")
+		inputRight = love.keyboard.isDown(".")
+	end
+
+	self:updateSteerPlayerDigital(inputLeft, inputRight, dt)
+end
+
+function Car:updateSteerResult(dt)
+	if self.isPlayer then
+		self:updateSteerResultPlayer(dt)
+	else
+		self:updateSteerResultCpu(dt)
+	end
+end
+
+function Car:updateSteerResultCpu(dt)
+	if self.steerResult < self.steer then
+		self.steerResult = self.steerResult + AI_STEER_RESULT_CHANGE * dt
+
+		if self.steerResult > self.steer then
+			self.steerResult = self.steer
+		end
+	elseif self.steerResult > self.steer then
+		self.steerResult = self.steerResult - AI_STEER_RESULT_CHANGE * dt
+
+		if self.steerResult < self.steer then
+			self.steerResult = self.steer
 		end
 	end
 end
@@ -779,524 +1313,17 @@ function Car:updateSteerResultPlayer(dt)
 	end
 end
 
-function Car:updateSteerResultCpu(dt)
-	if self.steerResult < self.steer then
-		self.steerResult = self.steerResult + AI_STEER_RESULT_CHANGE * dt
+function Car:updateWheelAnimation(dt)
+	if self.speed > 0 then
+		self.rearWheelCount = self.rearWheelCount + self.speed * dt
 
-		if self.steerResult > self.steer then
-			self.steerResult = self.steer
-		end
-	elseif self.steerResult > self.steer then
-		self.steerResult = self.steerResult - AI_STEER_RESULT_CHANGE * dt
+		if self.rearWheelCount > 1.1 then
+			self.rearWheelCount = 0
+			self.rearWheelIndex = self.rearWheelIndex + 1
 
-		if self.steerResult < self.steer then
-			self.steerResult = self.steer
-		end
-	end
-end
-
-function Car:updateSteerResult(dt)
-	if self.isPlayer then
-		self:updateSteerResultPlayer(dt)
-	else
-		self:updateSteerResultCpu(dt)
-	end
-end
-
-function Car:updateOutwardForcePlayer(dt)
-	local newOutwardForce = self.segmentDdx * self.speed * self.speed * OUTWARD_FORCE
-
-	if math.abs(newOutwardForce) < math.abs(self.outwardForce) then
-		self.outwardForce = (4 * self.outwardForce + 1 * newOutwardForce) / 5
-	else
-		self.outwardForce = (14 * self.outwardForce + 1 * newOutwardForce) / 15
-	end	
-end
-
-function Car:updateOutwardForceCpu(dt)
-	local newOutwardForce = self.segmentDdx * self.speed * self.speed * AI_OUTWARD_FORCE
-
-	if math.abs(newOutwardForce) < math.abs(self.outwardForce) then
-		self.outwardForce = (1 * self.outwardForce + 1 * newOutwardForce) / 2
-	else
-		self.outwardForce = (9 * self.outwardForce + 1 * newOutwardForce) / 10
-	end	
-end
-
-function Car:updateOutwardForce(dt)
-	if self.isPlayer then
-		self:updateOutwardForcePlayer(dt)
-	else
-		self:updateOutwardForceCpu(dt)
-	end
-end
-
-function Car:updateEngineSoundPlayer()
-	local gear = math.floor((self.speed / self.topSpeed) / (1.0 / self.gears))
-	local gearSpeed = (self.speed - (gear * (self.topSpeed / self.gears))) / (self.topSpeed / self.gears)
-
-	self.sndEngineIdle:setPitch(1 + 2.5 * (self.speed / self.topSpeed))
-
-	local pitch = 0.5 + gear * 0.045 + gearSpeed * 0.4
-
-	if self.falling then
-		pitch = pitch * 1.4
-	end
-
-	self.sndEnginePower:setPitch(pitch)
-	
-	if self.inTunnel then
-		if not self.echoEnabled then
-			self.sndEnginePower:setEffect("tunnel_echo")
-			self.echoEnabled = true
-
-			if self.ravine then
-				-- volume not already modified such as by countdown
-				-- note: taking floating point error into account in check for equality
-				if math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC) < 0.01 then
-					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN, sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL)
-				end
-			elseif self.city then
-				-- volume not already modified such as by countdown
-				if math.abs(sound.getVolume(sound.RACE_MUSIC_CITY) - sound.VOLUME_MUSIC) < 0.01 then
-					sound.setVolume(sound.RACE_MUSIC_CITY, sound.VOLUME_MUSIC_IN_TUNNEL)
-				end
-			else
-				-- volume not already modified such as by countdown
-				if math.abs(sound.getVolume(sound.RACE_MUSIC_FOREST) - sound.VOLUME_MUSIC) < 0.01 then
-					sound.setVolume(sound.RACE_MUSIC_FOREST, sound.VOLUME_MUSIC_IN_TUNNEL)
-				end
+			if self.rearWheelIndex > 4 then
+				self.rearWheelIndex = 1
 			end
 		end
-	else
-		if self.echoEnabled then
-			self.sndEnginePower:setEffect("tunnel_echo", false)
-			self.echoEnabled = false
-
-			if self.ravine then
-				-- volume not already modified such as by countdown
-				if math.abs(sound.getVolume(sound.RACE_MUSIC_MOUNTAIN) - sound.VOLUME_MUSIC_IN_RAVINE_TUNNEL) < 0.01 then
-					sound.setVolume(sound.RACE_MUSIC_MOUNTAIN, sound.VOLUME_MUSIC)
-				end
-			elseif self.city then
-				-- volume not already modified such as by countdown
-				if math.abs(sound.getVolume(sound.RACE_MUSIC_CITY) - sound.VOLUME_MUSIC_IN_TUNNEL) < 0.01 then
-					sound.setVolume(sound.RACE_MUSIC_CITY, sound.VOLUME_MUSIC)
-				end
-			else
-				-- volume not already modified such as by countdown
-				if math.abs(sound.getVolume(sound.RACE_MUSIC_FOREST) - sound.VOLUME_MUSIC_IN_TUNNEL) < 0.01 then
-					sound.setVolume(sound.RACE_MUSIC_FOREST, sound.VOLUME_MUSIC)
-				end
-			end
-		end
-	end
-end
-
-function Car:updateEngineSoundCpu()
-	local gear = math.floor((self.speed / self.topSpeed) / (1.0 / self.gears))
-	local gearSpeed = (self.speed - (gear * (self.topSpeed / self.gears))) / (self.topSpeed / self.gears)
-
-	self.sndEnginePower:setPitch(0.5 + gear * 0.045 + gearSpeed * 0.4)
-	
-	local volume = 1 - (self.z - perspective.minZ) / (perspective.maxZ / 2 - perspective.minZ)
-
-	if volume > 1 then
-		volume = 1
-	end
-
-	if volume < 0 then
-		volume = 0
-	end
-
-	self.sndEnginePower:setVolume(volume * AI_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
-end
-
-function Car:updateEngineSound()
-	if self.isPlayer then
-		self:updateEngineSoundPlayer()
-	else
-		self:updateEngineSoundCpu()
-	end
-end
-
-function Car:explode(afterFall)
-	self.explodeAfterFall = afterFall
-
-	if self.isPlayer then
-		self.sndEngineIdle:setVolume(0)
-		self.sndEnginePower:setVolume(0)
-	end
-
-	sound.play(sound.EXPLOSION)
-
-	self.speed = 0
-	self.explosionTime = EXPLOSION_TIME + EXPLOSION_WAIT
-end
-
-function Car:fall()
-	self.falling = true
-	self.fallDy = 1
-	self.fallDx = -self.outwardForce + self.steerResult
-end
-
-function Car:updateExplosion(dt)
-	local delete = false
-
-	self.explosionTime = self.explosionTime - dt
-
-	if self.explosionTime <= 0 then
-		if self.isPlayer then
-			self.sndEngineIdle:setVolume(PLAYER_ENGINE_SOUND_IDLE_VOLUME * sound.VOLUME_EFFECTS)
-			self.sndEnginePower:setVolume(PLAYER_ENGINE_SOUND_POWER_VOLUME * sound.VOLUME_EFFECTS)
-			self.steer = 0
-            self.steerResult = 0
-			self.x = 0
-		else
-			delete = true
-		end
-
-		self.explosionTime = 0
-	end
-
-	return delete
-end
-
-function Car:updateFall(dt)
-	local explode = false
-
-	self.fallDy = self.fallDy + (self.fallDy * 8) * dt
-
-	local fallDistance = 70
-
-	if not self.isPlayer then
-		-- cars are not drawn behind road so cars falling in distance will show
-		-- through road; therefore for cpu cars the fall distance is limited
-		fallDistance = 10
-	end
-
-	if self.fallDy >= fallDistance then
-		self.falling = false
-		self.fallDy = 0
-		self.fallDx = 0
-
-		explode = true
-	end
-
-	return explode
-end
-
-function Car:update(dt)
-	local delete = false
-	local explodeAfterFall = false
-	local offRoad = self:updateOffRoad(dt)
-	local acc = self:getAcceleration()
-
-	if offRoad then
-		acc = acc * OFF_ROAD_ACC_FACTOR
-
-		if self.ravine and (self.x < -MAX_DIST_BEFORE_RAVINE) and (self.explosionTime == 0) then
-			if not self.falling then
-				self:fall()
-			end
-		end
-	end
-	
-	if self.explosionTime == 0 then
-		self:updateSteer(dt)
-	
-		if self.collision == nil then
-			self:updateSpeed(acc, dt)
-		else
-			-- 50% crash
-			if self.collision.speed > (self.topSpeed * 0.5) then
-				self:explode(false)
-			-- 20% crash
-			elseif self.collision.speed > (self.topSpeed * 0.2) then
-				sound.play(sound.COLLISION)
-			-- light touch
-			else
-				-- ...
-			end
-		end
-	end
-	
-	if self.explosionTime == 0 then
-		if not self.falling then
-			self:updateSteerResult(dt)
-			self:updateOutwardForce(dt)
-			self:updateSpark(dt)
-		else
-			explodeAfterFall = self:updateFall(dt)
-		end
-	end
-
-	if explodeAfterFall then
-		self:explode(true)
-	end
-
-	if self.explosionTime ~= 0 then
-		delete = self:updateExplosion(dt)
-	end
-
-	self:updateEngineSound()	
-	
-	if not self.isPlayer then
-		-- update z
-		self.z = self.z + self.speed * dt
-	end
-	
-	self:updateWheelAnimation(dt)
-	
-	if self.explosionTime == 0 then
-		if not self.falling then
-			-- apply outward force to x
-			self.x = self.x - self.outwardForce * dt
-	
-			-- apply steer result to x
-			self.x = self.x + self.steerResult * dt
-		else
-			self.x = self.x + self.fallDx * dt
-		end
-	end
-	
-	if self.x < -(road.ROAD_WIDTH * 2) then
-		self.x = -road.ROAD_WIDTH * 2
-		self.steer = 0
-	elseif self.x > (road.ROAD_WIDTH * 2) then
-		self.x = road.ROAD_WIDTH * 2
-		self.steer = 0
-	end
-	
-	return delete
-end
-
-function Car:scroll(playerSpeed, dt)
-	local lap = false
-	local delete = false
-	
-	if not self.isPlayer then
-		self.z = self.z - playerSpeed * dt
-
-		if (self.z < perspective.minZ) or (self.z > perspective.maxZ) then
-			-- remove car
-			delete = true
-		end
-	end
-	
-	return {
-		lap = lap,
-		delete = delete
-	}
-end
-
-function Car:selectNewLane(collisionX, collisionDz, blockingCarSpeed, otherLaneResult)
-	-- other lane blocked
-	if otherLaneResult.collision then
-		-- consider braking
-		self.aiBlockingCarSpeed = blockingCarSpeed
-	else
-		if collisionX < 0 then
-			self.targetX = Car.getXFromLane(1, true)
-		else
-			self.targetX = Car.getXFromLane(-1, true)
-		end
-	end
-end
-
-function Car:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
-	Entity.setupForDraw(self, z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
-
-	self.segmentDdx = segment.ddx
-	self.targetSpeed = self.topSpeed
-	self.inTunnel = segment.tunnel
-	self.inLight = segment.light
-end
-
-function Car:draw()
-	local imageScale = self:computeImageScale() * WIDTH_MODIFIER
-	local newScreenX = self:computeNewScreenX()
-
-	love.graphics.push()
-	love.graphics.scale(imageScale, imageScale)
-	love.graphics.setColor(1, 1, 1)
-	
-	local screenX = newScreenX / imageScale
-	local screenY = (self.screenY + self.fallDy) / imageScale
-	
-	if (self.explosionTime == 0) or ((self.explosionTime > EXPLOSION_WAIT + EXPLOSION_TIME / 2) and (not self.explodeAfterFall)) then
-		local bumpDy = 0
-		
-		if (self.leftBumpDy ~= 0) or (self.rightBumpDy ~= 0) then
-			bumpDy = (self.leftBumpDy + self.rightBumpDy) * 0.9
-			screenY = screenY + bumpDy
-		end
-		
-		local steerPerspectiveEffect = self.steerFactor * MAX_STEER_PERSPECTIVE_EFFECT
-		local perspectiveEffect = (aspect.GAME_WIDTH / 2 - newScreenX) / (aspect.GAME_WIDTH / 2) * 10 + steerPerspectiveEffect
-		local frontWheelDy = -imgFrontWheel[1]:getHeight() - 5 * imageScale
-		local accEffect = self.accEffect * 0.01
-		
-		-- draw shadow
-		if not self.falling then
-			love.graphics.draw(imgShadow,screenX - shadowWidth / 2, screenY - 6)
-		end
-
-		-- compute body rotation
-		local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
-		local bodyRotation = bodyDegreesChange * math.pi / 180
-		
-		-- draw front wheels
-		local wheelScaleChange = bodyDegreesChange / MAX_BODY_DEGREES_CHANGE * MAX_WHEEL_SCALE_CHANGE
-		local leftWheelScale = 1 + wheelScaleChange
-		local rightWheelScale = 1 - wheelScaleChange
-
-		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelLeftDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
-		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelRightDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
-		
-		local mainColor
-
-		if self.city then
-			if (self.inTunnel) or (self.inLight) then
-				mainColor = self.color
-			else
-				mainColor = self.colorInDark
-			end
-		else
-			mainColor = self.color
-
-			if (self.inTunnel) and (not self.ravine) and (not self.falling) then
-				mainColor = self.colorInTunnel
-			end
-		end
-		
-		-- draw body
-		love.graphics.setColor(mainColor)
-		love.graphics.draw(imgBody, screenX - perspectiveEffect * 0.2, screenY - bodyHeight / 2 + accEffect, bodyRotation, 1, 1, bodyWidth / 2, bodyHeight / 2)
-		
-		-- draw helmet
-		love.graphics.setColor(1, 1, 1)
-		love.graphics.draw(imgHelmet, screenX - helmetWidth / 2  - perspectiveEffect * 0.2, screenY - bodyHeight - helmetHeight + accEffect)
-		
-		-- draw air scoop
-		love.graphics.setColor(mainColor)
-		love.graphics.draw(imgAirScoop, screenX - airScoopWidth / 2  - perspectiveEffect * 0.6, screenY - bodyHeight - airScoopHeight + accEffect + math.abs(perspectiveEffect) * 0.02)
-		
-		-- draw rear wheels
-		love.graphics.setColor(1, 1, 1)
-		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX - bodyWidth / 2 - rearWheelWidth - perspectiveEffect, screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
-		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX + bodyWidth / 2 - perspectiveEffect, screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
-		
-		-- draw rear wing
-		local wingDegreesChange = bodyDegreesChange
-		local wingRotation = wingDegreesChange * math.pi / 180
-
-		love.graphics.setColor(mainColor)
-		love.graphics.draw(self.imgWing, screenX - perspectiveEffect * 1.2, screenY - bodyHeight + 4 + accEffect * 2.5 + bumpDy, wingRotation, 1, 1, self.wingWidth / 2, self.wingHeight)
-		
-		-- draw diffuser
-		love.graphics.draw(imgDiffuser, screenX - diffuserWidth / 2  - perspectiveEffect, screenY - diffuserHeight + accEffect * 3)
-	
-		-- draw rear light
-		local lightSize = 4
-
-		love.graphics.setColor(0, 0, 0)
-		love.graphics.rectangle("fill", screenX - (lightSize + 4) / 2 - perspectiveEffect * 1.4, screenY - bodyHeight + accEffect * 2.8 + bumpDy, lightSize + 4, lightSize + 4)
-		
-		if not self.braking then
-			if not self.inTunnel then
-				if self.city then
-					if not self.inLight then
-						love.graphics.setColor(0.8, 0, 0)
-					else
-						love.graphics.setColor(0.4, 0, 0)
-					end
-				else
-					love.graphics.setColor(0.4, 0, 0)
-				end
-			else
-				if self.city then
-					love.graphics.setColor(0.4, 0, 0)
-				else
-					love.graphics.setColor(0.6, 0, 0)
-				end
-			end
-		else
-			love.graphics.setColor(1, 0, 0)
-		end
-
-		love.graphics.rectangle("fill", screenX - lightSize / 2 - perspectiveEffect * 1.6, screenY - bodyHeight + 2 + accEffect * 3.6 + bumpDy, lightSize, lightSize)
-	end
-	
-	if self.explosionTime > EXPLOSION_WAIT then
-		if not self.explodeAfterFall then
-			local progress = 1 - ((self.explosionTime - EXPLOSION_WAIT) / EXPLOSION_TIME)
-			local total = #imgExplosion
-			local i = math.ceil(total * progress)
-
-			love.graphics.setColor(1, 1, 1)
-			love.graphics.draw(imgExplosion[i], screenX - imgExplosion[i]:getWidth() / 2 * EXPLOSION_SCALE, screenY - imgExplosion[i]:getHeight() * EXPLOSION_SCALE, 0, EXPLOSION_SCALE, EXPLOSION_SCALE)
-		end
-	end
-	
-	love.graphics.pop()
-
-	self.storedScreenX = newScreenX
-end
-
--- Note: currently ai top speed same as player top speed in kmh even though actual ai top speed may be lower
-function Car:getSpeedAsKMH()
-	return math.floor(self.speed / self.topSpeed * TOP_SPEED_IN_KMH)
-end
-
--- used to turn player into cpu car after finish
-function Car:setIsPlayer(isPlayer)
-	self.isPlayer = isPlayer
-end
-
-function Car:breakDown(lane)
-	self.broken = true
-	self.sparkTime = 0
-	self.topSpeed = self.topSpeed * 0.7
-	self.speed = self.topSpeed
-	self.targetSpeed = self.topSpeed
-
-	-- only move more towards road side if not on ravine track
-	if not self.ravine then
-		self.targetX = self.targetX + lane * road.ROAD_WIDTH / 3
-	end
-end
-
-function Car:getSparks()
-	return self.sparks
-end
-
-function Car:resetSparks()
-	self.sparks = nil
-end
-
-function Car:isCar()
-	return true
-end
-
-function Car:exploding()
-	return self.explosionTime ~= 0
-end
-
-function Car:outsideTunnelBounds()
-	return (self.x < -MAX_DIST_BEFORE_TUNNEL_WALL) or (self.x > MAX_DIST_BEFORE_TUNNEL_WALL)
-end
-
-function Car:clean()
-	if self.sndEngineIdle ~= nil then
-		love.audio.stop(self.sndEngineIdle)
-
-		self.sndEngineIdle = nil
-	end
-
-	if self.sndEnginePower ~= nil then
-		love.audio.stop(self.sndEnginePower)
-		
-		self.sndEnginePower = nil
 	end
 end

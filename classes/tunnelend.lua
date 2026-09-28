@@ -1,6 +1,3 @@
--- Max Downforce - classes/tunnelend.lua
--- 2019-2020 Foppygames
-
 require "classes.entity"
 
 local aspect = require("modules.aspect")

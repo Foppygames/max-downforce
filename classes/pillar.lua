@@ -1,6 +1,3 @@
--- Max Downforce - classes/pillar.lua
--- 2019 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -10,8 +7,8 @@ local shadowHalfHeight = 0
 Pillar = Entity:new()
 
 function Pillar.init()
-	img = love.graphics.newImage("images/pillar.png")
-	shadowImg = love.graphics.newImage("images/shadow_pillar.png")
+	img = love.graphics.newImage("images/props/pillar.png")
+	shadowImg = love.graphics.newImage("images/shadows/shadow_pillar.png")
 	shadowHalfHeight = shadowImg:getHeight() / 2
 end
 

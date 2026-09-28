@@ -1,6 +1,3 @@
--- Max Downforce - classes/marker.lua
--- 2019 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -8,7 +5,7 @@ local img = nil
 Marker = Entity:new()
 
 function Marker.init()
-	img = love.graphics.newImage("images/marker.png")
+	img = love.graphics.newImage("images/props/marker.png")
 end
 
 function Marker:new(x, z)

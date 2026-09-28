@@ -1,6 +1,3 @@
--- Max Downforce - classes/flag.lua
--- 2019 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -10,8 +7,8 @@ Flag = Entity:new()
 
 function Flag.init()
 	img = {
-		love.graphics.newImage("images/flag1.png"),
-		love.graphics.newImage("images/flag2.png")
+		love.graphics.newImage("images/props/flag1.png"),
+		love.graphics.newImage("images/props/flag2.png")
 	}
 
 	index = 1

@@ -1,6 +1,3 @@
--- Max Downforce - modules/road.lua
--- 2017-2020 Foppygames
-
 local road = {}
 
 local aspect = require("modules.aspect")

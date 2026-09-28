@@ -1,6 +1,3 @@
--- Max Downforce - modules/perspective.lua
--- 2017-2020 Foppygames
-
 local perspective = {}
 
 local aspect = require("modules.aspect")

@@ -1,6 +1,3 @@
--- Max Downforce - modules/timer.lua
--- 2019 Foppygames
-
 local timer = {}
 
 local utils = require("modules.utils")

@@ -1,6 +1,3 @@
--- Max Downforce - modules/aspect.lua
--- 2017-2020 Foppygames
-
 local aspect = {}
 
 local utils = require("modules.utils")

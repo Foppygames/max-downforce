@@ -1,6 +1,3 @@
--- Max Downforce - modules/entities.lua
--- 2017-2020 Foppygames
-
 local entities = {}
 
 require "classes.banner"

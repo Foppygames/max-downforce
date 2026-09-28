@@ -1,6 +1,3 @@
--- Max Downforce - classes/light.lua
--- 2019 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -8,7 +5,7 @@ local img = nil
 Light = Entity:new()
 
 function Light.init()
-	img = love.graphics.newImage("images/light.png")
+	img = love.graphics.newImage("images/props/light.png")
 end
 
 function Light:new(x, z)

@@ -1,6 +1,3 @@
--- Max Downforce - modules/track3.lua
--- 2020 Foppygames
-
 local track3 = {}
 
 local aspect = require("modules.aspect")

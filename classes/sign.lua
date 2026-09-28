@@ -1,6 +1,3 @@
--- Max Downforce - classes/sign.lua
--- 2018 Foppygames
-
 require "classes.entity"
 
 local img = nil
@@ -10,9 +7,9 @@ Sign = Entity:new()
 
 function Sign.init()
 	img = {
-		love.graphics.newImage("images/sign1.png"),
-		love.graphics.newImage("images/sign2.png"),
-		love.graphics.newImage("images/sign3.png")
+		love.graphics.newImage("images/props/sign1.png"),
+		love.graphics.newImage("images/props/sign2.png"),
+		love.graphics.newImage("images/props/sign3.png")
 	}
 end
 

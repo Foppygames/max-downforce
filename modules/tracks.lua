@@ -1,6 +1,3 @@
--- Max Downforce - modules/tracks.lua
--- 2019-2020 Foppygames
-
 local tracks = {}
 
 local perspective = require("modules.perspective")

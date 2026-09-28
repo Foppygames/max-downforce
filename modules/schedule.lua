@@ -1,6 +1,3 @@
--- Max Downforce - modules/schedule.lua
--- 2017-2020 Foppygames
-
 local schedule = {}
 
 local entities = require("modules.entities")

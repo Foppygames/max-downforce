@@ -1,6 +1,3 @@
--- Max Downforce - classes/flagger.lua
--- 2019 Foppygames
-
 require "classes.entity"
 
 local WAVE_TIME = 0.2
@@ -11,10 +8,10 @@ Flagger = Entity:new()
 
 function Flagger.init()
 	img = {
-		love.graphics.newImage("images/flagger_left_1.png"),
-		love.graphics.newImage("images/flagger_left_2.png"),
-		love.graphics.newImage("images/flagger_right_1.png"),
-		love.graphics.newImage("images/flagger_right_2.png")
+		love.graphics.newImage("images/props/flagger_left_1.png"),
+		love.graphics.newImage("images/props/flagger_left_2.png"),
+		love.graphics.newImage("images/props/flagger_right_1.png"),
+		love.graphics.newImage("images/props/flagger_right_2.png")
 	}
 end
 

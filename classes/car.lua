@@ -957,7 +957,7 @@ function Car:updateSpeed(acc, dt)
 			if controls.selected.type == controls.TYPE_KEYBOARD then
 				self:updateSpeedPlayerKeyboard(acc, dt, controls.selected.config)
 			elseif controls.selected.type == controls.TYPE_GAMEPAD then
-				self:updateSpeedPlayerGamepad(acc, dt)
+				self:updateSpeedPlayerGamepad(acc, dt, controls.selected.config)
 			end
 		end
 	else
@@ -1037,72 +1037,76 @@ function Car:updateSpeedPlayerDigital(acc, inputDown, inputUp, dt)
 	end
 end
 
-function Car:updateSpeedPlayerGamepad(acc, dt)
-	self.braking = false
+function Car:updateSpeedPlayerGamepad(acc, dt, controlsConfig)
+	if controlsConfig == controls.CONFIG_GAMEPAD_DPAD then
+		self:updateSpeedPlayerDigital(acc, controls.joystick:isGamepadDown("b"), controls.joystick:isGamepadDown("a"), dt)
+	else
+		self.braking = false
 
-	local throttle = 0
-	local triggerLeft = 0
-	local triggerRight = 0
+		local throttle = 0
+		local triggerLeft = 0
+		local triggerRight = 0
 
-	if controls.joystick ~= nil then
-		throttle = -controls.joystick:getGamepadAxis(controls.joystickThrottleAxis)
+		if controls.joystick ~= nil then
+			throttle = -controls.joystick:getGamepadAxis(controls.joystickThrottleAxis)
 
-		if throttle == 0 then
-			triggerLeft = controls.joystick:getGamepadAxis("triggerleft")
-			triggerRight = controls.joystick:getGamepadAxis("triggerright")
+			if throttle == 0 then
+				triggerLeft = controls.joystick:getGamepadAxis("triggerleft")
+				triggerRight = controls.joystick:getGamepadAxis("triggerright")
 
-			if triggerLeft > 0 then
-				throttle = -triggerLeft
-			elseif triggerRight > 0 then
-				throttle = triggerRight
+				if triggerLeft > 0 then
+					throttle = -triggerLeft
+				elseif triggerRight > 0 then
+					throttle = triggerRight
+				end
 			end
+
+			self.braking = (throttle < 0)
 		end
 
-		self.braking = (throttle < 0)
-	end
+		if self.pause > 0 then
+			self.pause = self.pause - dt
+		else
+			if controls.joystick ~= nil then
+				local relSpeed = self.speed / self.topSpeed
+				
+				-- player wants to go faster
+				if throttle > relSpeed then
+					local howMuchFaster = (throttle - relSpeed) / (1 - relSpeed)
+					local appliedAcc = acc * howMuchFaster
 
-	if self.pause > 0 then
-		self.pause = self.pause - dt
-	else
-		if controls.joystick ~= nil then
-			local relSpeed = self.speed / self.topSpeed
-			
-			-- player wants to go faster
-			if throttle > relSpeed then
-				local howMuchFaster = (throttle - relSpeed) / (1 - relSpeed)
-				local appliedAcc = acc * howMuchFaster
+					self.speed = self.speed + appliedAcc * dt
+					self.accEffect = appliedAcc
 
-				self.speed = self.speed + appliedAcc * dt
-				self.accEffect = appliedAcc
-
-				if self.speed > (self.topSpeed * throttle) then
-					self.speed = (self.topSpeed * throttle)
-					self.accEffect = 0
-				end
-			-- player wants to go slower or remain at this speed
-			else
-				if self.speed > 0 then
-					-- applying the brakes
-					if self.braking then
-						self.speed = self.speed - BRAKE * dt
-						self.accEffect = -BRAKE
-					-- reducing throttle
-					else
-						local targetSpeed = throttle * self.topSpeed
-
-						self.speed = self.speed - IDLE_BRAKE * dt
-
-						if self.speed < targetSpeed then
-							self.speed = targetSpeed
-						end
-
-						self.accEffect = self.accEffect * 0.9
+					if self.speed > (self.topSpeed * throttle) then
+						self.speed = (self.topSpeed * throttle)
+						self.accEffect = 0
 					end
-				end
-				if self.speed <= 0 then
-					self.speed = 0
-					self.steer = 0
-					self.accEffect = self.accEffect * 0.6
+				-- player wants to go slower or remain at this speed
+				else
+					if self.speed > 0 then
+						-- applying the brakes
+						if self.braking then
+							self.speed = self.speed - BRAKE * dt
+							self.accEffect = -BRAKE
+						-- reducing throttle
+						else
+							local targetSpeed = throttle * self.topSpeed
+
+							self.speed = self.speed - IDLE_BRAKE * dt
+
+							if self.speed < targetSpeed then
+								self.speed = targetSpeed
+							end
+
+							self.accEffect = self.accEffect * 0.9
+						end
+					end
+					if self.speed <= 0 then
+						self.speed = 0
+						self.steer = 0
+						self.accEffect = self.accEffect * 0.6
+					end
 				end
 			end
 		end
@@ -1130,7 +1134,7 @@ function Car:updateSteer(dt)
 			if controls.selected.type == controls.TYPE_KEYBOARD then
 				self:updateSteerPlayerKeyboard(dt, controls.selected.config)
 			elseif controls.selected.type == controls.TYPE_GAMEPAD then
-				self:updateSteerPlayerGamepad(dt)
+				self:updateSteerPlayerGamepad(dt, controls.selected.config)
 			end
 		end
 	else
@@ -1221,8 +1225,10 @@ function Car:updateSteerPlayerDigital(inputLeft, inputRight, dt)
 	self.steerFactor = self.steer / MAX_STEER_KEYBOARD
 end
 
-function Car:updateSteerPlayerGamepad(dt)
-	if controls.joystick ~= nil then
+function Car:updateSteerPlayerGamepad(dt, controlsConfig)
+	if controlsConfig == controls.CONFIG_GAMEPAD_DPAD then
+		self:updateSteerPlayerDigital(controls.joystick:isGamepadDown("dpleft"), controls.joystick:isGamepadDown("dpright"), dt)
+	elseif controls.joystick ~= nil then
 		local steerBackHardFactor = 1
 		local gamepadX = controls.joystick:getGamepadAxis(controls.joystickSteerAxis)
 

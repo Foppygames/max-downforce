@@ -4,8 +4,9 @@ local controls = {}
 
 controls.CONFIG_GAMEPAD_L = 1
 controls.CONFIG_GAMEPAD_R = 2
-controls.CONFIG_KEYBOARD_ARROWS = 3
-controls.CONFIG_KEYBOARD_AZ_COMMA_PERIOD = 4
+controls.CONFIG_GAMEPAD_DPAD = 3
+controls.CONFIG_KEYBOARD_ARROWS = 4
+controls.CONFIG_KEYBOARD_AZ_COMMA_PERIOD = 5
 
 controls.TYPE_KEYBOARD = 1
 controls.TYPE_GAMEPAD = 2
@@ -90,6 +91,15 @@ function controls.init()
 
 			table.insert(controls.available, {
 				config = controls.CONFIG_GAMEPAD_L,
+				type = controls.TYPE_GAMEPAD,
+				label = controls.GAMEPAD_LABEL,
+				labelDx = controls.GAMEPAD_LABEL_DX,
+				startText = controls.GAMEPAD_START_TEXT,
+				startTextDx = controls.GAMEPAD_START_TEXT_DX
+			})
+
+			table.insert(controls.available, {
+				config = controls.CONFIG_GAMEPAD_DPAD,
 				type = controls.TYPE_GAMEPAD,
 				label = controls.GAMEPAD_LABEL,
 				labelDx = controls.GAMEPAD_LABEL_DX,
@@ -191,7 +201,7 @@ function controls.updateJoystickAxes()
 			if controls.selected.config == controls.CONFIG_GAMEPAD_R then
 				controls.joystickSteerAxis = "rightx"
 				controls.joystickThrottleAxis = "lefty"
-			else
+			elseif controls.selected.config == controls.CONFIG_GAMEPAD_L then
 				controls.joystickSteerAxis = "leftx"
 				controls.joystickThrottleAxis = "righty"
 			end

@@ -104,6 +104,7 @@ local version = ""
 local imageTrophyBronze = nil
 local imageTrophySilver = nil
 local imageTrophyGold = nil
+local imageGamepadDpad = nil
 local imageGamepadModeR = nil
 local imageGamepadModeL = nil
 
@@ -214,7 +215,9 @@ local function drawTitleScreen()
 	love.graphics.setColor(1, 1, 1)
 
 	if controls.getSelected().type == controls.TYPE_GAMEPAD then
-		if controls.getSelected().config == controls.CONFIG_GAMEPAD_L then
+		if controls.getSelected().config == controls.CONFIG_GAMEPAD_DPAD then
+			love.graphics.draw(imageGamepadDpad, 255, 128)
+		elseif controls.getSelected().config == controls.CONFIG_GAMEPAD_L then
 			love.graphics.draw(imageGamepadModeL, 255, 128)
 		elseif controls.getSelected().config == controls.CONFIG_GAMEPAD_R then
 			love.graphics.draw(imageGamepadModeR, 255, 128)
@@ -510,6 +513,7 @@ function states.init(gameVersion, gameTitle)
 	love.graphics.setLineStyle("rough")
 	love.graphics.setFont(love.graphics.newFont("Retroville_NC.ttf", 10))
 	
+	imageGamepadDpad = love.graphics.newImage("images/interface/gamepad_dpad.png")
 	imageGamepadModeL = love.graphics.newImage("images/interface/gamepad_l.png")
 	imageGamepadModeR = love.graphics.newImage("images/interface/gamepad_r.png")
 	imageKeyboardModeArrows = love.graphics.newImage("images/interface/keyboard_arrows.png")

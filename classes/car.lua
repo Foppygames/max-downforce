@@ -208,7 +208,7 @@ function Car:draw()
 		
 		-- draw shadow
 		if not self.falling then
-			love.graphics.draw(imgShadow,screenX - shadowWidth / 2, screenY - 6)
+			love.graphics.draw(imgShadow, screenX - shadowWidth / 2, screenY - 6)
 		end
 
 		-- compute body rotation

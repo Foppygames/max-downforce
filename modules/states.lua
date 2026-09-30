@@ -16,6 +16,7 @@ require "classes.tree"
 
 local aspect = require("modules.aspect")
 local controls = require("modules.controls")
+local daynight = require("modules.daynight")
 local entities = require("modules.entities")
 local horizon = require("modules.horizon")
 local opponents = require("modules.opponents")
@@ -26,6 +27,7 @@ local segments = require("modules.segments")
 local sound = require("modules.sound")
 local timer = require("modules.timer")
 local tracks = require("modules.tracks")
+local track1 = require("modules.track1")
 
 local STATE_TITLE = 0
 local STATE_RACE = 1
@@ -537,12 +539,14 @@ function states.init(gameVersion, gameTitle)
 	Tree.init()
 	
 	aspect.init(fullScreen)
+	daynight.init()
 	entities.init()
 	horizon.init()
 	perspective.initZMapAndScaling()
 	opponents.init()
 	segments.init()
 	sound.init()
+	track1.init()
 
 	selectedJoystick = controls.init()
 
@@ -551,6 +555,8 @@ end
 
 function states.update(dt)
 	if state == STATE_RACE then
+		daynight.update(dt)
+
 		if beepTimer > 0 then
 			beepTimer = beepTimer - dt
 
@@ -891,6 +897,10 @@ function states.draw()
 		drawInfoPlayerSpeed()
 		drawInfoCurrentLap()
 		drawInfoTime()
+
+		-- temp: draw daynight time
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.print(daynight.getDisplayTime(), aspect.GAME_WIDTH - 80, 40)
 	elseif state == STATE_TITLE then
 		drawTitleScreen()
 	elseif state == STATE_GAME_OVER then

@@ -1,11 +1,15 @@
 local track1 = {}
 
 local aspect = require("modules.aspect")
+local daynight = require("modules.daynight")
 local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
 local FIRST_SEGMENT_LENGTH = 0.55
 local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
+
+local imgSun
+local sunX
 
 track1.name = "Forest"
 track1.number = 1
@@ -496,6 +500,15 @@ track1.segments = {
 function track1.drawSky()
 	love.graphics.setColor(0, 0.65, 1)
 	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
+
+	-- todo: move sun into separate module
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.draw(imgSun, sunX, SKY_HEIGHT - daynight.getSunHeight() * SKY_HEIGHT)
+end
+
+function track1.init()
+	imgSun = love.graphics.newImage("images/sky/sun.png")
+	sunX = aspect.GAME_WIDTH / 2
 end
 		
 return track1

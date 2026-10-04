@@ -1,6 +1,7 @@
 local track2 = {}
 
 local aspect = require("modules.aspect")
+local daynight = require("modules.daynight")
 local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
@@ -446,8 +447,9 @@ track2.segments = {
 }
 
 function track2.drawSky()
-	-- draw sky above horizon
-	love.graphics.setColor(0.9, 0.4, 0.5)
+	local sunLight = daynight:getSunLight()
+
+	love.graphics.setColor(0, sunLight * 0.65, sunLight)
 	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
 
  	-- draw mountain color below horizon

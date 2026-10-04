@@ -7,6 +7,7 @@ local START_TIME = 8
 local SUNRISE = 4
 
 local sunHeight
+local sunLight
 local time
 
 function daynight.init()
@@ -28,6 +29,10 @@ function daynight.getSunHeight()
 	return sunHeight
 end
 
+function daynight.getSunLight()
+	return sunLight
+end
+
 function daynight.reset()
 	time = START_TIME
 
@@ -35,18 +40,18 @@ function daynight.reset()
 end
 
 function daynight.update(dt)
-	-- update time
 	time = time + SPEED * dt
 
 	if time > MAX_TIME then
 		time = MIN_TIME + time - MAX_TIME
 	end
 
-	-- update sun height
 	sunHeight = 0
+	sunLight = 0
 
 	if time > 4 and time < 22 then
 		sunHeight = math.sin((time - 4) / 18 * math.pi)
+		sunLight = sunHeight
 	end
 end
 

@@ -1,6 +1,7 @@
 local track1 = {}
 
 local aspect = require("modules.aspect")
+local daynight = require("modules.daynight")
 local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
@@ -494,7 +495,9 @@ track1.segments = {
 }
 
 function track1.drawSky()
-	love.graphics.setColor(0, 0.65, 1)
+	local sunLight = daynight:getSunLight()
+
+	love.graphics.setColor(0, sunLight * 0.65, sunLight)
 	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
 end
 

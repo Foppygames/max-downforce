@@ -899,8 +899,10 @@ function states.draw()
 		drawInfoTime()
 
 		-- temp: draw daynight time
+		--[[
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.print(daynight.getDisplayTime(), aspect.GAME_WIDTH - 80, 40)
+		--]]
 	elseif state == STATE_TITLE then
 		drawTitleScreen()
 	elseif state == STATE_GAME_OVER then

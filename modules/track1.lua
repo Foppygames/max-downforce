@@ -1,15 +1,11 @@
 local track1 = {}
 
 local aspect = require("modules.aspect")
-local daynight = require("modules.daynight")
 local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
 local FIRST_SEGMENT_LENGTH = 0.55
 local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
-
-local imgSun
-local sunX
 
 track1.name = "Forest"
 track1.number = 1
@@ -87,7 +83,7 @@ track1.segments = {
 	-- leave stadiums behind
 	{
 		ddx = 0.7,
-		length = 1.5,
+		length = 1.7,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_TREES_L_R,
@@ -128,7 +124,7 @@ track1.segments = {
 	-- into the forest
 	{
 		ddx = 0.3,
-		length = 2,
+		length = 2.0,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_TREES_L_R,
@@ -192,7 +188,7 @@ track1.segments = {
 	-- in forest
 	{
 		ddx = 0.4,
-		length = 1.0,
+		length = 1,
 		scheduleItems = {},
 		tunnel = false
 	},
@@ -200,7 +196,7 @@ track1.segments = {
 	-- in forest
 	{
 		ddx = 0.1,
-		length = 3,
+		length = 2.9,
 		scheduleItems = {},
 		tunnel = false
 	},
@@ -242,7 +238,7 @@ track1.segments = {
 	-- sweep right
 	{
 		ddx = 0.4,
-		length = 2,
+		length = 2.3,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_SIGN_L,
@@ -262,7 +258,7 @@ track1.segments = {
 	-- continuing into harder long sweep right
 	{
 		ddx = 0.8,
-		length = 3,
+		length = 3.2,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_TREES_L_R,
@@ -326,14 +322,14 @@ track1.segments = {
 	-- short slightly curved straight, start of tunnel
 	{
 		ddx = 0.1,
-		length = 0.8,
+		length = 1.0,
 		scheduleItems = {},
 		tunnel = true
 	},
 	-- hard right, tunnel
 	{
 		ddx = 0.8,
-		length = 2,
+		length = 2.5,
 		scheduleItems = {},
 		tunnel = true
 	},
@@ -347,21 +343,21 @@ track1.segments = {
 	-- medium left, tunnel
 	{
 		ddx = -0.4,
-		length = 2,
+		length = 1.9,
 		scheduleItems = {},
 		tunnel = true
 	},
 	-- short straight, tunnel
 	{
 		ddx = 0,
-		length = 0.8,
+		length = 0.7,
 		scheduleItems = {},
 		tunnel = true
 	},
 	-- easy right, tunnel
 	{
-		ddx = 0.2,
-		length = 1,
+		ddx = 0.3,
+		length = 1.5,
 		scheduleItems = {},
 		tunnel = true
 	},
@@ -372,13 +368,13 @@ track1.segments = {
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_GRASS_L,
-				startZ = 0.1,
+				startZ = 0.2,
 				dz = 0.2,
 				count = 7
 			},
 			{
 				itemType = schedule.ITEM_GRASS_R,
-				startZ = 0.1,
+				startZ = 0.2,
 				dz = 0.2,
 				count = 5
 			},
@@ -440,7 +436,7 @@ track1.segments = {
 	-- hard very long right onto straight
 	{
 		ddx = 0.8,
-		length = 5,
+		length = 6,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_GRASS_R,
@@ -500,10 +496,6 @@ track1.segments = {
 function track1.drawSky()
 	love.graphics.setColor(0, 0.65, 1)
 	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
-
-	-- todo: move sun into separate module
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.draw(imgSun, sunX, SKY_HEIGHT - daynight.getSunHeight() * SKY_HEIGHT)
 end
 
 function track1.init()

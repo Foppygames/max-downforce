@@ -48,7 +48,7 @@ sound.paths = {}
 sound.sources = {}
 
 local crowdVolume = 0
-local musicEnabled = false --true
+local musicEnabled = true
 
 -- returns source for provided path if created before, nil otherwise
 -- Note: used to avoid duplicate music sources, not used for sound effects

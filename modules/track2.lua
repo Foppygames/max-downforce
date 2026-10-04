@@ -44,7 +44,7 @@ track2.segments = {
 	-- long straight after start/finish
 	{
 		ddx = 0,
-		length = 3.0,
+		length = 3.2,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_FLAG_L,
@@ -76,7 +76,7 @@ track2.segments = {
 	-- long curve right
 	{
 		ddx = 0.7,
-		length = 4,
+		length = 4.95,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_STADIUM_R,
@@ -100,7 +100,7 @@ track2.segments = {
 				itemType = schedule.ITEM_TREES_MOUNTAIN_R,
 				startZ = 4.1,
 				dz = 0.2,
-				count = 9
+				count = 13
 			},
 			{
 				itemType = schedule.ITEM_GRASS_MOUNTAIN_L,
@@ -121,7 +121,7 @@ track2.segments = {
 	-- long curve left
 	{
 		ddx = -0.5,
-		length = 3,
+		length = 3.2,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_SIGN_R,
@@ -145,7 +145,7 @@ track2.segments = {
 				itemType = schedule.ITEM_TREES_MOUNTAIN_R,
 				startZ = 3.2,
 				dz = 0.2,
-				count = 35
+				count = 42
 			}
 		},
 		tunnel = false
@@ -153,14 +153,14 @@ track2.segments = {
 	-- very short straight
 	{
 		ddx = 0,
-		length = 0.5,
+		length = 0.7,
 		scheduleItems = {},
 		tunnel = false
 	},
 	-- long curve right
 	{
 		ddx = 0.4,
-		length = 3,
+		length = 3.5,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_MARKER_L,
@@ -186,7 +186,7 @@ track2.segments = {
 	-- long straight towards tunnel
 	{
 		ddx = 0,
-		length = 2.5,
+		length = 3,
 		scheduleItems = {},
 		tunnel = false
 	},
@@ -207,21 +207,21 @@ track2.segments = {
 	-- long curve left, tunnel
 	{
 		ddx = -0.6,
-		length = 4,
+		length = 4.3,
 		scheduleItems = {},
 		tunnel = true
 	},
 	-- very short straight, tunnel
 	{
 		ddx = 0,
-		length = 0.5,
+		length = 0.6,
 		scheduleItems = {},
 		tunnel = true
 	},
 	-- long curve right, tunnel
 	{
 		ddx = 0.6,
-		length = 5,
+		length = 4.3,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_TREES_MOUNTAIN_L,
@@ -235,14 +235,14 @@ track2.segments = {
 	-- short straight, tunnel
 	{
 		ddx = 0,
-		length = 1,
+		length = 1.2,
 		scheduleItems = {},
 		tunnel = true
 	},
 	-- medium straight
 	{
 		ddx = 0,
-		length = 2,
+		length = 2.2,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_TREES_MOUNTAIN_R,
@@ -256,7 +256,7 @@ track2.segments = {
 	-- short curve right
 	{
 		ddx = 0.7,
-		length = 1.5,
+		length = 1.9,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_MARKER_L,
@@ -276,14 +276,14 @@ track2.segments = {
 	-- very short straight
 	{
 		ddx = 0,
-		length = 0.5,
+		length = 0.6,
 		scheduleItems = {},
 		tunnel = false
 	},
 	-- short curve left
 	{
 		ddx = -0.6,
-		length = 1.5,
+		length = 1.7,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_BANNER_FOREST_BRIDGE,
@@ -297,14 +297,14 @@ track2.segments = {
 	-- very short straight
 	{
 		ddx = 0,
-		length = 0.5,
+		length = 0.6,
 		scheduleItems = {},
 		tunnel = false
 	},
 	-- long hard curve right
 	{
 		ddx = 0.85,
-		length = 3.6,
+		length = 3.9,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_MARKER_L,
@@ -336,14 +336,14 @@ track2.segments = {
 	-- short straight
 	{
 		ddx = 0,
-		length = 1,
+		length = 1.2,
 		scheduleItems = {},
 		tunnel = false
 	},
 	-- short straight, tunnel
 	{
 		ddx = 0,
-		length = 1,
+		length = 1.2,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_PILLAR_L,
@@ -418,7 +418,7 @@ track2.segments = {
 	-- long medium curve right
 	{
 		ddx = 0.6,
-		length = 3.6,
+		length = 4.2,
 		scheduleItems = {
 			{
 				itemType = schedule.ITEM_MARKER_L,

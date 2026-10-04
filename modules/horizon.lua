@@ -1,6 +1,7 @@
 local horizon = {}
 
 local aspect = require("modules.aspect")
+local daynight = require("modules.daynight")
 local perspective = require("modules.perspective")
 local segments = require("modules.segments")
 local tracks = require("modules.tracks")
@@ -13,6 +14,9 @@ local COLOR_FOREST_TRACK = {1, 1, 1}
 local COLOR_MOUNTAIN_TRACK = {0.2, 0.3, 0.6}
 local COLOR_CITY_TRACK = {1,1,1}
 
+local SUN_FULL_CIRCLE_LENGTH = aspect.GAME_WIDTH * 4.572
+local SUN_SPEED = 1600
+
 local image = {}
 local imageIndexes = {}
 local width = {}
@@ -22,6 +26,9 @@ local y = {}
 local speed = {}
 local layerCount = 0
 local color
+
+local imgSun
+local sunX
 
 function horizon.init()
 	image = {
@@ -33,6 +40,10 @@ function horizon.init()
 		love.graphics.newImage("images/horizon/horizon_skyscrapers.png"),
 		love.graphics.newImage("images/horizon/horizon_buildings.png")
 	}
+
+	imgSun = love.graphics.newImage("images/sky/sun.png")
+
+	sunX = aspect.GAME_WIDTH / 2
 end
 
 function horizon.reset()
@@ -62,9 +73,12 @@ function horizon.reset()
 
 		speed[i] = 1600 + (i - 1) * 190
 	end
+
+	sunX = aspect.GAME_WIDTH / 2
 end
 
 function horizon.update(playerSegmentDdx, playerSpeed, dt)
+	-- move horizon layers
 	for i = 1, layerCount, 1 do
 		x[i] = x[i] - speed[i] * playerSegmentDdx * playerSpeed * dt
 
@@ -74,9 +88,25 @@ function horizon.update(playerSegmentDdx, playerSpeed, dt)
 			x[i] = x[i] - width[i]
 		end
 	end
+
+	-- move sun
+	sunX = sunX - SUN_SPEED * playerSegmentDdx * playerSpeed * dt
+
+	if sunX > SUN_FULL_CIRCLE_LENGTH then
+		sunX = -(SUN_FULL_CIRCLE_LENGTH - (sunX - SUN_FULL_CIRCLE_LENGTH))
+	end
+
+	if sunX < -SUN_FULL_CIRCLE_LENGTH then
+		sunX = SUN_FULL_CIRCLE_LENGTH + (sunX + SUN_FULL_CIRCLE_LENGTH)
+	end
 end
 
 function horizon.draw()
+	-- draw sun
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.draw(imgSun, sunX, perspective.HORIZON_Y - daynight.getSunHeight() * perspective.HORIZON_Y)
+	
+	-- draw horizon layers
 	love.graphics.setColor(color)
 
 	for i = 1, layerCount, 1 do

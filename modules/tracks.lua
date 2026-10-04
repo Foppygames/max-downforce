@@ -5,6 +5,7 @@ local schedule = require("modules.schedule")
 local track1 = require("modules.track1")
 local track2 = require("modules.track2")
 local track3 = require("modules.track3")
+local track4 = require("modules.track4")
 
 local SMOOTHING_SEGMENT_DDX_STEP = 0.04
 local SMOOTHING_SEGMENT_LENGTH = 0.05
@@ -84,11 +85,46 @@ local function initTrackModule(trackModule)
 	--print("total track length: "..trackModule.totalLength.." ("..trackModule.name..")")
 end
 
+-- Returns total left corner and total right corner stat for use in sun calibration
+local function getTrackCornerStats(trackModule)
+	-- stats are computed as corner strength times corner length, summed over all corners
+	local leftCornerSum = 0
+	local rightCornerSum = 0
+
+	for i = 1, #trackModule.segments, 1 do
+		if trackModule.segments[i].ddx < 0 then
+			leftCornerSum = leftCornerSum + trackModule.segments[i].ddx * trackModule.segments[i].length
+		elseif trackModule.segments[i].ddx > 0 then
+			rightCornerSum = rightCornerSum + trackModule.segments[i].ddx * trackModule.segments[i].length
+		end
+	end
+
+	return {
+		left = leftCornerSum,
+		right = rightCornerSum,
+		saldo = leftCornerSum + rightCornerSum
+	}
+end
+
 function tracks.init()
 	initTrackModule(track1)
 	initTrackModule(track2)
 	initTrackModule(track3)
+	initTrackModule(track4)
 
+	--[[
+	local cornerStats = {}
+	
+	table.insert(cornerStats, getTrackCornerStats(track1))
+	table.insert(cornerStats, getTrackCornerStats(track2))
+	table.insert(cornerStats, getTrackCornerStats(track3))
+	table.insert(cornerStats, getTrackCornerStats(track4))
+
+	for i = 1, 4, 1 do
+		print("track " .. i .." left: " .. cornerStats[i].left .. " right: " .. cornerStats[i].right .. " saldo: " .. cornerStats[i].saldo)
+	end
+	--]]
+	
 	selectedTrack = track1
 end
 

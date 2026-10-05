@@ -7,8 +7,8 @@ local segments = require("modules.segments")
 local tracks = require("modules.tracks")
 
 local IMAGE_INDEXES_FOREST_TRACK = {1, 2, 3}
-local IMAGE_INDEXES_MOUNTAIN_TRACK = {1, 5, 2, 5}
-local IMAGE_INDEXES_CITY_TRACK = {4, 6, 7}
+local IMAGE_INDEXES_MOUNTAIN_TRACK = {1, 4, 2, 4}
+local IMAGE_INDEXES_CITY_TRACK = {5, 6, 5}
 
 local COLOR_FOREST_TRACK = {1, 1, 1}
 local COLOR_MOUNTAIN_TRACK = {0.2, 0.3, 0.6}
@@ -35,7 +35,6 @@ function horizon.init()
 		love.graphics.newImage("images/horizon/horizon_clouds.png"),
 		love.graphics.newImage("images/horizon/horizon_hills.png"),
 		love.graphics.newImage("images/horizon/horizon_trees.png"),
-		love.graphics.newImage("images/horizon/horizon_clouds_2.png"),
 		love.graphics.newImage("images/horizon/horizon_hills_2.png"),
 		love.graphics.newImage("images/horizon/horizon_skyscrapers.png"),
 		love.graphics.newImage("images/horizon/horizon_buildings.png")
@@ -107,7 +106,9 @@ function horizon.draw()
 	love.graphics.draw(imgSun, sunX, perspective.HORIZON_Y - daynight.getSunHeight() * perspective.HORIZON_Y)
 	
 	-- draw horizon layers
-	love.graphics.setColor(color)
+	local sunLight = math.max(0.1, daynight:getSunLight())
+
+	love.graphics.setColor(sunLight, sunLight, sunLight)
 
 	for i = 1, layerCount, 1 do
 		for j = 0, count[i]-1, 1 do

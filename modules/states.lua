@@ -42,7 +42,7 @@ local COLORS_CURBS_CITY = {
 }
 local COLORS_GRASS_NO_RAVINE = {{0.45, 0.8, 0.25}, {0.36, 0.6, 0.20}}
 local COLORS_GRASS_RAVINE = {{0.5, 0.36, 0.03}, {0.45, 0.31, 0.01}}
-local COLORS_GRASS_CITY = {{0.03, 0.0, 0.0}, {0.06, 0.05, 0.05}}
+local COLORS_GRASS_CITY = {{0.4, 0.4, 0.44}, {0.5, 0.5, 0.55}}
 local COLORS_STRIPES_RAVINE = {
 	tunnel = {0.9, 0.9, 0},
 	no_tunnel = {1, 0.95, 0.95}
@@ -278,14 +278,24 @@ local function drawInfoTime()
 end
 
 local function drawGrass(trackHasRavine, trackIsInCity, tunnel, crossroads, light, colorIndex, ravineX, screenY, roadX)
+	local sunLight = math.max(0.1, daynight:getSunLight())
+	
 	if crossroads then
 		if tunnel or light then
 			love.graphics.setColor(tarmacColors.tunnel[colorIndex])
 		else
-			love.graphics.setColor(tarmacColors.no_tunnel[colorIndex])
+			love.graphics.setColor(
+				tarmacColors.no_tunnel[colorIndex][1] * sunLight,
+				tarmacColors.no_tunnel[colorIndex][2] * sunLight,
+				tarmacColors.no_tunnel[colorIndex][3] * sunLight
+			)
 		end
 	else
-		love.graphics.setColor(grassColors[colorIndex])
+		love.graphics.setColor(
+			grassColors[colorIndex][1] * sunLight,
+			grassColors[colorIndex][2] * sunLight,
+			grassColors[colorIndex][3] * sunLight
+		)
 	end
 
 	if trackHasRavine then	
@@ -293,7 +303,9 @@ local function drawGrass(trackHasRavine, trackIsInCity, tunnel, crossroads, ligh
 			love.graphics.line(ravineX, screenY, aspect.GAME_WIDTH, screenY)	
 		else
 			love.graphics.line(ravineX, screenY, roadX, screenY)
+
 			love.graphics.setColor(0.45, 0.32, 0.027)
+
 			love.graphics.line(roadX, screenY, aspect.GAME_WIDTH, screenY)
 		end
 	else

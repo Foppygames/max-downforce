@@ -325,7 +325,13 @@ local function drawTarmac(trackHasRavine, tunnel, colorIndex, roadX, screenY, ro
 	if tunnel then
 		love.graphics.setColor(tarmacColors.tunnel[colorIndex])
 	else
-		love.graphics.setColor(tarmacColors.no_tunnel[colorIndex])
+		local sunLight = math.max(0.3, daynight:getSunLight())
+
+		love.graphics.setColor(
+			tarmacColors.no_tunnel[colorIndex][1] * sunLight,
+			tarmacColors.no_tunnel[colorIndex][2] * sunLight,
+			tarmacColors.no_tunnel[colorIndex][3] * sunLight
+		)
 	end
 
 	love.graphics.line(roadX, screenY, roadX + roadWidth, screenY)
@@ -359,14 +365,24 @@ local function drawCrosswalk(tunnel, screenX, stripeWidth, screenY, crosswalk)
 end
 
 local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth)
+	local sunLight = math.max(0.3, daynight:getSunLight())
+
 	if trackIsInCity then
 		if light then
 			love.graphics.setColor(curbColors.light[colorIndex])
 		else
-			love.graphics.setColor(curbColors.no_light[colorIndex])
+			love.graphics.setColor(
+				curbColors.no_light[colorIndex][1] * sunLight,
+				curbColors.no_light[colorIndex][2] * sunLight,
+				curbColors.no_light[colorIndex][3] * sunLight
+			)
 		end
 	else
-		love.graphics.setColor(curbColors[colorIndex])
+		love.graphics.setColor(
+			curbColors[colorIndex][1] * sunLight,
+			curbColors[colorIndex][2] * sunLight,
+			curbColors[colorIndex][3] * sunLight
+		)
 	end
 
 	love.graphics.line(roadX, screenY, roadX + curbWidth, screenY)
@@ -374,10 +390,16 @@ local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth
 end
 
 local function drawStripes(tunnel, screenX, stripeWidth, screenY, crosswalk)
+	local sunLight = math.max(0.3, daynight:getSunLight())
+
 	if tunnel then
 		love.graphics.setColor(stripeColors.tunnel)
 	else
-		love.graphics.setColor(stripeColors.no_tunnel)
+		love.graphics.setColor(
+			stripeColors.no_tunnel[1] * sunLight,
+			stripeColors.no_tunnel[2] * sunLight,
+			stripeColors.no_tunnel[3] * sunLight
+		)
 	end
 
 	if crosswalk then

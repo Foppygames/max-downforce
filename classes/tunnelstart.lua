@@ -1,6 +1,7 @@
 require "classes.entity"
 
 local aspect = require("modules.aspect")
+local daynight = require("modules.daynight")
 local road = require("modules.road")
 
 TunnelStart = Entity:new()
@@ -19,12 +20,6 @@ function TunnelStart:new(z, trackHasRavine, trackIsInCity)
 	o.solid = true
 	o.ravine = trackHasRavine
 
-	if trackIsInCity then
-		o.color = {0.10, 0.08, 0.08}
-	else
-		o.color = {1, 1, 1}
-	end
-	
 	return o
 end
 
@@ -41,7 +36,9 @@ function TunnelStart:draw()
 	-- Note: slightly increase height (after setting y) to avoid seeing thin line of grass under tunnel start
 	height = height + 0.5
 
-	love.graphics.setColor(self.color)
+	local sunLight = math.max(0.4, daynight:getSunLight())
+
+	love.graphics.setColor(sunLight, sunLight, sunLight)
 
 	if not self.ravine then
 		love.graphics.rectangle("fill", 0, y, leftWidth, height)

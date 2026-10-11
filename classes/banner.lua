@@ -1,5 +1,7 @@
 require "classes.entity"
 
+local daynight = require("modules.daynight")
+
 local POLE_WIDTH = 1
 local POLE_HEIGHT = 30
 
@@ -69,14 +71,15 @@ end
 function Banner:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
+	local sunLight = math.max(0.3, daynight:getSunLight())
 	local x1 = newScreenX / imageScale - self.width / 2
 	local y1 = self.screenY / imageScale - self.poleHeight
-	
+
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)
-	love.graphics.setColor(self.color, self.color, self.color)
+	love.graphics.setColor(self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight)
 	love.graphics.draw(self.image, x1, y1)
-	love.graphics.setColor(self.poleColor)
+	love.graphics.setColor(self.poleColor[1] * sunLight, self.poleColor[2] * sunLight, self.poleColor[3] * sunLight)
 	love.graphics.rectangle("fill", x1 - self.poleWidth, y1, self.poleWidth, self.poleHeight)
 	love.graphics.rectangle("fill", x1 + self.width, y1, self.poleWidth, self.poleHeight)
 

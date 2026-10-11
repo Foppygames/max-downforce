@@ -1,3 +1,4 @@
+local daynight = require("modules.daynight")
 local perspective = require("modules.perspective")
 
 Entity = {}
@@ -21,7 +22,7 @@ function Entity:new(x, z)
 	o.image = nil
 	o.width = 0
 	o.height = 0
-	o.color = 1
+	o.color = {1, 1, 1}
 	o.segment = nil
 	
 	return o
@@ -85,9 +86,11 @@ function Entity:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
 
+	local sunLight = math.max(0.3, daynight:getSunLight())
+
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)
-	love.graphics.setColor(self.color, self.color, self.color)
+	love.graphics.setColor(self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight)
 	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2,self.screenY / imageScale - self.height)
 	love.graphics.pop()
 	

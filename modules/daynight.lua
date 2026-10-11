@@ -2,8 +2,8 @@ local daynight = {}
 
 local MIN_TIME = 0
 local MAX_TIME = 24
-local SPEED = 0.0166 * 30
-local START_TIME = 8
+local SPEED = 0.0166 --* 30
+local START_TIME = 2 --8
 local SUNRISE = 4
 
 local sunHeight

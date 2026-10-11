@@ -23,17 +23,18 @@ function Spark:new(x, z, speed, color)
 
 	self.__index = self
 	
-	o.speed = speed
+	o.baseScale = math.random(3, 5)
 	o.color = color
 	o.imageIndex = 1
-	o.imageTime = 1
-	o.imageSpeed = math.random(10, 30)
 	o.image = img[o.imageIndex]
-	o.width = o.image:getWidth()
-	o.height = o.image:getHeight()
+	o.imageSpeed = math.random(10, 30)
+	o.imageTime = 1
 	o.smoothX = true
 	o.solid = false
-	o.baseScale = math.random(3, 5)
+	o.speed = speed
+	
+	o.width = o.image:getWidth()
+	o.height = o.image:getHeight()
 	
 	return o
 end

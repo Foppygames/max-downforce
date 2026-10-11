@@ -1,5 +1,7 @@
 require "classes.entity"
 
+local daynight = require("modules.daynight")
+
 local img = nil
 local shadowImg = nil
 local ravineShadowImg = nil
@@ -47,7 +49,7 @@ function Tree:new(x, z, color, mountain)
 	o.height = o.image:getHeight()
 	o.smoothX = true
 	o.baseScale = 10
-	o.color = color
+	o.color = {color, color, color}
 	
 	return o
 end
@@ -56,10 +58,12 @@ function Tree:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
 
+	local sunLight = math.max(0.3, daynight:getSunLight())
+	
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)
 	love.graphics.draw(self.shadowImg, newScreenX / imageScale - self.shadowHalfWidth, self.screenY / imageScale - self.shadowHalfHeight)
-	love.graphics.setColor(self.color, self.color, self.color)
+	love.graphics.setColor(self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight)
 	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2, self.screenY / imageScale - self.height)
 	love.graphics.pop()
 
@@ -74,7 +78,7 @@ end
 function Tree:setSegment(segment)
 	self.segment = segment
 
-	if segment.isInCity and (not segment.light) then
+	--[[if segment.isInCity and (not segment.light) then
 		self.color = 0.25
-	end
+	end--]]
 end

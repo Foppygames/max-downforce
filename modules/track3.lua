@@ -55,8 +55,8 @@ track3.segments = {
 				count = 1
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		----light = true
 	},
 	-- long straight after start/finish, part 1, lights
 	{
@@ -96,15 +96,15 @@ track3.segments = {
 				count = 4
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		----light = true
 	},
 	-- crosswalk
 	{
 		ddx = 0,
 		length = 0.07,
 		scheduleItems = {},
-		light = true,
+		--light = true,
 		crosswalk = true
 	},
 	-- crossing
@@ -113,7 +113,7 @@ track3.segments = {
 		length = 0.18,
 		scheduleItems = {},
 		tunnel = false,
-		light = true,
+		--light = true,
 		crossroads = true
 	},
 	-- crosswalk
@@ -121,7 +121,7 @@ track3.segments = {
 		ddx = 0,
 		length = 0.07,
 		scheduleItems = {},
-		light = true,
+		--light = true,
 		crosswalk = true
 	},
 	{
@@ -135,29 +135,29 @@ track3.segments = {
 				count = 4
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	{
 		ddx = 0,
 		length = 0.2,
 		scheduleItems = {},
-		tunnel = true,
-		light = true
+		tunnel = true
+		--light = true
 	},
 	{
 		ddx = 0,
 		length = 0.3,
 		scheduleItems = {},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- crosswalk
 	{
 		ddx = 0,
 		length = 0.07,
 		scheduleItems = {},
-		light = true,
+		--light = true,
 		crosswalk = true
 	},
 	-- crossing, lights
@@ -166,7 +166,7 @@ track3.segments = {
 		length = 0.18,
 		scheduleItems = {},
 		tunnel = false,
-		light = true,
+		--light = true,
 		crossroads = true
 	},
 	-- crosswalk
@@ -174,7 +174,7 @@ track3.segments = {
 		ddx = 0,
 		length = 0.07,
 		scheduleItems = {},
-		light = true,
+		--light = true,
 		crosswalk = true
 	},
 	-- short straight, lights
@@ -182,8 +182,8 @@ track3.segments = {
 		ddx = 0,
 		length = 0.4,
 		scheduleItems = {},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- long curve left, part 1, lights
 	{
@@ -209,8 +209,8 @@ track3.segments = {
 				count = 2
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- long curve left, part 2
 	{
@@ -243,8 +243,8 @@ track3.segments = {
 				count = 4
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- long curve left, part 4
 	{
@@ -298,8 +298,8 @@ track3.segments = {
 				count = 9
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- medium curve right, part 2
 	{
@@ -364,8 +364,8 @@ track3.segments = {
 				count = 5
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- very short straight
 	{
@@ -450,24 +450,24 @@ track3.segments = {
 				count = 2
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- crosswalk
 	{
 		ddx = 0.3,
 		length = 0.07,
 		scheduleItems = {},
-		crosswalk = true,
-		light = true
+		crosswalk = true
+		--light = true
 	},
 	-- crossing
 	{
 		ddx = 0.3,
 		length = 0.18,
 		scheduleItems = {},
-		crossroads = true,
-		light = true
+		crossroads = true
+		--light = true
 	},
 	-- crosswalk
 	{
@@ -481,8 +481,8 @@ track3.segments = {
 				count = 1
 			}
 		},
-		crosswalk = true,
-		light = true
+		crosswalk = true
+		--light = true
 	},
 	-- long curve right, part 2, towards tunnel
 	{
@@ -688,40 +688,40 @@ track3.segments = {
 				count = 3
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- very short straight
 	{
 		ddx = 0,
 		length = 0.1,
 		scheduleItems = {},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- long left, part 1
 	{
 		ddx = -0.2,
 		length = 2.9,
 		scheduleItems = {},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- long left, part 2, tunnel
 	{
 		ddx = -0.2,
 		length = 4,
 		scheduleItems = {},
-		tunnel = true,
-		light = true
+		tunnel = true
+		--light = true
 	},
 	-- long left, part 3
 	{
 		ddx = -0.2,
 		length = 1,
 		scheduleItems = {},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	},
 	-- straight before start/finish
 	{
@@ -741,8 +741,8 @@ track3.segments = {
 				count = 4
 			}
 		},
-		tunnel = false,
-		light = true
+		tunnel = false
+		--light = true
 	}
 }
 

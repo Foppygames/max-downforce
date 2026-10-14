@@ -14,6 +14,7 @@ local COLOR_FOREST_TRACK = {1, 1, 1}
 local COLOR_MOUNTAIN_TRACK = {0.2, 0.3, 0.6}
 local COLOR_CITY_TRACK = {1,1,1}
 
+local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
 local SUN_FULL_CIRCLE_LENGTH = aspect.GAME_WIDTH * 4.572
 local SUN_SPEED = 1600
 
@@ -101,8 +102,12 @@ function horizon.update(playerSegmentDdx, playerSpeed, dt)
 end
 
 function horizon.draw()
-	-- draw sun
 	love.graphics.setColor(1, 1, 1)
+	
+	-- draw sky	
+	love.graphics.draw(daynight:getSkyGradient(), 0, 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
+
+	-- draw sun
 	love.graphics.draw(imgSun, sunX, perspective.HORIZON_Y - daynight.getSunHeight() * perspective.HORIZON_Y)
 	
 	-- draw horizon layers
@@ -115,6 +120,10 @@ function horizon.draw()
 			love.graphics.draw(image[imageIndexes[i]], x[i] + j * width[i], y[i])
 		end
 	end
+end
+
+function horizon.drawSky()
+	
 end
 
 return horizon

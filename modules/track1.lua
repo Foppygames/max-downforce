@@ -6,7 +6,6 @@ local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
 local FIRST_SEGMENT_LENGTH = 0.55
-local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
 
 track1.name = "Forest"
 track1.number = 1
@@ -493,13 +492,6 @@ track1.segments = {
 		tunnel = false
 	}
 }
-
-function track1.drawSky()
-	local sunLight = daynight:getSunLight()
-
-	love.graphics.setColor(0, sunLight * 0.65, sunLight)
-	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
-end
 
 function track1.init()
 	imgSun = love.graphics.newImage("images/sky/sun.png")

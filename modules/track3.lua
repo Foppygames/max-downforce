@@ -746,11 +746,4 @@ track3.segments = {
 	}
 }
 
-function track3.drawSky()
-	local sunLight = daynight:getSunLight()
-
-	love.graphics.setColor(0, sunLight * 0.65, sunLight)
-	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
-end
-
 return track3

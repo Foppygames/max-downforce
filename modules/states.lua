@@ -524,6 +524,7 @@ local function switchToState(newState)
 		trackIsInForest = tracks.isInForest()
 		trackIsInCity = tracks.isInCity()
 
+		daynight.reset()
 		horizon.reset()
 		schedule.reset()
 		segments.reset()
@@ -802,9 +803,6 @@ function states.draw()
 	aspect.apply()
 	
 	if state == STATE_RACE then
-		-- draw sky
-		tracks.getSelectedTrack().drawSky()
-
 		-- draw horizon
 		horizon.draw()
 

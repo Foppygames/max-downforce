@@ -1,17 +1,19 @@
 local daynight = {}
 
+local utils = require("modules.utils")
+
 local MIN_TIME = 0
 local MAX_TIME = 24
-local SPEED = 0.0166 --* 30
-local START_TIME = 2 --8
+local SPEED = 0.0166
 local SUNRISE = 4
 
+local skyGradient
 local sunHeight
 local sunLight
 local time
 
 function daynight.init()
-	daynight.reset()
+	-- ...
 end
 
 function daynight.getDisplayTime()
@@ -25,6 +27,10 @@ function daynight.getDisplayTime()
 	return hours .. ":" .. minutes
 end
 
+function daynight.getSkyGradient()
+	return skyGradient
+end
+
 function daynight.getSunHeight()
 	return sunHeight
 end
@@ -34,9 +40,18 @@ function daynight.getSunLight()
 end
 
 function daynight.reset()
-	time = START_TIME
+	time = math.random(4, 18)
 
 	daynight.update(0)
+end
+
+-- return the color between color1 and color2
+local function getProgressedColor(color1, color2, progression)
+	return {
+		color1[1] + (color2[1] - color1[1]) * progression,
+		color1[2] + (color2[2] - color1[2]) * progression,
+		color1[3] + (color2[3] - color1[3]) * progression
+	}
 end
 
 function daynight.update(dt)
@@ -46,13 +61,29 @@ function daynight.update(dt)
 		time = MIN_TIME + time - MAX_TIME
 	end
 
-	sunHeight = 0
-	sunLight = 0
-
-	if time > 4 and time < 22 then
-		sunHeight = math.sin((time - 4) / 18 * math.pi)
-		sunLight = sunHeight
+	sunHeight = math.sin((time - 6) / 12 * math.pi)
+	sunLight = math.max(0, sunHeight)
+	
+	-- update sky gradient
+	local blue = math.min(1, math.max(0, sunHeight + 0.4))
+	local baseColor = {blue * 0.4, blue * 0.7, blue}
+	local horizonColor = baseColor
+	
+	-- between sunheight 0.6 and sunheight 0: horizon turns from baseColor to red
+	if sunHeight < 0.6 and sunHeight > 0 then
+		horizonColor = getProgressedColor(baseColor, {0.8, 0.3, 0.2}, 1 - (sunHeight / 0.6))
+	-- between sunheight 0 and sunheight -0.5: horizon turns from red to black
+	elseif sunHeight <= 0 and sunHeight > -0.5 then
+		horizonColor = getProgressedColor({0.8, 0.3, 0.2}, {0, 0, 0}, sunHeight / -0.5)
 	end
+
+	skyGradient = utils.verticalGradientMesh(
+		baseColor,
+		baseColor,
+		baseColor,
+		horizonColor,
+		horizonColor
+    )
 end
 
 return daynight

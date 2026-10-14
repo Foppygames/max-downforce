@@ -4,6 +4,12 @@ local VERSION = "1.2.1"
 local TITLE = "Max Downforce"
 
 function love.load()
+	-- print lua version
+	--[[
+	local major, minor, revision, codename = love.getVersion()
+    print(string.format("Version %d.%d.%d - %s", major, minor, revision, codename), 20, 20)
+	--]]
+	
 	states.init(VERSION, TITLE)
 end
 

@@ -446,7 +446,7 @@ track2.segments = {
 	}
 }
 
-function track2.drawSky()
+--[[function track2.drawSky()
 	local sunLight = daynight:getSunLight()
 
 	love.graphics.setColor(0, sunLight * 0.65, sunLight)
@@ -455,6 +455,6 @@ function track2.drawSky()
  	-- draw mountain color below horizon
 	love.graphics.setColor(0.06, 0.16, 0.415)
 	love.graphics.rectangle("fill", 0, SKY_HEIGHT, aspect.GAME_WIDTH, REMAINING_HEIGHT)
-end
+end--]]
 
 return track2

@@ -6,8 +6,6 @@ local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
 local FIRST_SEGMENT_LENGTH = 0.55
-local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.65
-local REMAINING_HEIGHT = aspect.GAME_HEIGHT - SKY_HEIGHT
 
 track2.name = "Mountain"
 track2.number = 2
@@ -445,16 +443,5 @@ track2.segments = {
 		tunnel = false
 	}
 }
-
---[[function track2.drawSky()
-	local sunLight = daynight:getSunLight()
-
-	love.graphics.setColor(0, sunLight * 0.65, sunLight)
-	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
-
- 	-- draw mountain color below horizon
-	love.graphics.setColor(0.06, 0.16, 0.415)
-	love.graphics.rectangle("fill", 0, SKY_HEIGHT, aspect.GAME_WIDTH, REMAINING_HEIGHT)
-end--]]
 
 return track2

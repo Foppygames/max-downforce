@@ -4,7 +4,7 @@ local utils = require("modules.utils")
 
 local MIN_TIME = 0
 local MAX_TIME = 24
-local SPEED = 0.0166
+local SPEED = 0.0166 * 3
 local SUNRISE = 4
 
 local skyGradient
@@ -40,7 +40,7 @@ function daynight.getSunLight()
 end
 
 function daynight.reset()
-	time = 4 --math.random(4, 18)
+	time = math.random(4, 18)
 
 	daynight.update(0)
 end

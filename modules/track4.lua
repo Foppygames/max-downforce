@@ -18,11 +18,10 @@ local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
 local STRAIGHT_LENGTH = 16
-local CURVE_DIAMETER = 4 --8
+local CURVE_DIAMETER = 4
 local CURVE_RADIUS = CURVE_DIAMETER / 2
 local CURVE_LENGTH = 2 * math.pi * CURVE_RADIUS / 2
 local FIRST_SEGMENT_LENGTH = 0.55
-local SKY_HEIGHT = aspect.GAME_HEIGHT * 0.5
 
 track4.name = "Oval"
 track4.number = 4
@@ -197,11 +196,6 @@ track4.segments = {
 		},
 	}
 }
-
-function track4.drawSky()
-	love.graphics.setColor(0, 0.65, 1)
-	love.graphics.rectangle("fill", 0, 0, aspect.GAME_WIDTH, SKY_HEIGHT)
-end
 
 function track4.init()
 	imgSun = love.graphics.newImage("images/sky/sun.png")

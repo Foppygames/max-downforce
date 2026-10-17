@@ -1,5 +1,6 @@
 local aspect = require("modules.aspect")
 local controls = require("modules.controls")
+local daynight = require("modules.daynight")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 local sound = require("modules.sound")
@@ -223,20 +224,13 @@ function Car:draw()
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelLeftDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelRightDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
+		local sunLight = math.max(0.3, daynight:getSunLight())
 		local mainColor
 
-		if self.city then
-			if (self.inTunnel) or (self.inLight) then
-				mainColor = self.color
-			else
-				mainColor = self.colorInDark
-			end
-		else
+		if (self.inTunnel and (not self.falling)) or self.inLight then
 			mainColor = self.color
-
-			if (self.inTunnel) and (not self.ravine) and (not self.falling) then
-				mainColor = self.colorInTunnel
-			end
+		else
+			mainColor = {self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight}
 		end
 		
 		-- draw body
@@ -244,7 +238,7 @@ function Car:draw()
 		love.graphics.draw(imgBody, screenX - perspectiveEffect * 0.2, screenY - bodyHeight / 2 + accEffect, bodyRotation, 1, 1, bodyWidth / 2, bodyHeight / 2)
 		
 		-- draw helmet
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(sunLight, sunLight, sunLight)
 		love.graphics.draw(imgHelmet, screenX - helmetWidth / 2  - perspectiveEffect * 0.2, screenY - bodyHeight - helmetHeight + accEffect)
 		
 		-- draw air scoop
@@ -252,7 +246,7 @@ function Car:draw()
 		love.graphics.draw(imgAirScoop, screenX - airScoopWidth / 2  - perspectiveEffect * 0.6, screenY - bodyHeight - airScoopHeight + accEffect + math.abs(perspectiveEffect) * 0.02)
 		
 		-- draw rear wheels
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(sunLight, sunLight, sunLight)
 		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX - bodyWidth / 2 - rearWheelWidth - perspectiveEffect, screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
 		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX + bodyWidth / 2 - perspectiveEffect, screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
@@ -272,26 +266,10 @@ function Car:draw()
 		love.graphics.setColor(0, 0, 0)
 		love.graphics.rectangle("fill", screenX - (lightSize + 4) / 2 - perspectiveEffect * 1.4, screenY - bodyHeight + accEffect * 2.8 + bumpDy, lightSize + 4, lightSize + 4)
 		
-		if not self.braking then
-			if not self.inTunnel then
-				if self.city then
-					if not self.inLight then
-						love.graphics.setColor(0.8, 0, 0)
-					else
-						love.graphics.setColor(0.4, 0, 0)
-					end
-				else
-					love.graphics.setColor(0.4, 0, 0)
-				end
-			else
-				if self.city then
-					love.graphics.setColor(0.4, 0, 0)
-				else
-					love.graphics.setColor(0.6, 0, 0)
-				end
-			end
-		else
+		if self.braking then
 			love.graphics.setColor(1, 0, 0)
+		else
+			love.graphics.setColor(0.4, 0, 0)
 		end
 
 		love.graphics.rectangle("fill", screenX - lightSize / 2 - perspectiveEffect * 1.6, screenY - bodyHeight + 2 + accEffect * 3.6 + bumpDy, lightSize, lightSize)
@@ -435,18 +413,6 @@ function Car:new(lane, z, isPlayer, progress, pause, ravine, city)
 		love.audio.play(o.sndEnginePower)
 		
 		o.gears = math.random(3, 8)
-	end
-	
-	o.colorInTunnel = {}
-
-	for i = 1, 3 do
-		o.colorInTunnel[i] = o.color[i] / 2
-	end
-	
-	o.colorInDark = {}
-
-	for i = 1, 3 do
-		o.colorInDark[i] = o.color[i] / 4
 	end
 	
 	o.topSpeedForAcceleration = (3 * TOP_SPEED + o.topSpeed) / 4

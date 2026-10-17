@@ -1,9 +1,11 @@
 local aspect = require("modules.aspect")
 local controls = require("modules.controls")
 local daynight = require("modules.daynight")
+local palette = require("modules.palette")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 local sound = require("modules.sound")
+local utils = require("modules.utils")
 
 require "classes.entity"
 
@@ -98,22 +100,16 @@ end
 
 function Car.init()
 	colors = {
-		{1, 0, 0}, -- red
-		{0.5, 0, 0}, -- dark red
-		{0, 1, 0}, -- green
-		{0, 0.5, 0}, -- dark green
-		{0, 0, 1}, -- blue
-		{0, 0, 0.5}, -- dark blue
-		{1, 1, 0}, -- yellow
-		{0, 0, 0}, -- black
-		{0.5, 0.5, 0.5}, -- grey
-		{0.2, 0.2, 0.2}, -- dark grey
-		{1, 1, 1}, -- white
-		{0.5, 0, 1}, -- purple
-		{1, 0, 0.5}, -- pink
-		{0, 1, 1}, -- cyan
-		{1, 0.3, 0}, -- orange
-		{0.75, 1, 0.25} -- olive
+		palette.HEPT32_7,
+		palette.HEPT32_8,
+		palette.HEPT32_9,
+		palette.HEPT32_13,
+		palette.HEPT32_14,
+		palette.HEPT32_15,
+		palette.HEPT32_24,
+		palette.HEPT32_25,
+		palette.HEPT32_27,
+		palette.HEPT32_31
 	}
 
 	imgBody = love.graphics.newImage("images/car/car_body.png")

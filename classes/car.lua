@@ -843,8 +843,7 @@ function Car:updateOffRoad(dt)
 			table.insert(self.sparks, {
 				x = self.x + sparkDx - 5 + math.random(0, 10),
 				z = self.z + 3 - i * 0.7,
-				speed = 0,
-				color = {1, 1, math.random()}
+				speed = 0
 			})
 		end
 	end

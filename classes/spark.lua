@@ -16,7 +16,20 @@ function Spark.init()
 	}
 end
 
-function Spark:new(x, z, speed, color)
+function Spark:draw()
+	local imageScale = self:computeImageScale()
+	local newScreenX = self:computeNewScreenX()
+
+	love.graphics.push()
+	love.graphics.scale(imageScale, imageScale)
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2,self.screenY / imageScale - self.height)
+	love.graphics.pop()
+	
+	self.storedScreenX = newScreenX
+end
+
+function Spark:new(x, z, speed)
 	o = Entity:new(x, z)
 
 	setmetatable(o, self)
@@ -24,7 +37,6 @@ function Spark:new(x, z, speed, color)
 	self.__index = self
 	
 	o.baseScale = math.random(3, 5)
-	o.color = color
 	o.imageIndex = 1
 	o.image = img[o.imageIndex]
 	o.imageSpeed = math.random(10, 30)

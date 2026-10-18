@@ -339,7 +339,7 @@ function entities.update(playerSpeed, dt, trackLength)
 
 			if sparks ~= nil then
 				for j = 1, #sparks, 1 do
-					entities.addSpark(sparks[j].x, sparks[j].z, sparks[j].speed, sparks[j].color)
+					entities.addSpark(sparks[j].x, sparks[j].z, sparks[j].speed)
 				end
 
 				list[i]:resetSparks()

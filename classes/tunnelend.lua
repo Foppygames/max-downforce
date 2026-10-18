@@ -9,10 +9,6 @@ local count = 0
 
 TunnelEnd = Entity:new()
 
-function TunnelEnd.init()
-	-- ...
-end
-
 function TunnelEnd.reset()
 	count = 0
 end

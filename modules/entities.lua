@@ -17,7 +17,6 @@ require "classes.tunnelstart"
 
 local aspect = require("modules.aspect")
 local perspective = require("modules.perspective")
-local road = require("modules.road")
 local utils = require("modules.utils")
 
 local baseScale = {}

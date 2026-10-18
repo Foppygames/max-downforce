@@ -185,7 +185,6 @@ function Car:draw()
 
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)
-	love.graphics.setColor(1, 1, 1)
 	
 	local screenX = newScreenX / imageScale
 	local screenY = (self.screenY + self.fallDy) / imageScale
@@ -205,6 +204,7 @@ function Car:draw()
 		
 		-- draw shadow
 		if not self.falling then
+			love.graphics.setColor(1, 1, 1)
 			love.graphics.draw(imgShadow, screenX - shadowWidth / 2, screenY - 6)
 		end
 
@@ -212,7 +212,10 @@ function Car:draw()
 		local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
 		local bodyRotation = bodyDegreesChange * math.pi / 180
 		
+		local sunLight = math.max(0.3, daynight:getSunLight())
+		
 		-- draw front wheels
+		love.graphics.setColor(sunLight, sunLight, sunLight)
 		local wheelScaleChange = bodyDegreesChange / MAX_BODY_DEGREES_CHANGE * MAX_WHEEL_SCALE_CHANGE
 		local leftWheelScale = 1 + wheelScaleChange
 		local rightWheelScale = 1 - wheelScaleChange
@@ -220,7 +223,6 @@ function Car:draw()
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelLeftDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelRightDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
-		local sunLight = math.max(0.3, daynight:getSunLight())
 		local mainColor
 
 		if (self.inTunnel and (not self.falling)) or self.inLight then

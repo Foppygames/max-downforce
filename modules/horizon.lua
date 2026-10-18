@@ -2,16 +2,19 @@ local horizon = {}
 
 local aspect = require("modules.aspect")
 local daynight = require("modules.daynight")
+local palette = require("modules.palette")
 local perspective = require("modules.perspective")
 local segments = require("modules.segments")
 local tracks = require("modules.tracks")
 
 local IMAGE_INDEXES_FOREST_TRACK = {1, 2, 3}
 local IMAGE_INDEXES_MOUNTAIN_TRACK = {1, 4, 2, 4}
-local IMAGE_INDEXES_CITY_TRACK = {5, 6, 5}
+local IMAGE_INDEXES_CITY_TRACK = {5, 6}
 
 local SUN_FULL_CIRCLE_LENGTH = aspect.GAME_WIDTH * 4.572
 local SUN_SPEED = 1600
+
+local RAVINE_BACKGROUND_COLOR = palette.HEPT32_3
 
 local image = {}
 local imageIndexes = {}
@@ -135,7 +138,7 @@ function horizon.draw()
 
 	if drawRavineBackground then
 		-- draw mountain color below horizon
-		love.graphics.setColor(0.314 * sunLight, 0.533 * sunLight, 0.690 * sunLight)
+		love.graphics.setColor(RAVINE_BACKGROUND_COLOR[1] * sunLight, RAVINE_BACKGROUND_COLOR[2] * sunLight, RAVINE_BACKGROUND_COLOR[3] * sunLight)
 		love.graphics.rectangle("fill", 0, ravineBackgroundY, aspect.GAME_WIDTH, ravineBackgroundHeight)
 	end
 end

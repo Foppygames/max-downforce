@@ -2,10 +2,15 @@ local track1 = {}
 
 local aspect = require("modules.aspect")
 local daynight = require("modules.daynight")
+local palette = require("modules.palette")
 local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
 local FIRST_SEGMENT_LENGTH = 0.55
+
+track1.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
+track1.STRIPE_COLOR = palette.HEPT32_6
+track1.TARMAC_COLOR = palette.HEPT32_3
 
 track1.name = "Forest"
 track1.number = 1
@@ -493,9 +498,4 @@ track1.segments = {
 	}
 }
 
-function track1.init()
-	imgSun = love.graphics.newImage("images/sky/sun.png")
-	sunX = aspect.GAME_WIDTH / 2
-end
-		
 return track1

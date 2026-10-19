@@ -9,66 +9,34 @@ road.CURB_WIDTH = road.ROAD_WIDTH / 15
 road.STRIPE_WIDTH = road.CURB_WIDTH / 3
 road.RAVINE_ROADSIDE_WIDTH = road.CURB_WIDTH * 6
 
-local COLORS_CURBS_NO_RAVINE = {{1, 0.26, 0}, {1, 0.95, 0.95}}
-local COLORS_CURBS_RAVINE = {{0.1, 0.26, 0.8}, {1, 0.95, 0.95}}
-local COLORS_CURBS_CITY = {
-	light = {{1, 0.26, 0}, {1, 0.95, 0.95}},
-	no_light = {{0.8, 0.1, 0}, {0.8, 0.6, 0.6}}
-}
-
 local COLORS_GRASS_NO_RAVINE = {{0.45, 0.8, 0.25}, {0.36, 0.6, 0.20}}
 local COLORS_GRASS_RAVINE = {{0.5, 0.36, 0.03}, {0.45, 0.31, 0.01}}
 local COLORS_GRASS_CITY = {{0.4, 0.4, 0.44}, {0.5, 0.5, 0.55}}
-
-local COLORS_STRIPES_RAVINE = {
-	tunnel = {0.9, 0.9, 0},
-	no_tunnel = {1, 0.95, 0.95}
-}
-local COLORS_STRIPES_NO_RAVINE = {
-	tunnel = {0.8, 0.8, 0},
-	no_tunnel = {1, 0.95, 0.95}
-}
-local COLORS_STRIPES_CITY = {
-	tunnel = {1, 0.95, 0.95},
-	no_tunnel = {0.8, 0.6, 0.6}
-}
-local COLORS_TARMAC_RAVINE = {
-	tunnel = {{0.24, 0.2, 0.26}, {0.24, 0.2, 0.26}},
-	no_tunnel = {{0.39, 0.28, 0.28}, {0.42, 0.30, 0.30}}
-}
-local COLORS_TARMAC_NO_RAVINE = {
-	tunnel = {{0.1, 0.1, 0.13}, {0.11, 0.11, 0.14}},
-	no_tunnel = {{0.34, 0.28, 0.28}, {0.37, 0.30, 0.30}}
-}
-local COLORS_TARMAC_CITY = {
-	tunnel = {{0.39, 0.28, 0.28}, {0.42, 0.30, 0.30}},
-	no_tunnel = {{0.22, 0.14, 0.18}, {0.24, 0.16, 0.20}}
-}
 
 local curbColors = nil
 local grassColors = nil
 local previousRavineX = nil
 local ravineMinX = nil
 local ravineMinXY = nil
-local stripeColors = nil
-local tarmacColors = nil
+local stripeColor = nil
+local tarmacColor = nil
 local textureOffset = 0
 local trackHasRavine
-local trackIsInMountains
-local trackIsInForest
 local trackIsInCity
+local trackIsInForest
+local trackIsInMountains
 
 local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY, roadX)
 	local sunLight = math.max(0.1, daynight:getSunLight())
 	
 	if crossroads then
 		if tunnel or light then
-			love.graphics.setColor(tarmacColors.tunnel[colorIndex])
+			love.graphics.setColor(tarmacColor)
 		else
 			love.graphics.setColor(
-				tarmacColors.no_tunnel[colorIndex][1] * sunLight,
-				tarmacColors.no_tunnel[colorIndex][2] * sunLight,
-				tarmacColors.no_tunnel[colorIndex][3] * sunLight
+				tarmacColor[1] * sunLight,
+				tarmacColor[2] * sunLight,
+				tarmacColor[3] * sunLight
 			)
 		end
 	else
@@ -102,27 +70,33 @@ local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY
 	end
 end
 
-local function drawTarmac(tunnel, colorIndex, roadX, screenY, roadWidth)
-	if tunnel then
-		love.graphics.setColor(tarmacColors.tunnel[colorIndex])
+local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth)
+	if light then
+		love.graphics.setColor(tarmacColor)
 	else
 		local sunLight = math.max(0.3, daynight:getSunLight())
 
 		love.graphics.setColor(
-			tarmacColors.no_tunnel[colorIndex][1] * sunLight,
-			tarmacColors.no_tunnel[colorIndex][2] * sunLight,
-			tarmacColors.no_tunnel[colorIndex][3] * sunLight
+			tarmacColor[1] * sunLight,
+			tarmacColor[2] * sunLight,
+			tarmacColor[3] * sunLight
 		)
 	end
 
 	love.graphics.line(roadX, screenY, roadX + roadWidth, screenY)
 end
 
-local function drawCrosswalk(tunnel, screenX, stripeWidth, screenY, crosswalk)
-	if tunnel then
-		love.graphics.setColor(stripeColors.tunnel)
+local function drawCrosswalk(light, screenX, stripeWidth, screenY, crosswalk)
+	if light then
+		love.graphics.setColor(stripeColor)
 	else
-		love.graphics.setColor(stripeColors.no_tunnel)
+		local sunLight = math.max(0.3, daynight:getSunLight())
+
+		love.graphics.setColor(
+			stripeColor[1] * sunLight,
+			stripeColor[2] * sunLight,
+			stripeColor[3] * sunLight
+		)
 	end
 
 	for i = -4, 4 do
@@ -133,40 +107,32 @@ local function drawCrosswalk(tunnel, screenX, stripeWidth, screenY, crosswalk)
 end
 
 local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth)
-	local sunLight = math.max(0.3, daynight:getSunLight())
-
-	if trackIsInCity then
-		if light then
-			love.graphics.setColor(curbColors.light[colorIndex])
-		else
-			love.graphics.setColor(
-				curbColors.no_light[colorIndex][1] * sunLight,
-				curbColors.no_light[colorIndex][2] * sunLight,
-				curbColors.no_light[colorIndex][3] * sunLight
-			)
-		end
+	if light then
+		love.graphics.setColor(curbColors[colorIndex])
 	else
+		local sunLight = math.max(0.3, daynight:getSunLight())
+		
 		love.graphics.setColor(
 			curbColors[colorIndex][1] * sunLight,
 			curbColors[colorIndex][2] * sunLight,
 			curbColors[colorIndex][3] * sunLight
 		)
 	end
-
+	
 	love.graphics.line(roadX, screenY, roadX + curbWidth, screenY)
 	love.graphics.line(roadX + roadWidth - curbWidth, screenY, roadX + roadWidth, screenY)
 end
 
-local function drawStripes(tunnel, screenX, stripeWidth, screenY, crosswalk)
+local function drawStripes(light, screenX, stripeWidth, screenY, crosswalk)
 	local sunLight = math.max(0.3, daynight:getSunLight())
 
-	if tunnel then
-		love.graphics.setColor(stripeColors.tunnel)
+	if light then
+		love.graphics.setColor(stripeColor)
 	else
 		love.graphics.setColor(
-			stripeColors.no_tunnel[1] * sunLight,
-			stripeColors.no_tunnel[2] * sunLight,
-			stripeColors.no_tunnel[3] * sunLight
+			stripeColor[1] * sunLight,
+			stripeColor[2] * sunLight,
+			stripeColor[3] * sunLight
 		)
 	end
 
@@ -299,16 +265,6 @@ function road.draw(player, entities, segments)
     end
 end
 
-local function setCurbColors()
-	if trackIsInMountains then
-		curbColors = COLORS_CURBS_RAVINE
-	elseif trackIsInForest then
-		curbColors = COLORS_CURBS_NO_RAVINE
-	else
-		curbColors = COLORS_CURBS_CITY
-	end
-end
-
 local function setGrassColors()
 	if trackIsInMountains then
 		grassColors = COLORS_GRASS_RAVINE
@@ -319,36 +275,17 @@ local function setGrassColors()
 	end
 end
 
-local function setStripeColors()
-	if trackIsInMountains then
-		stripeColors = COLORS_STRIPES_RAVINE
-	elseif trackIsInForest then
-		stripeColors = COLORS_STRIPES_NO_RAVINE
-	else
-		stripeColors = COLORS_STRIPES_CITY
-	end
-end
+function road.reset(tracks)
+    trackHasRavine = tracks.hasRavine()
+	trackIsInMountains = tracks.isInMountains()
+	trackIsInForest = tracks.isInForest()
+	trackIsInCity = tracks.isInCity()
 
-local function setTarmacColors()
-	if trackIsInMountains then
-		tarmacColors = COLORS_TARMAC_RAVINE
-	elseif trackIsInForest then
-		tarmacColors = COLORS_TARMAC_NO_RAVINE
-	else
-		tarmacColors = COLORS_TARMAC_CITY
-	end
-end
-
-function road.reset(hasRavine, isInMountains, isInForest, isInCity)
-    trackHasRavine = hasRavine
-	trackIsInMountains = isInMountains
-	trackIsInForest = isInForest
-	trackIsInCity = isInCity
-
-    setCurbColors()
-	setGrassColors()
-	setStripeColors()
-	setTarmacColors()
+	curbColors = tracks.getCurbColors()
+	stripeColor = tracks.getStripeColor()
+	tarmacColor = tracks.getTarmacColor()
+	
+    setGrassColors()
 end
 
 function road.updateTextureOffset(playerSpeed, dt)

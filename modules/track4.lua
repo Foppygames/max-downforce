@@ -14,6 +14,7 @@ cannot be selected in the published game.
 local track4 = {}
 
 local aspect = require("modules.aspect")
+local palette = require("modules.palette")
 local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
@@ -22,6 +23,10 @@ local CURVE_DIAMETER = 4
 local CURVE_RADIUS = CURVE_DIAMETER / 2
 local CURVE_LENGTH = 2 * math.pi * CURVE_RADIUS / 2
 local FIRST_SEGMENT_LENGTH = 0.55
+
+track4.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
+track4.STRIPE_COLOR = palette.HEPT32_6
+track4.TARMAC_COLOR = palette.HEPT32_3
 
 track4.name = "Oval"
 track4.number = 4

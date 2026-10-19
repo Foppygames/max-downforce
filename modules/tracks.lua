@@ -106,6 +106,42 @@ local function getTrackCornerStats(trackModule)
 	}
 end
 
+function tracks.getCurbColors()
+	return selectedTrack.CURB_COLORS
+end
+
+function tracks.getSelectedTrack()
+	return selectedTrack
+end
+
+function tracks.getSelectedTrackName()
+	return selectedTrack.name
+end
+
+function tracks.getSelectedTrackNumber()
+	return selectedTrack.number
+end
+
+function tracks.getSelectedTrackSkyHeight()
+	return selectedTrack.skyHeight
+end
+
+function tracks.getStripeColor()
+	return selectedTrack.STRIPE_COLOR
+end
+
+function tracks.getTarmacColor()
+	return selectedTrack.TARMAC_COLOR
+end
+
+function tracks.getTrackCount()
+	return 3
+end
+
+function tracks.hasRavine()
+	return selectedTrack.hasRavine
+end
+
 function tracks.init()
 	initTrackModule(track1)
 	initTrackModule(track2)
@@ -126,30 +162,6 @@ function tracks.init()
 	--]]
 	
 	selectedTrack = track1
-end
-
-function tracks.getSelectedTrack()
-	return selectedTrack
-end
-
-function tracks.getSelectedTrackName()
-	return selectedTrack.name
-end
-
-function tracks.getSelectedTrackNumber()
-	return selectedTrack.number
-end
-
-function tracks.getSelectedTrackSkyHeight()
-	return selectedTrack.skyHeight
-end
-
-function tracks.getTrackCount()
-	return 3
-end
-
-function tracks.hasRavine()
-	return selectedTrack.hasRavine
 end
 
 function tracks.isInMountains()

@@ -304,7 +304,7 @@ local function switchToState(newState)
 		segments.reset()
 		segments.addFirst()
 		opponents.reset()
-		road.reset(tracks.hasRavine(), tracks.isInMountains(), tracks.isInForest(), tracks.isInCity())
+		road.reset(tracks)
 		timer.reset(progress, TIME_BEFORE_START)
 
 		TunnelEnd.reset()
@@ -353,8 +353,7 @@ function states.init(gameVersion, gameTitle)
 	opponents.init()
 	segments.init()
 	sound.init()
-	track1.init()
-
+	
 	selectedJoystick = controls.init()
 
 	switchToState(STATE_TITLE)

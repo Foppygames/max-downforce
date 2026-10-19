@@ -2,10 +2,15 @@ local track3 = {}
 
 local aspect = require("modules.aspect")
 local daynight = require("modules.daynight")
+local palette = require("modules.palette")
 local schedule = require("modules.schedule")
 local sound = require("modules.sound")
 
 local FIRST_SEGMENT_LENGTH = 0.55
+
+track3.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
+track3.STRIPE_COLOR = palette.HEPT32_6
+track3.TARMAC_COLOR = palette.HEPT32_3
 
 track3.name = "City"
 track3.number = 3

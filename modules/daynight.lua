@@ -82,6 +82,7 @@ function daynight.update(dt)
 		baseColor,
 		baseColor,
 		horizonColor,
+		horizonColor,
 		horizonColor
     )
 end

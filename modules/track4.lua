@@ -25,6 +25,7 @@ local CURVE_LENGTH = 2 * math.pi * CURVE_RADIUS / 2
 local FIRST_SEGMENT_LENGTH = 0.55
 
 track4.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
+track4.GRASS_COLOR = palette.HEPT32_12
 track4.STRIPE_COLOR = palette.HEPT32_6
 track4.TARMAC_COLOR = palette.HEPT32_3
 

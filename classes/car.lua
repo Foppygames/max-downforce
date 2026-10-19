@@ -212,7 +212,15 @@ function Car:draw()
 		local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
 		local bodyRotation = bodyDegreesChange * math.pi / 180
 		
-		local sunLight = math.max(0.3, daynight:getSunLight())
+		local sunLight
+
+		if (self.inTunnel and (not self.falling)) or self.inLight then
+			sunLight = 1
+		else
+			sunLight = math.max(0.3, daynight:getSunLight())
+		end
+
+		local mainColor = {self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight}
 		
 		-- draw front wheels
 		love.graphics.setColor(sunLight, sunLight, sunLight)
@@ -222,14 +230,6 @@ function Car:draw()
 
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelLeftDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelRightDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
-		
-		local mainColor
-
-		if (self.inTunnel and (not self.falling)) or self.inLight then
-			mainColor = self.color
-		else
-			mainColor = {self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight}
-		end
 		
 		-- draw body
 		love.graphics.setColor(mainColor)

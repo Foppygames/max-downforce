@@ -110,6 +110,10 @@ function tracks.getCurbColors()
 	return selectedTrack.CURB_COLORS
 end
 
+function tracks.getGrassColor()
+	return selectedTrack.GRASS_COLOR
+end
+
 function tracks.getSelectedTrack()
 	return selectedTrack
 end

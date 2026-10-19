@@ -9,6 +9,7 @@ local sound = require("modules.sound")
 local FIRST_SEGMENT_LENGTH = 0.55
 
 track1.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
+track1.GRASS_COLOR = palette.HEPT32_12
 track1.STRIPE_COLOR = palette.HEPT32_6
 track1.TARMAC_COLOR = palette.HEPT32_3
 

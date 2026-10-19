@@ -9,12 +9,8 @@ road.CURB_WIDTH = road.ROAD_WIDTH / 15
 road.STRIPE_WIDTH = road.CURB_WIDTH / 3
 road.RAVINE_ROADSIDE_WIDTH = road.CURB_WIDTH * 6
 
-local COLORS_GRASS_NO_RAVINE = {{0.45, 0.8, 0.25}, {0.36, 0.6, 0.20}}
-local COLORS_GRASS_RAVINE = {{0.5, 0.36, 0.03}, {0.45, 0.31, 0.01}}
-local COLORS_GRASS_CITY = {{0.4, 0.4, 0.44}, {0.5, 0.5, 0.55}}
-
 local curbColors = nil
-local grassColors = nil
+local grassColor = nil
 local previousRavineX = nil
 local ravineMinX = nil
 local ravineMinXY = nil
@@ -41,9 +37,9 @@ local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY
 		end
 	else
 		love.graphics.setColor(
-			grassColors[colorIndex][1] * sunLight,
-			grassColors[colorIndex][2] * sunLight,
-			grassColors[colorIndex][3] * sunLight
+			grassColor[1] * sunLight,
+			grassColor[2] * sunLight,
+			grassColor[3] * sunLight
 		)
 	end
 
@@ -265,16 +261,6 @@ function road.draw(player, entities, segments)
     end
 end
 
-local function setGrassColors()
-	if trackIsInMountains then
-		grassColors = COLORS_GRASS_RAVINE
-	elseif trackIsInForest then
-		grassColors = COLORS_GRASS_NO_RAVINE
-	else
-		grassColors = COLORS_GRASS_CITY
-	end
-end
-
 function road.reset(tracks)
     trackHasRavine = tracks.hasRavine()
 	trackIsInMountains = tracks.isInMountains()
@@ -282,10 +268,9 @@ function road.reset(tracks)
 	trackIsInCity = tracks.isInCity()
 
 	curbColors = tracks.getCurbColors()
+	grassColor = tracks.getGrassColor()
 	stripeColor = tracks.getStripeColor()
 	tarmacColor = tracks.getTarmacColor()
-	
-    setGrassColors()
 end
 
 function road.updateTextureOffset(playerSpeed, dt)

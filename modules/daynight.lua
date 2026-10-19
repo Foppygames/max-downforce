@@ -1,5 +1,6 @@
 local daynight = {}
 
+local palette = require("modules.palette")
 local utils = require("modules.utils")
 
 local MIN_TIME = 0
@@ -65,24 +66,20 @@ function daynight.update(dt)
 	sunLight = math.max(0, sunHeight)
 	
 	-- update sky gradient
-	local blue = math.min(1, math.max(0, sunHeight + 0.4))
-	local baseColor = {blue * 0.4, blue * 0.7, blue}
+	local baseColor = getProgressedColor(palette.HEPT32_2, palette.HEPT32_9, sunHeight)
 	local horizonColor = baseColor
 	
 	-- between sunheight 0.6 and sunheight 0: horizon turns from baseColor to red
 	if sunHeight < 0.6 and sunHeight > 0 then
-		horizonColor = getProgressedColor(baseColor, {0.8, 0.3, 0.2}, 1 - (sunHeight / 0.6))
+		horizonColor = getProgressedColor(baseColor, palette.HEPT32_30, 1 - (sunHeight / 0.6))
 	-- between sunheight 0 and sunheight -0.5: horizon turns from red to black
 	elseif sunHeight <= 0 and sunHeight > -0.5 then
-		horizonColor = getProgressedColor({0.8, 0.3, 0.2}, {0, 0, 0}, sunHeight / -0.5)
+		horizonColor = getProgressedColor(palette.HEPT32_30, palette.HEPT32_2, sunHeight / -0.5)
 	end
 
 	skyGradient = utils.verticalGradientMesh(
 		baseColor,
 		baseColor,
-		baseColor,
-		horizonColor,
-		horizonColor,
 		horizonColor
     )
 end

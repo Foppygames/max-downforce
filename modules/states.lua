@@ -20,6 +20,7 @@ local daynight = require("modules.daynight")
 local entities = require("modules.entities")
 local horizon = require("modules.horizon")
 local opponents = require("modules.opponents")
+local palette = require("modules.palette")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 local schedule = require("modules.schedule")
@@ -67,7 +68,7 @@ local imageGamepadModeR = nil
 local imageGamepadModeL = nil
 
 local function drawGameOverScreen()
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(palette.HEPT32_7)
 
 	if not finished then
 		love.graphics.push()
@@ -80,12 +81,12 @@ local function drawGameOverScreen()
 			love.graphics.print("Don't give up!", 138, 70)
 		-- beyond first lap
 		else
-			love.graphics.setColor(1, 1, 0)
+			love.graphics.setColor(palette.HEPT32_27)
 
 			-- in second lap
 			if lap == 2 then
 				love.graphics.print("You completed 1 full lap", 103, 70)
-				love.graphics.setColor(1, 1, 1)
+				love.graphics.setColor(palette.HEPT32_7)
 				love.graphics.print("Well done!", 149, 95)
 			-- beyond second lap
 			else
@@ -93,7 +94,7 @@ local function drawGameOverScreen()
 
 				-- completed more than one lap
 				if lap > 2 then
-					love.graphics.setColor(1, 1, 1)
+					love.graphics.setColor(palette.HEPT32_7)
 
 					-- completed nine laps
 					if lap == 10 then
@@ -115,12 +116,15 @@ local function drawGameOverScreen()
 		love.graphics.scale(2, 2)
 		love.graphics.print("CONGRATULATIONS!", 24, 20)
 		love.graphics.pop()
-		love.graphics.setColor(1, 1, 0)
+		
+		love.graphics.setColor(palette.HEPT32_27)
 		love.graphics.print("You finished the race", 110, 70)
-		love.graphics.setColor(1, 1, 1)
+		
+		love.graphics.setColor(palette.HEPT32_7)
 		love.graphics.print("You win the gold cup!", 113, 95)
 		love.graphics.draw(imageTrophyGold,aspect.GAME_WIDTH / 2 - imageTrophyGold:getWidth() / 2, 120)
-		love.graphics.setColor(0.471, 0.902, 1)
+		
+		love.graphics.setColor(palette.HEPT32_8)
 		love.graphics.print("You may consider yourself a member of", 48, 150)
 		love.graphics.print("an elite group of grand prix racers", 58, 170)
 	end
@@ -134,43 +138,51 @@ local function drawTitleScreen()
 
 	for i = 1, string.len(titleAllCaps) do
 		local diff = math.abs(i - titleShineIndex)
+		local dy
+		local frontColor
 
 		if diff > 1 then
-			love.graphics.setColor(1, 0, 0)
+			dy = 0
+			frontColor = palette.HEPT32_30
 		elseif diff == 1 then
-			love.graphics.setColor(1, 0.5, 0.5)
-		else
-			love.graphics.setColor(1, 1, 1)
+			dy = -0.5
+			frontColor = palette.HEPT32_26
+		elseif diff == 0 then
+			dy = -1.0
+			frontColor = palette.HEPT32_7
 		end
 
-		love.graphics.print(string.sub(titleAllCaps, i, i), 17 + i * 10, 6)
+		love.graphics.setColor(palette.HEPT32_28)
+		love.graphics.print(string.sub(titleAllCaps, i, i), 17 + i * 10, 6 + dy + 0.5)
+
+		love.graphics.setColor(frontColor)
+		love.graphics.print(string.sub(titleAllCaps, i, i), 17 + i * 10, 6 + dy)		
 	end
 
 	love.graphics.pop()
 	
-	love.graphics.setColor(0.1, 0.1, 0.3)
+	love.graphics.setColor(palette.HEPT32_10)
 	love.graphics.print(version, 278, 4)
 	
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(palette.HEPT32_7)
 	love.graphics.print("Written by Robbert Prins", 93, 45)
 	love.graphics.print(sound.MUSIC_CREDITS, sound.MUSIC_CREDITS_X, 65)
 	
-	love.graphics.setColor(0.470, 0.902, 1)
-	love.graphics.print("T = track "..tracks.getSelectedTrackNumber().."/"..tracks.getTrackCount()..": "..tracks.getSelectedTrackName(), 93, 90)
+	love.graphics.setColor(palette.HEPT32_8)
+	love.graphics.print("T = track " .. tracks.getSelectedTrackNumber() .. "/" .. tracks.getTrackCount() .. ": " .. tracks.getSelectedTrackName(), 93, 90)
 	love.graphics.print("W = windowed / full screen", 93, 105)
-	love.graphics.print("M = music: "..sound.getMusicEnabledLabel(), 93, 120)
+	love.graphics.print("M = music: " .. sound.getMusicEnabledLabel(), 93, 120)
 
 	-- more than one control method available
 	if controls.getAvailableCount() > 1 then
-		love.graphics.setColor(0.470, 0.902, 1)
-		love.graphics.print("C = controls: "..controls.getSelected().label, 93, 135)
+		love.graphics.print("C = controls: " .. controls.getSelected().label, 93, 135)
 	-- one control method available (note: assuming there is never less than one)
 	else
-		love.graphics.setColor(1, 1, 1)
-		love.graphics.print("Controls: "..controls.getSelected().label, 93, 135)
+		love.graphics.setColor(palette.HEPT32_7)
+		love.graphics.print("Controls: " .. controls.getSelected().label, 93, 135)
 	end
 
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(palette.HEPT32_7)
 
 	if controls.getSelected().type == controls.TYPE_GAMEPAD then
 		if controls.getSelected().config == controls.CONFIG_GAMEPAD_DPAD then
@@ -188,15 +200,15 @@ local function drawTitleScreen()
 		end
 	end
 
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(palette.HEPT32_7)
 	love.graphics.print(controls.getSelected().startText, 108 + controls.getSelected().startTextDx, 160)
 	
-	love.graphics.setColor(1, 1, 0)
+	love.graphics.setColor(palette.HEPT32_27)
 	love.graphics.print("Foppygames 2019-2026", 100, 178)
 end
 
 local function drawInfoCurrentLap()
-	love.graphics.setColor(0.471, 0.902, 1)
+	love.graphics.setColor(palette.HEPT32_8)
 	love.graphics.print("LAP", 20, 10)
 	love.graphics.print(math.max(lap, 1), 20, 25)
 	love.graphics.print("/ "..LAP_COUNT, 40, 25)
@@ -210,7 +222,7 @@ end
 
 local function drawInfoPlayerSpeed()
 	if player ~= nil then
-		love.graphics.setColor(0.471, 0.902, 1)
+		love.graphics.setColor(palette.HEPT32_8)
 		love.graphics.print("SPEED", aspect.GAME_WIDTH - 60, 10)
 		love.graphics.print(player:getSpeedAsKMH(), aspect.GAME_WIDTH - 80, 25)
 		love.graphics.print("km/h", aspect.GAME_WIDTH - 50, 25)
@@ -218,7 +230,7 @@ local function drawInfoPlayerSpeed()
 end
 
 local function drawInfoTime()
-	love.graphics.setColor(1, 1, 0)
+	love.graphics.setColor(palette.HEPT32_27)
 	love.graphics.print("TIME", aspect.GAME_WIDTH / 2 - 20, 10)
 
 	local timeScale = 1
@@ -489,7 +501,7 @@ function states.update(dt)
 			switchToState(STATE_GAME_OVER)
 		end
 	elseif state == STATE_TITLE then
-		titleShineTimer = titleShineTimer + 20 * dt
+		titleShineTimer = titleShineTimer + 18 * dt
 
 		if titleShineTimer >= 1 then
 			titleShineTimer = 0
@@ -581,7 +593,7 @@ function states.draw()
 
 		-- temp: draw daynight time
 		--[[
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(palette.HEPT32_7)
 		love.graphics.print(daynight.getDisplayTime(), aspect.GAME_WIDTH - 80, 40)
 		--]]
 	elseif state == STATE_TITLE then

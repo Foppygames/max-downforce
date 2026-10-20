@@ -34,6 +34,6 @@ palette.HEPT32_28 = utils.getColorFromHexColor("#F78D8D")
 palette.HEPT32_29 = utils.getColorFromHexColor("#F94E6D")
 palette.HEPT32_30 = utils.getColorFromHexColor("#C12458")
 palette.HEPT32_31 = utils.getColorFromHexColor("#841252")
-palette.HEPT32_31 = utils.getColorFromHexColor("#3D083B")
+palette.HEPT32_32 = utils.getColorFromHexColor("#3D083B")
 
 return palette

@@ -11,10 +11,6 @@ local remaining
 local pauseRemaining
 local halted
 
-function timer.init()
-	-- ...
-end
-
 function timer.reset(progress, pause)
 	halted = false
 

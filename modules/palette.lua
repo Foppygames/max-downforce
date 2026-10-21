@@ -36,4 +36,13 @@ palette.HEPT32_30 = utils.getColorFromHexColor("#C12458")
 palette.HEPT32_31 = utils.getColorFromHexColor("#841252")
 palette.HEPT32_32 = utils.getColorFromHexColor("#3D083B")
 
+-- return the color between color1 and color2
+function palette.getProgressedColor(color1, color2, progression)
+	return {
+		color1[1] + (color2[1] - color1[1]) * progression,
+		color1[2] + (color2[2] - color1[2]) * progression,
+		color1[3] + (color2[3] - color1[3]) * progression
+	}
+end
+
 return palette

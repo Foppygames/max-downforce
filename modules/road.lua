@@ -27,12 +27,12 @@ local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY
 	
 	if crossroads then
 		if tunnel or light then
-			love.graphics.setColor(tarmacColor)
+			love.graphics.setColor(tarmacColor[colorIndex])
 		else
 			love.graphics.setColor(
-				tarmacColor[1] * sunLight,
-				tarmacColor[2] * sunLight,
-				tarmacColor[3] * sunLight
+				tarmacColor[colorIndex][1] * sunLight,
+				tarmacColor[colorIndex][2] * sunLight,
+				tarmacColor[colorIndex][3] * sunLight
 			)
 		end
 	else
@@ -68,14 +68,14 @@ end
 
 local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth)
 	if light then
-		love.graphics.setColor(tarmacColor)
+		love.graphics.setColor(tarmacColor[colorIndex])
 	else
 		local sunLight = math.max(0.3, daynight:getSunLight())
 
 		love.graphics.setColor(
-			tarmacColor[1] * sunLight,
-			tarmacColor[2] * sunLight,
-			tarmacColor[3] * sunLight
+			tarmacColor[colorIndex][1] * sunLight,
+			tarmacColor[colorIndex][2] * sunLight,
+			tarmacColor[colorIndex][3] * sunLight
 		)
 	end
 
@@ -270,7 +270,7 @@ function road.reset(tracks)
 	curbColors = tracks.getCurbColors()
 	grassColor = tracks.getGrassColor()
 	stripeColor = tracks.getStripeColor()
-	tarmacColor = tracks.getTarmacColor()
+	tarmacColor = tracks.getTarmacColors()
 end
 
 function road.updateTextureOffset(playerSpeed, dt)

@@ -358,7 +358,6 @@ function states.init(gameVersion, gameTitle)
 	Tree.init()
 	
 	aspect.init(fullScreen)
-	daynight.init()
 	entities.init()
 	horizon.init()
 	perspective.initZMapAndScaling()

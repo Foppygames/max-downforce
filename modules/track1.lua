@@ -8,10 +8,21 @@ local sound = require("modules.sound")
 
 local FIRST_SEGMENT_LENGTH = 0.55
 
+local function getProgressedColor(color1, color2, progression)
+	return {
+		color1[1] + (color2[1] - color1[1]) * progression,
+		color1[2] + (color2[2] - color1[2]) * progression,
+		color1[3] + (color2[3] - color1[3]) * progression
+	}
+end
+
 track1.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
 track1.GRASS_COLOR = palette.HEPT32_12
 track1.STRIPE_COLOR = palette.HEPT32_6
-track1.TARMAC_COLOR = palette.HEPT32_3
+track1.TARMAC_COLORS = {
+	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),
+	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.22),
+}
 
 track1.name = "Forest"
 track1.number = 1

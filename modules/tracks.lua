@@ -134,8 +134,8 @@ function tracks.getStripeColor()
 	return selectedTrack.STRIPE_COLOR
 end
 
-function tracks.getTarmacColor()
-	return selectedTrack.TARMAC_COLOR
+function tracks.getTarmacColors()
+	return selectedTrack.TARMAC_COLORS
 end
 
 function tracks.getTrackCount()

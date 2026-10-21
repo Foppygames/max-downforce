@@ -27,7 +27,10 @@ local FIRST_SEGMENT_LENGTH = 0.55
 track4.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
 track4.GRASS_COLOR = palette.HEPT32_12
 track4.STRIPE_COLOR = palette.HEPT32_6
-track4.TARMAC_COLOR = palette.HEPT32_3
+track4.TARMAC_COLORS = {
+	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),
+	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.22),
+}
 
 track4.name = "Oval"
 track4.number = 4

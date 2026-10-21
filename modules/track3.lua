@@ -11,7 +11,10 @@ local FIRST_SEGMENT_LENGTH = 0.55
 track3.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
 track3.GRASS_COLOR = palette.HEPT32_5
 track3.STRIPE_COLOR = palette.HEPT32_6
-track3.TARMAC_COLOR = palette.HEPT32_3
+track3.TARMAC_COLORS = {
+	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),
+	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.22),
+}
 
 track3.name = "City"
 track3.number = 3

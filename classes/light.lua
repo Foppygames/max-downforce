@@ -17,7 +17,7 @@ function Light:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
 
-	local sunLight = math.max(0.3, daynight:getSunLight())
+	local sunLight = math.max(self.minLight, daynight:getSunLight())
 
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)

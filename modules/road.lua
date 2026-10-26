@@ -22,8 +22,8 @@ local trackIsInCity
 local trackIsInForest
 local trackIsInMountains
 
-local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY, roadX)
-	local sunLight = math.max(0.1, daynight:getSunLight())
+local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY, roadX, minLight)
+	local sunLight = math.max(minLight, daynight:getSunLight())
 	
 	if crossroads then
 		if tunnel or light then
@@ -66,11 +66,11 @@ local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY
 	end
 end
 
-local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth)
+local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth, minLight)
 	if light then
 		love.graphics.setColor(tarmacColor[colorIndex])
 	else
-		local sunLight = math.max(0.3, daynight:getSunLight())
+		local sunLight = math.max(minLight, daynight:getSunLight())
 
 		love.graphics.setColor(
 			tarmacColor[colorIndex][1] * sunLight,
@@ -82,11 +82,11 @@ local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth)
 	love.graphics.line(roadX, screenY, roadX + roadWidth, screenY)
 end
 
-local function drawCrosswalk(light, screenX, stripeWidth, screenY, crosswalk)
+local function drawCrosswalk(light, screenX, stripeWidth, screenY, minLight)
 	if light then
 		love.graphics.setColor(stripeColor)
 	else
-		local sunLight = math.max(0.3, daynight:getSunLight())
+		local sunLight = math.max(minLight, daynight:getSunLight())
 
 		love.graphics.setColor(
 			stripeColor[1] * sunLight,
@@ -102,11 +102,11 @@ local function drawCrosswalk(light, screenX, stripeWidth, screenY, crosswalk)
 	end
 end
 
-local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth)
+local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth, minLight)
 	if light then
 		love.graphics.setColor(curbColors[colorIndex])
 	else
-		local sunLight = math.max(0.3, daynight:getSunLight())
+		local sunLight = math.max(minLight + 0.02, daynight:getSunLight())
 		
 		love.graphics.setColor(
 			curbColors[colorIndex][1] * sunLight,
@@ -119,12 +119,12 @@ local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth
 	love.graphics.line(roadX + roadWidth - curbWidth, screenY, roadX + roadWidth, screenY)
 end
 
-local function drawStripes(light, screenX, stripeWidth, screenY, crosswalk)
-	local sunLight = math.max(0.3, daynight:getSunLight())
-
+local function drawStripes(light, screenX, stripeWidth, screenY, crosswalk, minLight)
 	if light then
 		love.graphics.setColor(stripeColor)
 	else
+		local sunLight = math.max(minLight + 0.02, daynight:getSunLight())
+
 		love.graphics.setColor(
 			stripeColor[1] * sunLight,
 			stripeColor[2] * sunLight,
@@ -189,6 +189,10 @@ function road.draw(player, entities, segments)
     previousRavineX = nil
     ravineMinX = nil
 
+	-- minimum light factor decreases towards horizon
+	local deltaMinLight = 0.3 / perspective.GROUND_HEIGHT
+	local minLight = 0.3
+
     -- draw road
     for i = 1, perspective.GROUND_HEIGHT do
         local z = perspective.zMap[i]
@@ -229,20 +233,20 @@ function road.draw(player, entities, segments)
         previousRavineX = ravineX
 
         -- update entities x, y, scale
-        entities.setupForDraw(z, screenX, screenY, perspective.scale[i], previousZ, previousScreenX, previousScreenY, previousScale, segment)
+        entities.setupForDraw(z, screenX, screenY, perspective.scale[i], previousZ, previousScreenX, previousScreenY, previousScale, segment, minLight)
         
-        -- draw grass and road elements
-        drawGrass(segment.tunnel, segment.crossroads, segment.light, colorIndex, ravineX, screenY, roadX)
-        drawTarmac(segment.tunnel or segment.light, colorIndex, roadX, screenY, roadWidth)
+		-- draw grass and road elements
+        drawGrass(segment.tunnel, segment.crossroads, segment.light, colorIndex, ravineX, screenY, roadX, minLight)
+        drawTarmac(segment.tunnel or segment.light, colorIndex, roadX, screenY, roadWidth, minLight)
 
         if segment.crosswalk then
-            drawCrosswalk(segment.tunnel or segment.light, screenX, stripeWidth * 2, screenY)
+            drawCrosswalk(segment.tunnel or segment.light, screenX, stripeWidth * 2, screenY, minLight)
         elseif colorIndex ~= 1 then
-            drawStripes(segment.tunnel or segment.light, screenX, stripeWidth, screenY)
+            drawStripes(segment.tunnel or segment.light, screenX, stripeWidth, screenY, false, minLight)
         end
 
         if not (segment.tunnel or segment.crossroads) then
-            drawCurbs(segment.light, colorIndex, roadX, screenY, curbWidth, roadWidth)
+            drawCurbs(segment.light, colorIndex, roadX, screenY, curbWidth, roadWidth, minLight)
         end
         
         previousZ = z
@@ -258,6 +262,9 @@ function road.draw(player, entities, segments)
         
         -- apply the change to x and apply perspective correction 
         screenX = screenX + dx + perspectiveDX
+
+		-- increase minimum light factor
+		minLight = minLight - deltaMinLight
     end
 end
 

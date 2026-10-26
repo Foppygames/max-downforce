@@ -24,6 +24,7 @@ function Entity:new(x, z)
 	o.height = 0
 	o.color = {1, 1, 1}
 	o.segment = nil
+	o.minLight = 0
 	
 	return o
 end
@@ -55,7 +56,7 @@ function Entity:scroll(playerSpeed, dt)
 	}
 end
 
-function Entity:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
+function Entity:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment, minLight)
 	if self.segment == nil then
 		self:setSegment(segment)
 	end
@@ -66,6 +67,7 @@ function Entity:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX,
 	self.roadX = fractionTowardsZ * roadX + fractionRemaining * previousRoadX
 	self.screenY = fractionTowardsZ * screenY + fractionRemaining * previousScreenY
 	self.scale = fractionTowardsZ * scale + fractionRemaining * previousScale
+	self.minLight = minLight
 end
 
 function Entity:computeImageScale()
@@ -86,7 +88,7 @@ function Entity:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
 
-	local sunLight = math.max(0.3, daynight:getSunLight())
+	local sunLight = math.max(self.minLight, daynight:getSunLight())
 
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)

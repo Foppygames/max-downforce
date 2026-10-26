@@ -71,7 +71,7 @@ end
 function Banner:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
-	local sunLight = math.max(0.3, daynight:getSunLight())
+	local sunLight = math.max(self.minLight, daynight:getSunLight())
 	local x1 = newScreenX / imageScale - self.width / 2
 	local y1 = self.screenY / imageScale - self.poleHeight
 

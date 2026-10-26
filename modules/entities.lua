@@ -412,9 +412,9 @@ function entities.resetForDraw()
 	index = 1
 end
 
-function entities.setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
+function entities.setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment, minLight)
 	while (index <= #list) and (list[index].z <= z) do
-		list[index]:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
+		list[index]:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment, minLight)
 
 		index = index + 1
 	end

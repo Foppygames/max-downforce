@@ -40,7 +40,7 @@ function TunnelEnd:new(z, trackHasRavine, trackIsInCity, last)
 		o.wallColor = {color, color, color * 0.6}
 		o.roofColor = {color * 0.95, color * 0.95, color * 0.54}
 	else
-		color = math.cos(math.rad(colorAngle)) / 50
+		color = math.cos(math.rad(colorAngle)) / 20
 
 		o.wallColor = {color, color, color * 1.3}
 		o.roofColor = o.wallColor

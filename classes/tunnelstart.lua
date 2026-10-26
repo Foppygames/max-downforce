@@ -36,7 +36,7 @@ function TunnelStart:draw()
 	-- Note: slightly increase height (after setting y) to avoid seeing thin line of grass under tunnel start
 	height = height + 0.5
 
-	local sunLight = math.max(0.4, daynight:getSunLight())
+	local sunLight = math.max(self.minLight, daynight:getSunLight())
 
 	love.graphics.setColor(sunLight, sunLight, sunLight)
 

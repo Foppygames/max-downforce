@@ -217,13 +217,14 @@ function Car:draw()
 		if (self.inTunnel and (not self.falling)) or self.inLight then
 			sunLight = 1
 		else
-			sunLight = math.max(0.3, daynight:getSunLight())
+			sunLight = math.max(self.minLight + 0.06, daynight:getSunLight())
 		end
 
 		local mainColor = {self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight}
 		
 		-- draw front wheels
 		love.graphics.setColor(sunLight, sunLight, sunLight)
+
 		local wheelScaleChange = bodyDegreesChange / MAX_BODY_DEGREES_CHANGE * MAX_WHEEL_SCALE_CHANGE
 		local leftWheelScale = 1 + wheelScaleChange
 		local rightWheelScale = 1 - wheelScaleChange
@@ -265,9 +266,9 @@ function Car:draw()
 		love.graphics.rectangle("fill", screenX - (lightSize + 4) / 2 - perspectiveEffect * 1.4, screenY - bodyHeight + accEffect * 2.8 + bumpDy, lightSize + 4, lightSize + 4)
 		
 		if self.braking then
-			love.graphics.setColor(1, 0, 0)
+			love.graphics.setColor(1, 0.4, 0.4)
 		else
-			love.graphics.setColor(0.4, 0, 0)
+			love.graphics.setColor(0.6, 0.3, 0.3)
 		end
 
 		love.graphics.rectangle("fill", screenX - lightSize / 2 - perspectiveEffect * 1.6, screenY - bodyHeight + 2 + accEffect * 3.6 + bumpDy, lightSize, lightSize)
@@ -486,8 +487,8 @@ function Car:setIsPlayer(isPlayer)
 	self.isPlayer = isPlayer
 end
 
-function Car:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
-	Entity.setupForDraw(self, z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment)
+function Car:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment, minLight)
+	Entity.setupForDraw(self, z, roadX, screenY, scale, previousZ, previousRoadX, previousScreenY, previousScale, segment, minLight)
 
 	self.segmentDdx = segment.ddx
 	self.targetSpeed = self.topSpeed

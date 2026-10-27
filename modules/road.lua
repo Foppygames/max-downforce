@@ -2,12 +2,16 @@ local road = {}
 
 local aspect = require("modules.aspect")
 local daynight = require("modules.daynight")
+local palette = require("modules.palette")
 local perspective = require("modules.perspective")
+
+local RAVINE_COLOR = palette.HEPT32_18
 
 road.ROAD_WIDTH = aspect.GAME_WIDTH * 1.6
 road.CURB_WIDTH = road.ROAD_WIDTH / 15
 road.STRIPE_WIDTH = road.CURB_WIDTH / 3
 road.RAVINE_ROADSIDE_WIDTH = road.CURB_WIDTH * 6
+road.RAVINE_TUNNEL_WALL_COLOR = palette.HEPT32_19
 
 local curbColors = nil
 local grassColor = nil
@@ -22,8 +26,8 @@ local trackIsInCity
 local trackIsInForest
 local trackIsInMountains
 
-local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY, roadX, minLight)
-	local sunLight = math.max(minLight, daynight:getSunLight())
+local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY, roadX, minLight, sunLight)
+	local sunLight = math.max(minLight, sunLight)
 	
 	if crossroads then
 		if tunnel or light then
@@ -49,7 +53,7 @@ local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY
 		else
 			love.graphics.line(ravineX, screenY, roadX, screenY)
 
-			love.graphics.setColor(0.45, 0.32, 0.027)
+			love.graphics.setColor(road.RAVINE_TUNNEL_WALL_COLOR)
 
 			love.graphics.line(roadX, screenY, aspect.GAME_WIDTH, screenY)
 		end
@@ -66,11 +70,11 @@ local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY
 	end
 end
 
-local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth, minLight)
+local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth, minLight, sunLight)
 	if light then
 		love.graphics.setColor(tarmacColor[colorIndex])
 	else
-		local sunLight = math.max(minLight, daynight:getSunLight())
+		local sunLight = math.max(minLight, sunLight)
 
 		love.graphics.setColor(
 			tarmacColor[colorIndex][1] * sunLight,
@@ -82,11 +86,11 @@ local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth, minLight
 	love.graphics.line(roadX, screenY, roadX + roadWidth, screenY)
 end
 
-local function drawCrosswalk(light, screenX, stripeWidth, screenY, minLight)
+local function drawCrosswalk(light, screenX, stripeWidth, screenY, minLight, sunLight)
 	if light then
 		love.graphics.setColor(stripeColor)
 	else
-		local sunLight = math.max(minLight, daynight:getSunLight())
+		local sunLight = math.max(minLight, sunLight)
 
 		love.graphics.setColor(
 			stripeColor[1] * sunLight,
@@ -102,11 +106,11 @@ local function drawCrosswalk(light, screenX, stripeWidth, screenY, minLight)
 	end
 end
 
-local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth, minLight)
+local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth, minLight, sunLight)
 	if light then
 		love.graphics.setColor(curbColors[colorIndex])
 	else
-		local sunLight = math.max(minLight + 0.02, daynight:getSunLight())
+		local sunLight = math.max(minLight + 0.02, sunLight)
 		
 		love.graphics.setColor(
 			curbColors[colorIndex][1] * sunLight,
@@ -119,11 +123,11 @@ local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth
 	love.graphics.line(roadX + roadWidth - curbWidth, screenY, roadX + roadWidth, screenY)
 end
 
-local function drawStripes(light, screenX, stripeWidth, screenY, crosswalk, minLight)
+local function drawStripes(light, screenX, stripeWidth, screenY, crosswalk, minLight, sunLight)
 	if light then
 		love.graphics.setColor(stripeColor)
 	else
-		local sunLight = math.max(minLight + 0.02, daynight:getSunLight())
+		local sunLight = math.max(minLight + 0.02, sunLight)
 
 		love.graphics.setColor(
 			stripeColor[1] * sunLight,
@@ -146,10 +150,19 @@ local function drawStripes(light, screenX, stripeWidth, screenY, crosswalk, minL
 end
 
 function road.draw(player, entities, segments)
+	local sunLight = daynight:getSunLight()
+
     -- draw ravine
     if trackHasRavine then
         if ravineMinX ~= nil then
-            love.graphics.setColor(0.25, 0.18, 0.015)
+			local ravineSunlight = math.max(0.2, sunLight)
+
+            love.graphics.setColor(
+				RAVINE_COLOR[1] * ravineSunlight,
+				RAVINE_COLOR[2] * ravineSunlight,
+				RAVINE_COLOR[3] * ravineSunlight
+			)
+
             love.graphics.rectangle("fill", ravineMinX, ravineMinXY, aspect.GAME_WIDTH - ravineMinX, aspect.GAME_HEIGHT - ravineMinXY)	
         end
     end
@@ -236,17 +249,17 @@ function road.draw(player, entities, segments)
         entities.setupForDraw(z, screenX, screenY, perspective.scale[i], previousZ, previousScreenX, previousScreenY, previousScale, segment, minLight)
         
 		-- draw grass and road elements
-        drawGrass(segment.tunnel, segment.crossroads, segment.light, colorIndex, ravineX, screenY, roadX, minLight)
-        drawTarmac(segment.tunnel or segment.light, colorIndex, roadX, screenY, roadWidth, minLight)
+        drawGrass(segment.tunnel, segment.crossroads, segment.light, colorIndex, ravineX, screenY, roadX, minLight, sunLight)
+        drawTarmac(segment.tunnel or segment.light, colorIndex, roadX, screenY, roadWidth, minLight, sunLight)
 
         if segment.crosswalk then
-            drawCrosswalk(segment.tunnel or segment.light, screenX, stripeWidth * 2, screenY, minLight)
+            drawCrosswalk(segment.tunnel or segment.light, screenX, stripeWidth * 2, screenY, minLight, sunLight)
         elseif colorIndex ~= 1 then
-            drawStripes(segment.tunnel or segment.light, screenX, stripeWidth, screenY, false, minLight)
+            drawStripes(segment.tunnel or segment.light, screenX, stripeWidth, screenY, false, minLight, sunLight)
         end
 
         if not (segment.tunnel or segment.crossroads) then
-            drawCurbs(segment.light, colorIndex, roadX, screenY, curbWidth, roadWidth, minLight)
+            drawCurbs(segment.light, colorIndex, roadX, screenY, curbWidth, roadWidth, minLight, sunLight)
         end
         
         previousZ = z

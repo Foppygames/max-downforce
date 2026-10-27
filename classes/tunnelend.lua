@@ -1,8 +1,11 @@
 require "classes.entity"
 
 local aspect = require("modules.aspect")
+local palette = require("modules.palette")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
+
+local RAVINE_TUNNEL_ROOF_COLOR = palette.HEPT32_20
 
 local colorAngle = 0
 local count = 0
@@ -32,8 +35,8 @@ function TunnelEnd:new(z, trackHasRavine, trackIsInCity, last)
 	if trackHasRavine then
 		color = 1.0 - math.cos(math.rad(colorAngle)) * 0.1
 
-		o.wallColor = {color * 0.45, color * 0.32, color * 0.027}
-		o.roofColor = {color * 0.41, color * 0.27, color * 0.009}
+		o.wallColor = {color * road.RAVINE_TUNNEL_WALL_COLOR[1], color * road.RAVINE_TUNNEL_WALL_COLOR[2], color * road.RAVINE_TUNNEL_WALL_COLOR[3]}
+		o.roofColor = {color * RAVINE_TUNNEL_ROOF_COLOR[1], color * RAVINE_TUNNEL_ROOF_COLOR[2], color * RAVINE_TUNNEL_ROOF_COLOR[3]}
 	elseif trackIsInCity then
 		color = 1.0 - math.cos(math.rad(colorAngle)) * 0.1
 

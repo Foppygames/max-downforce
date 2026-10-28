@@ -12,11 +12,11 @@ Tree = Entity:new()
 
 function Tree.init()
 	img = {
+		love.graphics.newImage("images/props/tree1.png"),
 		love.graphics.newImage("images/props/tree2.png"),
 		love.graphics.newImage("images/props/tree3.png"),
 		love.graphics.newImage("images/props/tree4.png"),
-		love.graphics.newImage("images/props/tree5.png"),
-		love.graphics.newImage("images/props/tree6.png")
+		love.graphics.newImage("images/props/tree5.png")
 	}
 
 	shadowImg = love.graphics.newImage("images/shadows/shadow_tree.png")

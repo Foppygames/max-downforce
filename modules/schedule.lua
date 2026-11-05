@@ -134,13 +134,13 @@ function processItem(itemType, z)
 	elseif itemType == schedule.ITEM_TUNNEL_START then
 		entities.addTunnelStart(z)
 	elseif itemType == schedule.ITEM_BANNER_FOREST_BRIDGE then
-		entities.addBanner(0, z, 2)
+		entities.addBanner(0, z, 3)
 	elseif itemType == schedule.ITEM_BANNER_START then
 		entities.addBanner(0, z, 1)
 	elseif itemType == schedule.ITEM_BANNER_CITY_LIGHTS then
-		entities.addBanner(0, z, 3)
+		entities.addBanner(0, z, 5)
 	elseif itemType == schedule.ITEM_BANNER_CITY_LANTERNS then
-		entities.addBanner(0, z, 4)
+		entities.addBanner(0, z, 7)
 	end
 end
 

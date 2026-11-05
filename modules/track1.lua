@@ -17,7 +17,7 @@ local function getProgressedColor(color1, color2, progression)
 end
 
 track1.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
-track1.GRASS_COLOR = palette.HEPT32_12
+track1.GRASS_COLOR = palette.HEPT32_13
 track1.STRIPE_COLOR = palette.HEPT32_6
 track1.TARMAC_COLORS = {
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),

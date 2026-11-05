@@ -37,7 +37,7 @@ function daynight.getSunLight()
 end
 
 function daynight.reset()
-	time = math.random(8, 12)
+	time = 12 --math.random(8, 12)
 
 	daynight.update(0)
 end

@@ -24,9 +24,9 @@ function Marker:draw()
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)
 	love.graphics.setColor(self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight)
-	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2,self.screenY / imageScale - self.height)
+	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2, self.screenY / imageScale - self.height)
 	love.graphics.setColor(1, 1, 1)
-	love.graphics.draw(self.imageLight, newScreenX / imageScale - self.width / 2,self.screenY / imageScale - self.height)
+	love.graphics.draw(self.imageLight, newScreenX / imageScale - self.width / 2, self.screenY / imageScale - self.height)
 	love.graphics.pop()
 	
 	self.storedScreenX = newScreenX

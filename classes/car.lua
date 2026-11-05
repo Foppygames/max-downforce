@@ -266,9 +266,9 @@ function Car:draw()
 		love.graphics.rectangle("fill", screenX - (lightSize + 4) / 2 - perspectiveEffect * 1.4, screenY - bodyHeight + accEffect * 2.8 + bumpDy, lightSize + 4, lightSize + 4)
 		
 		if self.braking then
-			love.graphics.setColor(1, 0.4, 0.4)
+			love.graphics.setColor(palette.HEPT32_24)
 		else
-			love.graphics.setColor(0.6, 0.3, 0.3)
+			love.graphics.setColor(palette.HEPT32_31)
 		end
 
 		love.graphics.rectangle("fill", screenX - lightSize / 2 - perspectiveEffect * 1.6, screenY - bodyHeight + 2 + accEffect * 3.6 + bumpDy, lightSize, lightSize)

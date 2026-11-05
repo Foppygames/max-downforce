@@ -26,6 +26,45 @@ local trackIsInCity
 local trackIsInForest
 local trackIsInMountains
 
+local function drawCrosswalk(light, screenX, stripeWidth, screenY, minLight, sunLight)
+	local color = palette.HEPT32_6
+
+	if light then
+		love.graphics.setColor(color)
+	else
+		local sunLight = math.max(minLight, sunLight)
+
+		love.graphics.setColor(
+			color[1] * sunLight,
+			color[2] * sunLight,
+			color[3] * sunLight
+		)
+	end
+
+	for i = -4, 4 do
+		local startX = screenX + i * 2 * stripeWidth - stripeWidth / 2
+
+		love.graphics.line(startX, screenY, startX + stripeWidth, screenY)
+	end
+end
+
+local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth, minLight, sunLight)
+	if light then
+		love.graphics.setColor(curbColors[colorIndex])
+	else
+		local sunLight = math.max(minLight + 0.02, sunLight)
+		
+		love.graphics.setColor(
+			curbColors[colorIndex][1] * sunLight,
+			curbColors[colorIndex][2] * sunLight,
+			curbColors[colorIndex][3] * sunLight
+		)
+	end
+	
+	love.graphics.line(roadX, screenY, roadX + curbWidth, screenY)
+	love.graphics.line(roadX + roadWidth - curbWidth, screenY, roadX + roadWidth, screenY)
+end
+
 local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY, roadX, minLight, sunLight)
 	local sunLight = math.max(minLight, sunLight)
 	
@@ -70,6 +109,22 @@ local function drawGrass(tunnel, crossroads, light, colorIndex, ravineX, screenY
 	end
 end
 
+local function drawStripes(light, screenX, stripeWidth, screenY, minLight, sunLight)
+	if light then
+		love.graphics.setColor(stripeColor)
+	else
+		local sunLight = math.max(minLight + 0.02, sunLight)
+
+		love.graphics.setColor(
+			stripeColor[1] * sunLight,
+			stripeColor[2] * sunLight,
+			stripeColor[3] * sunLight
+		)
+	end
+
+	love.graphics.line(screenX - stripeWidth / 2, screenY, screenX + stripeWidth / 2, screenY)
+end
+
 local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth, minLight, sunLight)
 	if light then
 		love.graphics.setColor(tarmacColor[colorIndex])
@@ -84,69 +139,6 @@ local function drawTarmac(light, colorIndex, roadX, screenY, roadWidth, minLight
 	end
 
 	love.graphics.line(roadX, screenY, roadX + roadWidth, screenY)
-end
-
-local function drawCrosswalk(light, screenX, stripeWidth, screenY, minLight, sunLight)
-	if light then
-		love.graphics.setColor(stripeColor)
-	else
-		local sunLight = math.max(minLight, sunLight)
-
-		love.graphics.setColor(
-			stripeColor[1] * sunLight,
-			stripeColor[2] * sunLight,
-			stripeColor[3] * sunLight
-		)
-	end
-
-	for i = -4, 4 do
-		local startX = screenX + i * 2 * stripeWidth - stripeWidth / 2
-
-		love.graphics.line(startX, screenY, startX + stripeWidth, screenY)
-	end
-end
-
-local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth, minLight, sunLight)
-	if light then
-		love.graphics.setColor(curbColors[colorIndex])
-	else
-		local sunLight = math.max(minLight + 0.02, sunLight)
-		
-		love.graphics.setColor(
-			curbColors[colorIndex][1] * sunLight,
-			curbColors[colorIndex][2] * sunLight,
-			curbColors[colorIndex][3] * sunLight
-		)
-	end
-	
-	love.graphics.line(roadX, screenY, roadX + curbWidth, screenY)
-	love.graphics.line(roadX + roadWidth - curbWidth, screenY, roadX + roadWidth, screenY)
-end
-
-local function drawStripes(light, screenX, stripeWidth, screenY, crosswalk, minLight, sunLight)
-	if light then
-		love.graphics.setColor(stripeColor)
-	else
-		local sunLight = math.max(minLight + 0.02, sunLight)
-
-		love.graphics.setColor(
-			stripeColor[1] * sunLight,
-			stripeColor[2] * sunLight,
-			stripeColor[3] * sunLight
-		)
-	end
-
-	if crosswalk then
-		local width = stripeWidth * 2
-
-		for i = -4, 4 do
-			local startX = screenX + i * 2 * width - width / 2
-
-			love.graphics.line(startX, screenY, startX+width, screenY)
-		end
-	else
-		love.graphics.line(screenX - stripeWidth / 2, screenY, screenX + stripeWidth / 2, screenY)
-	end
 end
 
 function road.draw(player, entities, segments)
@@ -255,7 +247,7 @@ function road.draw(player, entities, segments)
         if segment.crosswalk then
             drawCrosswalk(segment.tunnel or segment.light, screenX, stripeWidth * 2, screenY, minLight, sunLight)
         elseif colorIndex ~= 1 then
-            drawStripes(segment.tunnel or segment.light, screenX, stripeWidth, screenY, false, minLight, sunLight)
+            drawStripes(segment.tunnel or segment.light, screenX, stripeWidth, screenY, minLight, sunLight)
         end
 
         if not (segment.tunnel or segment.crossroads) then

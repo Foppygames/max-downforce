@@ -52,7 +52,7 @@ local function drawCurbs(light, colorIndex, roadX, screenY, curbWidth, roadWidth
 	if light then
 		love.graphics.setColor(curbColors[colorIndex])
 	else
-		local sunLight = math.max(minLight + 0.02, sunLight)
+		local sunLight = math.max(minLight + 0.025, sunLight)
 		
 		love.graphics.setColor(
 			curbColors[colorIndex][1] * sunLight,
@@ -113,7 +113,7 @@ local function drawStripes(light, screenX, stripeWidth, screenY, minLight, sunLi
 	if light then
 		love.graphics.setColor(stripeColor)
 	else
-		local sunLight = math.max(minLight + 0.02, sunLight)
+		local sunLight = math.max(minLight + 0.028, sunLight)
 
 		love.graphics.setColor(
 			stripeColor[1] * sunLight,

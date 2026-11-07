@@ -3,6 +3,21 @@ local perspective = require("modules.perspective")
 
 Entity = {}
 
+function Entity:draw()
+	local imageScale = self:computeImageScale()
+	local newScreenX = self:computeNewScreenX()
+
+	local sunLight = math.max(self.minLight, daynight:getSunLight())
+
+	love.graphics.push()
+	love.graphics.scale(imageScale, imageScale)
+	love.graphics.setColor(self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight)
+	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2,self.screenY / imageScale - self.height)
+	love.graphics.pop()
+	
+	self.storedScreenX = newScreenX
+end
+
 function Entity:new(x, z)
 	o = {}
 
@@ -84,21 +99,6 @@ function Entity:computeNewScreenX()
 	return newScreenX
 end
 
-function Entity:draw()
-	local imageScale = self:computeImageScale()
-	local newScreenX = self:computeNewScreenX()
-
-	local sunLight = math.max(self.minLight, daynight:getSunLight())
-
-	love.graphics.push()
-	love.graphics.scale(imageScale, imageScale)
-	love.graphics.setColor(self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight)
-	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2,self.screenY / imageScale - self.height)
-	love.graphics.pop()
-	
-	self.storedScreenX = newScreenX
-end
-
 function Entity:isCar()
 	return false
 end
@@ -123,7 +123,6 @@ function Entity:setSegment(segment)
 	self.segment = segment
 end
 
--- cleans up object prior to deletion
 function Entity:clean()
 	-- ...
 end

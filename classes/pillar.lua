@@ -1,3 +1,5 @@
+local daynight = require("modules.daynight")
+
 require "classes.entity"
 
 local img = nil
@@ -35,7 +37,10 @@ function Pillar:draw()
 
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)
+
+	love.graphics.setColor(1, 1, 1, daynight:getSunLight())
 	love.graphics.draw(shadowImg, newScreenX / imageScale, self.screenY / imageScale - shadowHalfHeight)
+	
 	love.graphics.setColor(self.color, self.color, self.color)
 	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2, self.screenY / imageScale - self.height)
 	love.graphics.pop()

@@ -212,14 +212,7 @@ function Car:draw()
 		local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
 		local bodyRotation = bodyDegreesChange * math.pi / 180
 		
-		local sunLight
-
-		if (self.inTunnel and (not self.falling)) or self.inLight then
-			sunLight = 1
-		else
-			sunLight = math.max(self.minLight + 0.06, daynight:getSunLight())
-		end
-
+		local sunLight = math.max(self.minLight + 0.06, daynight:getSunLight())
 		local mainColor = {self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight}
 		
 		-- draw front wheels
@@ -376,7 +369,6 @@ function Car:new(lane, z, isPlayer, progress, pause, ravine, city)
 	o.ravine = ravine
 	o.city = city
 	o.inTunnel = false
-	o.inLight = false
 
 	o.imgWing = imgWing[math.random(5)]
 	o.wingWidth = o.imgWing:getWidth()
@@ -493,7 +485,6 @@ function Car:setupForDraw(z, roadX, screenY, scale, previousZ, previousRoadX, pr
 	self.segmentDdx = segment.ddx
 	self.targetSpeed = self.topSpeed
 	self.inTunnel = segment.tunnel
-	self.inLight = segment.light
 end
 
 function Car:update(dt)
@@ -741,7 +732,7 @@ function Car:updateOffRoad(dt)
 	-- left off tarmac
 	if self.x < -MAX_DIST_BEFORE_CURB then
 		-- not in tunnel, or on ravine track
-		if (not self.inTunnel) or (self.ravine) then
+		if (not self.inTunnel) or self.ravine then
 			-- bump left
 			if self.leftBumpDy == 0 then
 				self.leftBumpDy = -1

@@ -28,9 +28,6 @@ track3.totalLength = 0
 
 -- Note: length is written as fraction of maxZ, to be converted in segments.init()
 -- Note: dz is written as fraction of maxZ, to be converted in segments.init()
--- Note: light property only makes sense on this track as it is in dark by default
--- and tunnels are light; light segments are rendered as if they are tunnel segments
--- (but with curbs), so on the other tracks this would actually make them dark
 track3.segments = {
 	-- starting grid straight leading up to start/finish, lights
 	{
@@ -63,7 +60,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		----light = true
 	},
 	-- long straight after start/finish, part 1, lights
 	{
@@ -104,14 +100,12 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		----light = true
 	},
 	-- crosswalk
 	{
 		ddx = 0,
 		length = 0.07,
 		scheduleItems = {},
-		--light = true,
 		crosswalk = true
 	},
 	-- crossing
@@ -120,7 +114,6 @@ track3.segments = {
 		length = 0.18,
 		scheduleItems = {},
 		tunnel = false,
-		--light = true,
 		crossroads = true
 	},
 	-- crosswalk
@@ -128,7 +121,6 @@ track3.segments = {
 		ddx = 0,
 		length = 0.07,
 		scheduleItems = {},
-		--light = true,
 		crosswalk = true
 	},
 	{
@@ -143,28 +135,24 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		--light = true
-	},
+	},	
 	{
 		ddx = 0,
 		length = 0.2,
 		scheduleItems = {},
 		tunnel = true
-		--light = true
 	},
 	{
 		ddx = 0,
 		length = 0.3,
 		scheduleItems = {},
 		tunnel = false
-		--light = true
 	},
 	-- crosswalk
 	{
 		ddx = 0,
 		length = 0.07,
 		scheduleItems = {},
-		--light = true,
 		crosswalk = true
 	},
 	-- crossing, lights
@@ -173,7 +161,6 @@ track3.segments = {
 		length = 0.18,
 		scheduleItems = {},
 		tunnel = false,
-		--light = true,
 		crossroads = true
 	},
 	-- crosswalk
@@ -181,7 +168,6 @@ track3.segments = {
 		ddx = 0,
 		length = 0.07,
 		scheduleItems = {},
-		--light = true,
 		crosswalk = true
 	},
 	-- short straight, lights
@@ -190,7 +176,6 @@ track3.segments = {
 		length = 0.4,
 		scheduleItems = {},
 		tunnel = false
-		--light = true
 	},
 	-- long curve left, part 1, lights
 	{
@@ -217,7 +202,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		--light = true
 	},
 	-- long curve left, part 2
 	{
@@ -251,7 +235,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		--light = true
 	},
 	-- long curve left, part 4
 	{
@@ -306,7 +289,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		--light = true
 	},
 	-- medium curve right, part 2
 	{
@@ -372,7 +354,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		--light = true
 	},
 	-- very short straight
 	{
@@ -458,7 +439,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		--light = true
 	},
 	-- crosswalk
 	{
@@ -466,7 +446,6 @@ track3.segments = {
 		length = 0.07,
 		scheduleItems = {},
 		crosswalk = true
-		--light = true
 	},
 	-- crossing
 	{
@@ -474,7 +453,6 @@ track3.segments = {
 		length = 0.18,
 		scheduleItems = {},
 		crossroads = true
-		--light = true
 	},
 	-- crosswalk
 	{
@@ -489,7 +467,6 @@ track3.segments = {
 			}
 		},
 		crosswalk = true
-		--light = true
 	},
 	-- long curve right, part 2, towards tunnel
 	{
@@ -625,7 +602,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false,
-		light = false
 	},
 	-- very short straight
 	{
@@ -640,7 +616,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false,
-		light = false
 	},
 	-- quick left
 	{
@@ -661,7 +636,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false,
-		light = false
 	},
 	-- very short straight
 	{
@@ -669,7 +643,6 @@ track3.segments = {
 		length = 0.2,
 		scheduleItems = {},
 		tunnel = false,
-		light = false
 	},
 	-- long right
 	{
@@ -696,7 +669,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		--light = true
 	},
 	-- very short straight
 	{
@@ -704,7 +676,6 @@ track3.segments = {
 		length = 0.1,
 		scheduleItems = {},
 		tunnel = false
-		--light = true
 	},
 	-- long left, part 1
 	{
@@ -712,7 +683,6 @@ track3.segments = {
 		length = 2.9,
 		scheduleItems = {},
 		tunnel = false
-		--light = true
 	},
 	-- long left, part 2, tunnel
 	{
@@ -720,7 +690,6 @@ track3.segments = {
 		length = 4,
 		scheduleItems = {},
 		tunnel = true
-		--light = true
 	},
 	-- long left, part 3
 	{
@@ -728,7 +697,6 @@ track3.segments = {
 		length = 1,
 		scheduleItems = {},
 		tunnel = false
-		--light = true
 	},
 	-- straight before start/finish
 	{
@@ -749,7 +717,6 @@ track3.segments = {
 			}
 		},
 		tunnel = false
-		--light = true
 	}
 }
 

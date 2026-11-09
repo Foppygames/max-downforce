@@ -67,11 +67,3 @@ function Building:draw()
 
 	self.storedScreenX = newScreenX
 end
-
-function Building:setSegment(segment)
-	self.segment = segment
-
-	--[[if segment.isInCity and (not segment.light) then
-		self.color = 0.35
-	end--]]
-end

@@ -19,6 +19,7 @@ local controls = require("modules.controls")
 local daynight = require("modules.daynight")
 local entities = require("modules.entities")
 local horizon = require("modules.horizon")
+local lightmap = require("modules.lightmap")
 local opponents = require("modules.opponents")
 local palette = require("modules.palette")
 local perspective = require("modules.perspective")
@@ -312,6 +313,7 @@ local function switchToState(newState)
 	
 		daynight.reset()
 		horizon.reset()
+		lightmap.reset()
 		schedule.reset()
 		segments.reset()
 		segments.addFirst()
@@ -361,6 +363,7 @@ function states.init(gameVersion, gameTitle)
 	entities.init()
 	horizon.init()
 	perspective.initZMapAndScaling()
+	lightmap.init()
 	opponents.init()
 	segments.init()
 	sound.init()
@@ -407,6 +410,8 @@ function states.update(dt)
 			playerSpeed = 0
 		end
 		
+		lightmap.scroll(playerSpeed, dt)
+
 		road.updateTextureOffset(playerSpeed, dt)
 		
 		schedule.update(playerSpeed, dt)

@@ -126,7 +126,7 @@ function horizon.draw()
 	love.graphics.draw(imgSun, sunX, perspective.HORIZON_Y - daynight.getSunHeight() * perspective.HORIZON_Y)
 	
 	-- draw horizon layers
-	local sunLight = math.max(0.1, daynight:getSunLight())
+	local sunLight = math.max(0.1, daynight.getSunLight())
 
 	love.graphics.setColor(sunLight, sunLight, sunLight)
 

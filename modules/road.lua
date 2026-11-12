@@ -2,6 +2,7 @@ local road = {}
 
 local aspect = require("modules.aspect")
 local daynight = require("modules.daynight")
+local lightmap = require("modules.lightmap")
 local palette = require("modules.palette")
 local perspective = require("modules.perspective")
 
@@ -43,13 +44,14 @@ local function drawCrosswalk(screenX, stripeWidth, screenY, minLight, sunLight)
 	end
 end
 
-local function drawCurbs(colorIndex, roadX, screenY, curbWidth, roadWidth, minLight, sunLight)
+local function drawCurbs(colorIndex, roadX, screenY, curbWidth, roadWidth, minLight, sunLight, sectorLight)
 	local sunLight = math.max(minLight + 0.025, sunLight)
-	
+	local totalLight = math.min(1, sunLight + sectorLight)
+
 	love.graphics.setColor(
-		curbColors[colorIndex][1] * sunLight,
-		curbColors[colorIndex][2] * sunLight,
-		curbColors[colorIndex][3] * sunLight
+		curbColors[colorIndex][1] * totalLight,
+		curbColors[colorIndex][2] * totalLight,
+		curbColors[colorIndex][3] * totalLight
 	)
 
 	love.graphics.line(roadX, screenY, roadX + curbWidth, screenY)
@@ -109,32 +111,34 @@ local function drawGrass(tunnel, crossroads, colorIndex, ravineX, screenY, roadX
 	end
 end
 
-local function drawStripes(screenX, stripeWidth, screenY, minLight, sunLight)
+local function drawStripes(screenX, stripeWidth, screenY, minLight, sunLight, sectorLight)
 	local sunLight = math.max(minLight + 0.028, sunLight)
+	local totalLight = math.min(1, sunLight + sectorLight)
 
 	love.graphics.setColor(
-		stripeColor[1] * sunLight,
-		stripeColor[2] * sunLight,
-		stripeColor[3] * sunLight
+		stripeColor[1] * totalLight,
+		stripeColor[2] * totalLight,
+		stripeColor[3] * totalLight
 	)
 	
 	love.graphics.line(screenX - stripeWidth / 2, screenY, screenX + stripeWidth / 2, screenY)
 end
 
-local function drawTarmac(colorIndex, roadX, screenY, roadWidth, minLight, sunLight)
+local function drawTarmac(colorIndex, roadX, screenY, roadWidth, minLight, sunLight, sectorLight)
 	local sunLight = math.max(minLight, sunLight)
+	local totalLight = math.min(1, sunLight + sectorLight)
 
 	love.graphics.setColor(
-		tarmacColor[colorIndex][1] * sunLight,
-		tarmacColor[colorIndex][2] * sunLight,
-		tarmacColor[colorIndex][3] * sunLight
+		tarmacColor[colorIndex][1] * totalLight,
+		tarmacColor[colorIndex][2] * totalLight,
+		tarmacColor[colorIndex][3] * totalLight
 	)
 	
 	love.graphics.line(roadX, screenY, roadX + roadWidth, screenY)
 end
 
 function road.draw(player, entities, segments)
-	local sunLight = daynight:getSunLight()
+	local sunLight = daynight.getSunLight()
 
     -- draw ravine
     if trackHasRavine then
@@ -193,8 +197,8 @@ function road.draw(player, entities, segments)
     -- draw road
     for i = 1, perspective.GROUND_HEIGHT do
         local z = perspective.zMap[i]
-        
-        -- set default color index
+
+		-- set default color index
         local colorIndex = 1
         
         -- toggle colors for horizontal striping effect
@@ -232,18 +236,20 @@ function road.draw(player, entities, segments)
         -- update entities x, y, scale
         entities.setupForDraw(z, screenX, screenY, perspective.scale[i], previousZ, previousScreenX, previousScreenY, previousScale, segment, minLight)
         
+		local sectorLight = lightmap.getSectorLight(z) / 3
+
 		-- draw grass and road elements
         drawGrass(segment.tunnel, segment.crossroads, colorIndex, ravineX, screenY, roadX, minLight, sunLight)
-        drawTarmac(colorIndex, roadX, screenY, roadWidth, minLight, sunLight)
+        drawTarmac(colorIndex, roadX, screenY, roadWidth, minLight, sunLight, sectorLight)
 
         if segment.crosswalk then
             drawCrosswalk(screenX, stripeWidth * 2, screenY, minLight, sunLight)
         elseif colorIndex ~= 1 then
-            drawStripes(screenX, stripeWidth, screenY, minLight, sunLight)
+            drawStripes(screenX, stripeWidth, screenY, minLight, sunLight, sectorLight)
         end
 
         if not (segment.tunnel or segment.crossroads) then
-            drawCurbs(colorIndex, roadX, screenY, curbWidth, roadWidth, minLight, sunLight)
+            drawCurbs(colorIndex, roadX, screenY, curbWidth, roadWidth, minLight, sunLight, sectorLight)
         end
         
         previousZ = z

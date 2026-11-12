@@ -35,7 +35,7 @@ function Pillar:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
 
-	local sunLight = daynight:getSunLight()
+	local sunLight = daynight.getSunLight()
 
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)	

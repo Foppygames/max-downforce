@@ -1,6 +1,7 @@
 require "classes.entity"
 
 local daynight = require("modules.daynight")
+local lightmap = require("modules.lightmap")
 local palette = require("modules.palette")
 
 local POLE_WIDTH = 1
@@ -69,6 +70,9 @@ function Banner:new(x, z, forcedImageIndex)
 		o.poleColor = palette.HEPT32_22
 		o.poleWidth = o.poleWidth * 3
 		o.poleHeight = math.ceil(o.poleHeight * 1.6)
+	-- banner is start
+	elseif forcedImageIndex == 1 then
+		lightmap.addLight(z, 12)
 	end
 	
 	return o
@@ -77,7 +81,7 @@ end
 function Banner:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
-	local sunLight = math.max(self.minLight + 0.1, daynight:getSunLight())
+	local sunLight = math.max(self.minLight + 0.1, daynight.getSunLight())
 	local x1 = newScreenX / imageScale - self.width / 2
 	local y1 = self.screenY / imageScale - self.poleHeight
 

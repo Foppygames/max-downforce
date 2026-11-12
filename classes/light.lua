@@ -1,6 +1,7 @@
 require "classes.entity"
 
 local daynight = require("modules.daynight")
+local lightmap = require("modules.lightmap")
 
 local img = nil
 
@@ -17,7 +18,7 @@ function Light:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
 
-	local sunLight = math.max(self.minLight, daynight:getSunLight())
+	local sunLight = math.max(self.minLight, daynight.getSunLight())
 
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)
@@ -44,6 +45,8 @@ function Light:new(x, z)
 	o.smoothX = true
 	o.baseScale = 16
 	o.solid = false
+
+	lightmap.addLight(z, 6)
 	
 	return o
 end

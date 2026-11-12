@@ -1,6 +1,7 @@
 local aspect = require("modules.aspect")
 local controls = require("modules.controls")
 local daynight = require("modules.daynight")
+local lightmap = require("modules.lightmap")
 local palette = require("modules.palette")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
@@ -212,16 +213,17 @@ function Car:draw()
 		local bodyDegreesChange = -self.steerFactor * MAX_BODY_DEGREES_CHANGE
 		local bodyRotation = bodyDegreesChange * math.pi / 180
 		
-		local sunLight = math.max(self.minLight + 0.06, daynight:getSunLight())
-		local mainColor = {self.color[1] * sunLight, self.color[2] * sunLight, self.color[3] * sunLight}
+		local sunLight = math.max(self.minLight + 0.06, daynight.getSunLight())
+		local sectorLight = lightmap.getSectorLight(self.z) / 2
+		local totalLight = math.min(1, sunLight + sectorLight)
+		local mainColor = {self.color[1] * totalLight, self.color[2] * totalLight, self.color[3] * totalLight}
 		
 		-- draw front wheels
-		love.graphics.setColor(sunLight, sunLight, sunLight)
-
 		local wheelScaleChange = bodyDegreesChange / MAX_BODY_DEGREES_CHANGE * MAX_WHEEL_SCALE_CHANGE
 		local leftWheelScale = 1 + wheelScaleChange
 		local rightWheelScale = 1 - wheelScaleChange
 
+		love.graphics.setColor(totalLight, totalLight, totalLight)
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelLeftDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
 		love.graphics.draw(imgFrontWheel[self.rearWheelIndex], screenX + frontWheelRightDx + perspectiveEffect, screenY + frontWheelDy - accEffect * 2 + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		
@@ -230,7 +232,7 @@ function Car:draw()
 		love.graphics.draw(imgBody, screenX - perspectiveEffect * 0.2, screenY - bodyHeight / 2 + accEffect, bodyRotation, 1, 1, bodyWidth / 2, bodyHeight / 2)
 		
 		-- draw helmet
-		love.graphics.setColor(sunLight, sunLight, sunLight)
+		love.graphics.setColor(totalLight, totalLight, totalLight)
 		love.graphics.draw(imgHelmet, screenX - helmetWidth / 2  - perspectiveEffect * 0.2, screenY - bodyHeight - helmetHeight + accEffect)
 		
 		-- draw air scoop
@@ -238,7 +240,7 @@ function Car:draw()
 		love.graphics.draw(imgAirScoop, screenX - airScoopWidth / 2  - perspectiveEffect * 0.6, screenY - bodyHeight - airScoopHeight + accEffect + math.abs(perspectiveEffect) * 0.02)
 		
 		-- draw rear wheels
-		love.graphics.setColor(sunLight, sunLight, sunLight)
+		love.graphics.setColor(totalLight, totalLight, totalLight)
 		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX - bodyWidth / 2 - rearWheelWidth - perspectiveEffect, screenY - rearWheelHeight + self.leftBumpDy, 0, leftWheelScale, leftWheelScale)
 		love.graphics.draw(imgRearWheel[self.rearWheelIndex], screenX + bodyWidth / 2 - perspectiveEffect, screenY - rearWheelHeight + self.rightBumpDy, 0, rightWheelScale, rightWheelScale)
 		

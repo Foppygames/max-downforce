@@ -2,13 +2,13 @@ require "classes.entity"
 
 local aspect = require("modules.aspect")
 local daynight = require("modules.daynight")
+local lightmap = require("modules.lightmap")
 local palette = require("modules.palette")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 
 local RAVINE_TUNNEL_ROOF_COLOR = palette.HEPT32_20
 
-local colorAngle = 0
 local count = 0
 
 TunnelEnd = Entity:new()
@@ -76,42 +76,38 @@ function TunnelEnd:new(z, trackHasRavine, trackIsInCity, last)
 	count =	count + 1
 
 	o.solid = false
-	o.lamp = (count % 5 == 0)
+	o.lamp = (count % 6 == 0)
 	o.ravine = trackHasRavine
 	o.last = last
+
+	if o.lamp then
+		lightmap.addLight(z, 10)
+	end
 	
-	local sunLight = daynight:getSunLight()
+	local sunLight = daynight.getSunLight()
+	local sectorLight = lightmap.getSectorLight(z) / 6
+	local totalLight = math.min(1, sunLight + sectorLight)
 
 	local color
 
 	if trackHasRavine then
-		color = sunLight * (1.0 - math.cos(math.rad(colorAngle)) * 0.1)
+		color = totalLight
 
 		o.wallColor = {color * road.RAVINE_TUNNEL_WALL_COLOR[1], color * road.RAVINE_TUNNEL_WALL_COLOR[2], color * road.RAVINE_TUNNEL_WALL_COLOR[3]}
 		o.roofColor = {color * RAVINE_TUNNEL_ROOF_COLOR[1], color * RAVINE_TUNNEL_ROOF_COLOR[2], color * RAVINE_TUNNEL_ROOF_COLOR[3]}
 	elseif trackIsInCity then
-		color = sunLight * (1.0 - math.cos(math.rad(colorAngle)) * 0.1)
+		color = sectorLight
 
 		o.wallColor = {color, color, color * 0.6}
 		o.roofColor = {color * 0.95, color * 0.95, color * 0.54}
 	else
-		color = sunLight * (math.cos(math.rad(colorAngle)) / 20)
+		color = math.min(1, sectorLight)
 
-		o.wallColor = {color, color, color * 1.3}
+		o.wallColor = {color * 0.1, color * 0.1, color * 0.2}
 		o.roofColor = o.wallColor
 	end
 
 	o.endColor = {o.wallColor[1] / 2, o.wallColor[2] / 2, o.wallColor[3] / 2}
-	
-	if trackHasRavine then
-		colorAngle = colorAngle + 36
-	else
-		colorAngle = colorAngle + 16
-	end
-
-	if colorAngle > 360 then
-		colorAngle = 0
-	end
 	
 	return o
 end

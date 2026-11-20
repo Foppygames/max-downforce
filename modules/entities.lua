@@ -20,12 +20,12 @@ local perspective = require("modules.perspective")
 local utils = require("modules.utils")
 
 local baseScale = {}
+local city = false
 local images = {}
 local index = nil
 local lap = false
 local list = {}
 local ravine = false
-local city = false
 
 function entities.init()
 	list = {}
@@ -33,9 +33,9 @@ function entities.init()
 end
 
 function entities.reset(trackHasRavine, trackIsInCity)
-	ravine = trackHasRavine
 	city = trackIsInCity
-
+	ravine = trackHasRavine
+	
 	local i = 1
 
 	while i <= #list do

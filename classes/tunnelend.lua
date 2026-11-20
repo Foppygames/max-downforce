@@ -7,21 +7,21 @@ local palette = require("modules.palette")
 local perspective = require("modules.perspective")
 local road = require("modules.road")
 
-local RAVINE_TUNNEL_ROOF_COLOR = palette.HEPT32_20
-
-local count = 0
+local count = 3
+local wallColor
 
 TunnelEnd = Entity:new()
 
-function TunnelEnd.reset()
-	count = 0
+function TunnelEnd.reset(_wallColor)
+	count = 3
+	wallColor = _wallColor
 end
 
 function TunnelEnd:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
 	
-	local wallHeight = 200 * imageScale
+	local wallHeight = 210 * imageScale
 	local wallWidth = 300 * imageScale
 	local roofHeight = 120 * imageScale
 	
@@ -84,29 +84,13 @@ function TunnelEnd:new(z, trackHasRavine, trackIsInCity, last)
 		lightmap.addLight(z, 10)
 	end
 	
-	local sunLight = daynight.getSunLight()
-	local sectorLight = lightmap.getSectorLight(z) / 6
-	local totalLight = math.min(1, sunLight + sectorLight)
+	local light = math.min(1, 0.95 + lightmap.getSectorLight(z) / 20)
+	
+	o.wallColor = {light * wallColor[1], light * wallColor[2], light * wallColor[3]}
+	
+	light = light * 0.90
 
-	local color
-
-	if trackHasRavine then
-		color = totalLight
-
-		o.wallColor = {color * road.RAVINE_TUNNEL_WALL_COLOR[1], color * road.RAVINE_TUNNEL_WALL_COLOR[2], color * road.RAVINE_TUNNEL_WALL_COLOR[3]}
-		o.roofColor = {color * RAVINE_TUNNEL_ROOF_COLOR[1], color * RAVINE_TUNNEL_ROOF_COLOR[2], color * RAVINE_TUNNEL_ROOF_COLOR[3]}
-	elseif trackIsInCity then
-		color = sectorLight
-
-		o.wallColor = {color, color, color * 0.6}
-		o.roofColor = {color * 0.95, color * 0.95, color * 0.54}
-	else
-		color = math.min(1, sectorLight)
-
-		o.wallColor = {color * 0.1, color * 0.1, color * 0.2}
-		o.roofColor = o.wallColor
-	end
-
+	o.roofColor = {light * wallColor[1], light * wallColor[2], light * wallColor[3]}
 	o.endColor = {o.wallColor[1] / 2, o.wallColor[2] / 2, o.wallColor[3] / 2}
 	
 	return o

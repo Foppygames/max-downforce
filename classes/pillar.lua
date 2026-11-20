@@ -34,15 +34,14 @@ end
 function Pillar:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
-
 	local sunLight = daynight.getSunLight()
 
 	love.graphics.push()
 	love.graphics.scale(imageScale, imageScale)	
-	love.graphics.setColor(1, 1, 1, sunLight)
+	love.graphics.setColor(1, 1, 1, sunLight * 0.3)
 	love.graphics.draw(shadowImg, newScreenX / imageScale, self.screenY / imageScale - shadowHalfHeight)
 	
-	local sunLight = math.max(self.minLight, sunLight)
+	sunLight = math.max(0.6, sunLight)
 
 	love.graphics.setColor(sunLight * self.color[1], sunLight * self.color[2], sunLight * self.color[3])
 	love.graphics.draw(self.image, newScreenX / imageScale - self.width / 2, self.screenY / imageScale - self.height)

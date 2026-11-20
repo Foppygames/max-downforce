@@ -139,6 +139,10 @@ function tracks.getTrackCount()
 	return 3
 end
 
+function tracks.getTunnelWallColor()
+	return selectedTrack.TUNNEL_WALL_COLOR
+end
+
 function tracks.hasRavine()
 	return selectedTrack.hasRavine
 end

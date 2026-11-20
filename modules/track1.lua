@@ -23,6 +23,7 @@ track1.TARMAC_COLORS = {
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.22),
 }
+track1.TUNNEL_WALL_COLOR = palette.HEPT32_5
 
 track1.name = "Forest"
 track1.number = 1

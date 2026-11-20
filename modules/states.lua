@@ -29,7 +29,6 @@ local segments = require("modules.segments")
 local sound = require("modules.sound")
 local timer = require("modules.timer")
 local tracks = require("modules.tracks")
-local track1 = require("modules.track1")
 
 local STATE_TITLE = 0
 local STATE_RACE = 1
@@ -321,7 +320,7 @@ local function switchToState(newState)
 		road.reset(tracks)
 		timer.reset(progress, TIME_BEFORE_START)
 
-		TunnelEnd.reset()
+		TunnelEnd.reset(tracks.getTunnelWallColor())
 	
 		setupStartingGrid()
 	end
@@ -470,7 +469,7 @@ function states.update(dt)
 		elseif previousLastSegmentHadTunnel then
 			tunnelWallDistance = 0
 
-			TunnelEnd.reset()
+			TunnelEnd.reset(tracks.getTunnelWallColor())
 		end
 
 		previousLastSegmentHadTunnel = lastSegment.tunnel

@@ -15,6 +15,7 @@ track3.TARMAC_COLORS = {
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.22),
 }
+track3.TUNNEL_WALL_COLOR = palette.HEPT32_15
 
 track3.name = "City"
 track3.number = 3
@@ -37,8 +38,8 @@ track3.segments = {
 			{
 				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
 				startZ = 0,
-				dz = 0.5,
-				count = 2
+				dz = 0,
+				count = 1
 			},
 			{
 				itemType = schedule.ITEM_STADIUM_L,
@@ -126,14 +127,7 @@ track3.segments = {
 	{
 		ddx = 0,
 		length = 1,
-		scheduleItems = {
-			{
-				itemType = schedule.ITEM_BANNER_CITY_LIGHTS,
-				startZ = 0.5,
-				dz = 0.5,
-				count = 4
-			}
-		},
+		scheduleItems = {},
 		tunnel = false
 	},	
 	{

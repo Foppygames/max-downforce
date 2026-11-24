@@ -16,14 +16,41 @@ local function getProgressedColor(color1, color2, progression)
 	}
 end
 
-track1.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
+track1.CURB_COLORS = {
+	palette.HEPT32_24,
+	palette.HEPT32_6
+}
+
 track1.GRASS_COLOR = palette.HEPT32_13
 track1.STRIPE_COLOR = palette.HEPT32_6
+
 track1.TARMAC_COLORS = {
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.22),
 }
+
 track1.TUNNEL_WALL_COLOR = palette.HEPT32_5
+
+track1.HORIZON_EVENING_COLORS = {
+	palette.HEPT32_22,
+	palette.HEPT32_30,
+	palette.HEPT32_31
+}
+
+track1.HORIZON_MORNING_COLORS = {
+	palette.HEPT32_15,
+	palette.HEPT32_16,
+	palette.HEPT32_26,
+	palette.HEPT32_27
+}
+
+track1.SKY_COLORS_DAY = {
+	palette.HEPT32_9
+}
+
+track1.SKY_COLORS_NIGHT = {
+	palette.HEPT32_2
+}
 
 track1.name = "Forest"
 track1.number = 1

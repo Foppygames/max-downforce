@@ -8,14 +8,38 @@ local sound = require("modules.sound")
 
 local FIRST_SEGMENT_LENGTH = 0.55
 
-track3.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
+track3.CURB_COLORS = {
+	palette.HEPT32_24,
+	palette.HEPT32_6
+}
+
 track3.GRASS_COLOR = palette.HEPT32_4
 track3.STRIPE_COLOR = palette.HEPT32_27
+
 track3.TARMAC_COLORS = {
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.22),
 }
+
 track3.TUNNEL_WALL_COLOR = palette.HEPT32_15
+
+track3.HORIZON_EVENING_COLORS = {
+	palette.HEPT32_22,
+	palette.HEPT32_23
+}
+
+track3.HORIZON_MORNING_COLORS = {
+	palette.HEPT32_26,
+	palette.HEPT32_27
+}
+
+track3.SKY_COLORS_DAY = {
+	palette.getProgressedColor(palette.HEPT32_17, palette.HEPT32_9, 0.8)
+}
+
+track3.SKY_COLORS_NIGHT = {
+	palette.getProgressedColor(palette.HEPT32_1, palette.HEPT32_10, 0.2)
+}
 
 track3.name = "City"
 track3.number = 3

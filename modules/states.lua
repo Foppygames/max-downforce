@@ -310,7 +310,7 @@ local function switchToState(newState)
 		afterFinishedTimer = 0
 		previousDisplayTime = nil
 	
-		daynight.reset()
+		daynight.reset(tracks)
 		horizon.reset()
 		lightmap.reset()
 		schedule.reset()
@@ -593,7 +593,7 @@ function states.draw()
 		drawInfoPlayerSpeed()
 		drawInfoCurrentLap()
 		drawInfoTime()
-
+				
 		-- temp: draw daynight time
 		--[[
 		love.graphics.setColor(palette.HEPT32_7)

@@ -24,12 +24,38 @@ local CURVE_RADIUS = CURVE_DIAMETER / 2
 local CURVE_LENGTH = 2 * math.pi * CURVE_RADIUS / 2
 local FIRST_SEGMENT_LENGTH = 0.55
 
-track4.CURB_COLORS = {palette.HEPT32_24, palette.HEPT32_6}
+track4.CURB_COLORS = {
+	palette.HEPT32_24,
+	palette.HEPT32_6
+}
+
 track4.GRASS_COLOR = palette.HEPT32_12
 track4.STRIPE_COLOR = palette.HEPT32_6
+
 track4.TARMAC_COLORS = {
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.18),
 	palette.getProgressedColor(palette.HEPT32_4, palette.HEPT32_28, 0.22),
+}
+
+track4.HORIZON_EVENING_COLORS = {
+	palette.HEPT32_22,
+	palette.HEPT32_30,
+	palette.HEPT32_31
+}
+
+track4.HORIZON_MORNING_COLORS = {
+	palette.HEPT32_15,
+	palette.HEPT32_16,
+	palette.HEPT32_26,
+	palette.HEPT32_27
+}
+
+track4.SKY_COLORS_DAY = {
+	palette.HEPT32_9
+}
+
+track4.SKY_COLORS_NIGHT = {
+	palette.HEPT32_2
 }
 
 track4.name = "Oval"

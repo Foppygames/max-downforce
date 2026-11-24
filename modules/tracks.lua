@@ -111,6 +111,14 @@ function tracks.getGrassColor()
 	return selectedTrack.GRASS_COLOR
 end
 
+function tracks.getHorizonEveningColors()
+	return selectedTrack.HORIZON_EVENING_COLORS
+end
+
+function tracks.getHorizonMorningColors()
+	return selectedTrack.HORIZON_MORNING_COLORS
+end
+
 function tracks.getSelectedTrack()
 	return selectedTrack
 end
@@ -125,6 +133,14 @@ end
 
 function tracks.getSelectedTrackSkyHeight()
 	return selectedTrack.skyHeight
+end
+
+function tracks.getSkyColorsDay()
+	return selectedTrack.SKY_COLORS_DAY
+end
+
+function tracks.getSkyColorsNight()
+	return selectedTrack.SKY_COLORS_NIGHT
 end
 
 function tracks.getStripeColor()

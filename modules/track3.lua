@@ -13,6 +13,8 @@ track3.CURB_COLORS = {
 	palette.HEPT32_6
 }
 
+track3.DEFAULT_TIME = 17.75
+
 track3.GRASS_COLOR = palette.HEPT32_4
 track3.STRIPE_COLOR = palette.HEPT32_27
 
@@ -25,7 +27,8 @@ track3.TUNNEL_WALL_COLOR = palette.HEPT32_15
 
 track3.HORIZON_EVENING_COLORS = {
 	palette.HEPT32_22,
-	palette.HEPT32_23
+	palette.HEPT32_23,
+	palette.HEPT32_30
 }
 
 track3.HORIZON_MORNING_COLORS = {

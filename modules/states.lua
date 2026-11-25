@@ -153,58 +153,60 @@ local function drawTitleScreen()
 		end
 
 		love.graphics.setColor(palette.HEPT32_28)
-		love.graphics.print(string.sub(titleAllCaps, i, i), 17 + i * 10, 6 + dy + 0.5)
+		love.graphics.print(string.sub(titleAllCaps, i, i), 17 + i * 10, 2 + dy + 0.5)
 
 		love.graphics.setColor(frontColor)
-		love.graphics.print(string.sub(titleAllCaps, i, i), 17 + i * 10, 6 + dy)		
+		love.graphics.print(string.sub(titleAllCaps, i, i), 17 + i * 10, 2 + dy)		
 	end
 
 	love.graphics.pop()
 	
 	love.graphics.setColor(palette.HEPT32_10)
-	love.graphics.print(version, 278, 4)
+	--love.graphics.print(version, 278, 4)
+	love.graphics.print(version, 312, 8)
 	
 	love.graphics.setColor(palette.HEPT32_7)
-	love.graphics.print("Written by Robbert Prins", 93, 45)
-	love.graphics.print(sound.MUSIC_CREDITS, sound.MUSIC_CREDITS_X, 65)
+	love.graphics.print("Written by Robbert Prins", 93, 38)
+	love.graphics.print(sound.MUSIC_CREDITS, sound.MUSIC_CREDITS_X, 56)
 	
 	love.graphics.setColor(palette.HEPT32_8)
-	love.graphics.print("T = track " .. tracks.getSelectedTrackNumber() .. "/" .. tracks.getTrackCount() .. ": " .. tracks.getSelectedTrackName(), 93, 90)
-	love.graphics.print("W = windowed / full screen", 93, 105)
-	love.graphics.print("M = music: " .. sound.getMusicEnabledLabel(), 93, 120)
+	love.graphics.print("T = track " .. tracks.getSelectedTrackNumber() .. "/" .. tracks.getTrackCount() .. ": " .. tracks.getSelectedTrackName(), 93, 79)
+	love.graphics.print("D = day night cycle: " .. daynight.getCycleEnabledLabel(), 93, 94)
+	love.graphics.print("W = windowed / full screen", 93, 109)
+	love.graphics.print("M = music: " .. sound.getMusicEnabledLabel(), 93, 124)
 
 	-- more than one control method available
 	if controls.getAvailableCount() > 1 then
-		love.graphics.print("C = controls: " .. controls.getSelected().label, 93, 135)
+		love.graphics.print("C = controls: " .. controls.getSelected().label, 93, 139)
 	-- one control method available (note: assuming there is never less than one)
 	else
 		love.graphics.setColor(palette.HEPT32_7)
-		love.graphics.print("Controls: " .. controls.getSelected().label, 93, 135)
+		love.graphics.print("Controls: " .. controls.getSelected().label, 93, 139)
 	end
 
 	love.graphics.setColor(palette.HEPT32_7)
 
 	if controls.getSelected().type == controls.TYPE_GAMEPAD then
 		if controls.getSelected().config == controls.CONFIG_GAMEPAD_DPAD then
-			love.graphics.draw(imageGamepadDpad, 255, 128)
+			love.graphics.draw(imageGamepadDpad, 255, 132)
 		elseif controls.getSelected().config == controls.CONFIG_GAMEPAD_L then
-			love.graphics.draw(imageGamepadModeL, 255, 128)
+			love.graphics.draw(imageGamepadModeL, 255, 132)
 		elseif controls.getSelected().config == controls.CONFIG_GAMEPAD_R then
-			love.graphics.draw(imageGamepadModeR, 255, 128)
+			love.graphics.draw(imageGamepadModeR, 255, 132)
 		end
 	else
 		if controls.getSelected().config == controls.CONFIG_KEYBOARD_ARROWS then
-			love.graphics.draw(imageKeyboardModeArrows, 255, 120)
+			love.graphics.draw(imageKeyboardModeArrows, 255, 124)
 		elseif controls.getSelected().config == controls.CONFIG_KEYBOARD_AZ_COMMA_PERIOD then
-			love.graphics.draw(imageKeyboardModeAzCommaPeriod, 259, 120)
+			love.graphics.draw(imageKeyboardModeAzCommaPeriod, 259, 124)
 		end
 	end
 
 	love.graphics.setColor(palette.HEPT32_7)
-	love.graphics.print(controls.getSelected().startText, 108 + controls.getSelected().startTextDx, 160)
+	love.graphics.print(controls.getSelected().startText, 108 + controls.getSelected().startTextDx, 162)
 	
 	love.graphics.setColor(palette.HEPT32_27)
-	love.graphics.print("Foppygames 2019-2026", 100, 178)
+	love.graphics.print("Foppygames 2019-2026", 100, 180)
 end
 
 local function drawInfoCurrentLap()
@@ -519,6 +521,10 @@ end
 
 function states.updateKeyPressed(key)
 	if state == STATE_TITLE then
+		if key == "d" then
+			daynight.toggleCycleEnabled()
+		end
+
 		if key == "m" then
 			sound.toggleMusicEnabled()
 		end

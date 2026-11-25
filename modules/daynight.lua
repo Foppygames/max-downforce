@@ -9,6 +9,7 @@ local MAX_TIME = 24
 local SPEED = 0.0166 * 4
 local SUNRISE = 4
 
+local cycleEnabled = true
 local horizonEveningMorningColor
 local horizonEveningColors
 local horizonMorningColors
@@ -16,11 +17,22 @@ local skyColorDay
 local skyColorsDay
 local skyColorNight
 local skyColorsNight
-
 local skyGradient
 local sunHeight
 local sunLight
 local time
+
+function daynight.cycleIsEnabled()
+	return cycleEnabled
+end
+
+function daynight.getCycleEnabledLabel()
+	if cycleEnabled then
+		return "on"
+	end
+
+	return "off"
+end
 
 function daynight.getDisplayTime()
 	local hours = math.floor(time)
@@ -46,18 +58,29 @@ function daynight.getSunLight()
 end
 
 function daynight.reset(tracks)
-	time = math.random(6, 10)
+	if cycleEnabled then
+		time = math.random(8, 10)
+	else
+		time = tracks.getDefaultTime()
+	end
 
 	horizonEveningColors = tracks.getHorizonEveningColors()
 	horizonMorningColors = tracks.getHorizonMorningColors()
 	skyColorsDay = tracks.getSkyColorsDay()
 	skyColorsNight = tracks.getSkyColorsNight()
 
-	daynight.resetColors(true, false)
-	daynight.update(0)
+	if (time > MIN_TIME) and (time <= MID_TIME) then
+		daynight.resetHorizonEveningMorningColor(true, false)	
+	else
+		daynight.resetHorizonEveningMorningColor(false, true)
+	end
+
+	daynight.resetSkyColor(true, true)
+	daynight.updateSun()
+	daynight.updateSkyGradient()
 end
 
-function daynight.resetColors(resetDayColor, resetNightColor)
+function daynight.resetHorizonEveningMorningColor(resetDayColor, resetNightColor)
 	if resetDayColor then
 		horizonEveningMorningColor = horizonMorningColors[math.random(1, #horizonMorningColors)]
 	end
@@ -65,35 +88,43 @@ function daynight.resetColors(resetDayColor, resetNightColor)
 	if resetNightColor then
 		horizonEveningMorningColor = horizonEveningColors[math.random(1, #horizonEveningColors)]
 	end
+end
 
-	if (skyColorDay == nil) or resetDayColor then
+function daynight.resetSkyColor(resetDayColor, resetNightColor)
+	if resetDayColor then
 		skyColorDay = skyColorsDay[math.random(1, #skyColorsDay)]
 	end
 
-	if (skyColorNight == nil) or resetNightColor then
+	if resetNightColor then
 		skyColorNight = skyColorsNight[math.random(1, #skyColorsNight)]
 	end
 end
 
+-- Note: only used while on title screen
+function daynight.toggleCycleEnabled()
+	cycleEnabled = not cycleEnabled
+end
+
 function daynight.update(dt)
-	local oldTime = time
+	if cycleEnabled then
+		local updateTimeResult = daynight.updateTime(dt)
 
-	time = time + SPEED * dt
-
-	if time > MAX_TIME then
-		time = MIN_TIME + time - MAX_TIME
-
-		daynight.resetColors(true, false)
-	elseif oldTime < MID_TIME then
-		if time >= MID_TIME then
-			daynight.resetColors(false, true)
+		if updateTimeResult > 0 then
+			if updateTimeResult == 1 then
+				daynight.resetHorizonEveningMorningColor(true, false)
+				daynight.resetSkyColor(true, false)
+			else
+				daynight.resetHorizonEveningMorningColor(false, true)
+				daynight.resetSkyColor(false, true)
+			end
 		end
-	end
 
-	sunHeight = math.sin((time - 6) / 12 * math.pi)
-	sunLight = math.max(0, sunHeight)
-	
-	-- update sky gradient
+		daynight.updateSun()
+		daynight.updateSkyGradient()
+	end
+end
+
+function daynight.updateSkyGradient()
 	local baseColor = palette.getProgressedColor(skyColorNight, skyColorDay, math.max(0, sunHeight))
 	local horizonColor = baseColor
 	
@@ -110,6 +141,30 @@ function daynight.update(dt)
 		baseColor,
 		horizonColor
     )
+end
+
+function daynight.updateSun()
+	sunHeight = math.sin((time - 6) / 12 * math.pi)
+	sunLight = math.max(0, sunHeight)
+end
+
+-- Returns which colors should be updated: 1 for day colors, 2 for night colors, 0 for no update
+function daynight.updateTime(dt)
+	local oldTime = time
+
+	time = time + SPEED * dt
+
+	if time > MAX_TIME then
+		time = MIN_TIME + time - MAX_TIME
+
+		return 1
+	elseif oldTime < MID_TIME then
+		if time >= MID_TIME then
+			return 2
+		end
+	end
+
+	return 0
 end
 
 return daynight

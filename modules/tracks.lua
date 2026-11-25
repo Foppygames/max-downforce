@@ -107,6 +107,10 @@ function tracks.getCurbColors()
 	return selectedTrack.CURB_COLORS
 end
 
+function tracks.getDefaultTime()
+	return selectedTrack.DEFAULT_TIME
+end
+
 function tracks.getGrassColor()
 	return selectedTrack.GRASS_COLOR
 end

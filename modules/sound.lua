@@ -23,7 +23,7 @@ sound.VOLUME_COUNTDOWN_MIN = 0.3
 sound.VOLUME_COUNTDOWN_MAX = 1.0
 
 -- Note: used to pick music to be used in build
-sound.USE_OFFICIAL_MUSIC = true --false
+sound.USE_OFFICIAL_MUSIC = true
 
 -- use official music by PlayOnLoop.com (excluded from repository)
 if sound.USE_OFFICIAL_MUSIC then
@@ -48,7 +48,7 @@ sound.paths = {}
 sound.sources = {}
 
 local crowdVolume = 0
-local musicEnabled = false --true
+local musicEnabled = true
 
 -- returns source for provided path if created before, nil otherwise
 -- Note: used to avoid duplicate music sources, not used for sound effects

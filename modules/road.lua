@@ -200,8 +200,8 @@ function road.draw(player, entities, segments)
     ravineMinX = nil
 
 	-- minimum light factor decreases towards horizon
-	local deltaMinLight = 0.3 / perspective.GROUND_HEIGHT
-	local minLight = 0.3
+	local deltaMinLight = 0.5 / perspective.GROUND_HEIGHT
+	local minLight = 0.5
 
     -- draw road
     for i = 1, perspective.GROUND_HEIGHT do

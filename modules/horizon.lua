@@ -10,10 +10,8 @@ local tracks = require("modules.tracks")
 local IMAGE_INDEXES_FOREST_TRACK = {1, 2, 3}
 local IMAGE_INDEXES_MOUNTAIN_TRACK = {1, 4, 2, 4}
 local IMAGE_INDEXES_CITY_TRACK = {5, 6}
-
 local SUN_FULL_CIRCLE_LENGTH = aspect.GAME_WIDTH * 4.572
 local SUN_SPEED = 1600
-
 local RAVINE_BACKGROUND_COLOR = palette.HEPT32_3
 
 local image = {}
@@ -28,7 +26,6 @@ local skyHeight
 local drawRavineBackground
 local ravineBackgroundY
 local ravineBackgroundHeight
-
 local imgSun
 local sunX
 
@@ -105,14 +102,16 @@ function horizon.update(playerSegmentDdx, playerSpeed, dt)
 	end
 
 	-- move sun
-	sunX = sunX - SUN_SPEED * playerSegmentDdx * playerSpeed * dt
+	if daynight.cycleIsEnabled then
+		sunX = sunX - SUN_SPEED * playerSegmentDdx * playerSpeed * dt
 
-	if sunX > SUN_FULL_CIRCLE_LENGTH then
-		sunX = -(SUN_FULL_CIRCLE_LENGTH - (sunX - SUN_FULL_CIRCLE_LENGTH))
-	end
+		if sunX > SUN_FULL_CIRCLE_LENGTH then
+			sunX = -(SUN_FULL_CIRCLE_LENGTH - (sunX - SUN_FULL_CIRCLE_LENGTH))
+		end
 
-	if sunX < -SUN_FULL_CIRCLE_LENGTH then
-		sunX = SUN_FULL_CIRCLE_LENGTH + (sunX + SUN_FULL_CIRCLE_LENGTH)
+		if sunX < -SUN_FULL_CIRCLE_LENGTH then
+			sunX = SUN_FULL_CIRCLE_LENGTH + (sunX + SUN_FULL_CIRCLE_LENGTH)
+		end
 	end
 end
 
@@ -120,11 +119,13 @@ function horizon.draw()
 	love.graphics.setColor(1, 1, 1)
 	
 	-- draw sky	
-	love.graphics.draw(daynight:getSkyGradient(), 0, 0, 0, aspect.GAME_WIDTH, skyHeight)
+	love.graphics.draw(daynight.getSkyGradient(), 0, 0, 0, aspect.GAME_WIDTH, skyHeight)
 
 	-- draw sun
-	love.graphics.draw(imgSun, sunX, perspective.HORIZON_Y - daynight.getSunHeight() * perspective.HORIZON_Y)
-	
+	if daynight.cycleIsEnabled() then
+		love.graphics.draw(imgSun, sunX, perspective.HORIZON_Y - daynight.getSunHeight() * perspective.HORIZON_Y)
+	end
+
 	-- draw horizon layers
 	local sunLight = math.max(0.1, daynight.getSunLight())
 

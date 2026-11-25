@@ -21,6 +21,8 @@ track1.CURB_COLORS = {
 	palette.HEPT32_6
 }
 
+track1.DEFAULT_TIME = 12
+
 track1.GRASS_COLOR = palette.HEPT32_13
 track1.STRIPE_COLOR = palette.HEPT32_6
 

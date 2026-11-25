@@ -21,7 +21,7 @@ function TunnelEnd:draw()
 	local imageScale = self:computeImageScale()
 	local newScreenX = self:computeNewScreenX()
 	
-	local wallHeight = 210 * imageScale
+	local wallHeight = 200 * imageScale
 	local wallWidth = 300 * imageScale
 	local roofHeight = 120 * imageScale
 	

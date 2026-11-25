@@ -130,6 +130,14 @@ local function drawGameOverScreen()
 	end
 end
 
+local function getFullScreenLabel()
+	if fullScreen then
+		return "on"
+	end
+
+	return "off"
+end
+
 local function drawTitleScreen()
 	local titleAllCaps = string.upper(title)
 
@@ -172,7 +180,7 @@ local function drawTitleScreen()
 	love.graphics.setColor(palette.HEPT32_8)
 	love.graphics.print("T = track " .. tracks.getSelectedTrackNumber() .. "/" .. tracks.getTrackCount() .. ": " .. tracks.getSelectedTrackName(), 93, 79)
 	love.graphics.print("D = day night cycle: " .. daynight.getCycleEnabledLabel(), 93, 94)
-	love.graphics.print("W = windowed / full screen", 93, 109)
+	love.graphics.print("F = full screen: " .. getFullScreenLabel(), 93, 109)
 	love.graphics.print("M = music: " .. sound.getMusicEnabledLabel(), 93, 124)
 
 	-- more than one control method available
@@ -533,8 +541,9 @@ function states.updateKeyPressed(key)
 			tracks.selectNextTrack()
 		end
 
-		if key == "w" then
+		if key == "f" then
 			fullScreen = not fullScreen
+
 			aspect.init(fullScreen)
 		end
 

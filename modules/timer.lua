@@ -2,9 +2,9 @@ local timer = {}
 
 local utils = require("modules.utils")
 
-local MAX_TIME = 75 -- time available for first lap
+local MAX_TIME = 80 -- time available for first lap
 local MIN_TIME = 55 -- time available for last lap
-local CARRY_FACTOR = 0.1 -- factor of remaining time carried to next lap
+local CARRY_FACTOR = 0.2 -- factor of remaining time carried to next lap
 local TIME_DANGEROUS = 9
 
 local remaining
